@@ -2,8 +2,10 @@ package org.incredible;
 
 import com.google.zxing.NotFoundException;
 import com.google.zxing.WriterException;
+import org.apache.velocity.runtime.directive.Parse;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.CertificateFactory;
+import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
 import org.incredible.certProcessor.views.HTMLGenerator;
 import org.incredible.certProcessor.views.HTMLTemplateProvider;
@@ -50,11 +52,11 @@ public class CertificateGenerator {
     }
 
     private void generateQRCodeForCertificate(CertificateExtension certificateExtension) {
+        AccessCodeGenerator accessCodeGenerator = new AccessCodeGenerator(Double.valueOf(properties.get("ACCESS_CODE_LENGTH")));
         String id = certificateExtension.getId().split("Certificate/")[1];
         File Qrcode;
-        //todo generate n digit code
         QRCodeGenerationModel qrCodeGenerationModel = new QRCodeGenerationModel();
-        qrCodeGenerationModel.setText("123456");
+        qrCodeGenerationModel.setText(accessCodeGenerator.generate());
         qrCodeGenerationModel.setFileName(id);
         qrCodeGenerationModel.setData(certificateExtension.getId() + ".json");
         try {
