@@ -13,7 +13,7 @@ import java.util.List;
  * @author Amit Kumar
  */
 public class Application {
-    private final static String actorSystemName = "thisActorSystem";
+    private final static String actorSystemName = "certActorSystem";
     private static Application instance = new Application();
 
     // private constructor restricted to this class itself
