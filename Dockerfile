@@ -10,4 +10,4 @@ RUN chown -R sunbird:sunbird /home/sunbird
 USER sunbird
 EXPOSE 9000
 WORKDIR /home/sunbird/
-CMD java  -cp '/home/sunbird/cert-service-1.0.0/lib/*' play.core.server.ProdServerStart  /home/sunbird/cert-service-1.0.0
+CMD java  -cp '/home/sunbird/cert-service-1.0.0-SNAPSHOT/lib/*' play.core.server.ProdServerStart  /home/sunbird/cert-service-1.0.0
