@@ -1,29 +1,23 @@
 package controllers;
 
-import akka.actor.ActorRef;
+import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.junit.Test;
-
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.Localizer;
 import org.sunbird.response.Response;
+
+import akka.actor.ActorRef;
 import play.Application;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
-import utils.JsonKey;
-
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 
 @RunWith(PowerMockRunner.class)
@@ -39,7 +33,6 @@ public class BaseControllerTest {
   private org.sunbird.Application application;
   private static ActorRef actorRef;
   private static BaseController baseController;
-  //private OpenSaberApplication openSaberApplication;
 
   public BaseControllerTest() {
     baseControllerTestsetUp();
@@ -54,6 +47,7 @@ public class BaseControllerTest {
     mockRequestHandler();
   }
 
+    
   public void mockRequestHandler() {
 
     try {
@@ -73,24 +67,10 @@ public class BaseControllerTest {
     response.put("ResponseCode", "success");
     return response;
   }
-
-
+  
   @Test
-  public void testJsonifyResponseSuccess() {
-    Response response = new Response();
-    BaseController controller = new BaseController();
-    response.put(JsonKey.MESSAGE, localizer.getMessage(IResponseMessage.INTERNAL_ERROR,null));
-    String jsonifyResponse = controller.jsonify(response);
-    assertEquals(
-            "{\"id\":null,\"ver\":null,\"ts\":null,\"params\":null,\"responseCode\":\"OK\",\"result\":{\"message\":\"Process failed,please try again later.\"}}", jsonifyResponse);
-  }
-
-  @Test
-  public void testJsonifyResponseFailure() {
-    Response response = new Response();
-    BaseController controller = new BaseController();
-    response.put(JsonKey.MESSAGE, response.getResult());
-    String jsonifyResponse = controller.jsonify(response);
-    assertEquals(StringUtils.EMPTY, jsonifyResponse);
+  public void getTimeStampSuccess() {
+	 Long val = new BaseController().getTimeStamp();
+	 Assert.assertTrue(val<=System.currentTimeMillis());
   }
 }

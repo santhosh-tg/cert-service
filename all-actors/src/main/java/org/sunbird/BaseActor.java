@@ -15,7 +15,7 @@ public abstract class BaseActor extends UntypedAbstractActor {
 
     public abstract void onReceive(Request request) throws Throwable;
     protected Localizer localizer = Localizer.getInstance();
-
+   
     @Override
     public void onReceive(Object message) throws Throwable {
         if (message instanceof Request) {

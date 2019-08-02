@@ -7,6 +7,10 @@ import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Result;
 import play.mvc.Results;
@@ -55,12 +59,12 @@ public class RequestHandler extends BaseController {
     public static CompletionStage<Result> handleFailureResponse(Object exception, HttpExecutionContext httpExecutionContext) {
 
         Response response = new Response();
-        CompletableFuture<String> future = new CompletableFuture<>();
+        CompletableFuture<JsonNode> future = new CompletableFuture<>();
         if (exception instanceof BaseException) {
             BaseException ex = (BaseException) exception;
             response.setResponseCode(ResponseCode.BAD_REQUEST);
             response.put(JsonKey.MESSAGE, ex.getMessage());
-            future.complete(jsonify(response));
+            future.complete(Json.toJson(response));
             if (ex.getResponseCode() == Results.badRequest().status()) {
                 return future.thenApplyAsync(Results::badRequest, httpExecutionContext.current());
             } else {
@@ -69,7 +73,7 @@ public class RequestHandler extends BaseController {
         } else {
             response.setResponseCode(ResponseCode.SERVER_ERROR);
             response.put(JsonKey.MESSAGE,localizerObject.getMessage(IResponseMessage.INTERNAL_ERROR,null));
-            future.complete(jsonify(response));
+            future.complete(Json.toJson(response));
             return future.thenApplyAsync(Results::internalServerError, httpExecutionContext.current());
         }
     }
@@ -98,8 +102,8 @@ public class RequestHandler extends BaseController {
      */
 
     public static CompletionStage<Result> handleSuccessResponse(Response response, HttpExecutionContext httpExecutionContext) {
-        CompletableFuture<String> future = new CompletableFuture<>();
-        future.complete(jsonify(response));
+        CompletableFuture<JsonNode> future = new CompletableFuture<>();
+        future.complete(Json.toJson(response));
         return future.thenApplyAsync(Results::ok, httpExecutionContext.current());
     }
 }

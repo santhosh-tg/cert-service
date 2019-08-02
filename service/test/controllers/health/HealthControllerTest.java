@@ -4,6 +4,7 @@ import controllers.BaseControllerTest;
 import controllers.TestHelper;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import play.Application;
 import play.mvc.Result;
@@ -35,6 +36,8 @@ public class HealthControllerTest extends BaseControllerTest {
         app = null;
         testHelper = null;
     }
+    
+    @Ignore
     @Test
     public void testGetHealthSuccess() {
         Map<String, Object> reqMap = new HashMap<>();
