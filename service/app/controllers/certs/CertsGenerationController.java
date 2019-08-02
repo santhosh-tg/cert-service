@@ -2,9 +2,11 @@ package controllers.certs;
 
 import java.util.concurrent.CompletionStage;
 
+import org.sunbird.BaseException;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 
 import controllers.BaseController;
+import org.sunbird.request.Request;
 import play.mvc.Result;
 
 /**
@@ -13,15 +15,21 @@ import play.mvc.Result;
  *
  */
 public class CertsGenerationController  extends BaseController{
-	
-	
+
+
 	/**
-	   * This method will accept request for certificate generation. 
+	   * This method will accept request for certificate generation.
 	   * it will do request validation and processing of request.
 	   * @return a CompletableFuture of success response
 	   */
 	  public CompletionStage<Result> generateCerificate() {
-		CompletionStage<Result> response = handleRequest(request(),null,CertActorOperation.GENERATE_CERTIFICATE.getOperation());
+		CompletionStage<Result> response = handleRequest(request(),
+				request -> {
+					Request req = (Request) request;
+					new CertValidator().validateGenerateCertRequest(req);
+					return null;
+					},
+				CertActorOperation.GENERATE_CERTIFICATE.getOperation());
 	    return response;
 	  }
 	

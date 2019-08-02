@@ -29,5 +29,16 @@ public interface JsonKey {
   String ERRORS = "errors";
   String SUCCESS = "success";
 
+  String CERTIFICATE = "certificate";
+  String RECIPIENT_NAME = "recipientName";
+  String COURSE_NAME = "courseName";
+  String NAME = "name";
+  String HTML_TEMPLATE = "htmlTemplate";
+  String TAG = "tag";
+  String ISSUER = "issuer";
+  String URL = "url";
+  String SIGNATORY_LIST = "signatoryList";
+  String DESIGNATION = "designation";
+
 
 }
