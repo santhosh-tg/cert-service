@@ -31,9 +31,9 @@
     </properties>
 
     <modules>
-        <module>certgen</module> 
-        <module>all-actors</module>
+        <module>certgen</module>
         <module>sb-actor</module>
+        <module>all-actors</module>
         <module>service</module>
     </modules>
 </project>

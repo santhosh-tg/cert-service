@@ -5,10 +5,11 @@ package org.sunbird.message;
  *
  * @author Amit Kumar
  */
-public interface IResponseMessage extends IUserResponseMessage, IOrgResponseMessage {
+public interface IResponseMessage {
 
   String INVALID_REQUESTED_DATA = "INVALID_REQUESTED_DATA";
   String INVALID_OPERATION_NAME = "INVALID_OPERATION_NAME";
   String INTERNAL_ERROR = "INTERNAL_ERROR";
   String UNAUTHORIZED = "UNAUTHORIZED";
+  String MANDATORY_PARAMETER_MISSING = "Mandatory parameter {0} is missing.";
 }

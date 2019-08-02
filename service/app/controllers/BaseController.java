@@ -2,7 +2,6 @@ package controllers;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
 import javax.inject.Inject;
 
 import akka.actor.ActorRef;
@@ -12,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.log4j.Logger;
 import org.sunbird.Application;
 import org.sunbird.BaseException;
+import org.sunbird.RequestValidatorFunction;
 import org.sunbird.message.Localizer;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
@@ -44,7 +44,7 @@ public class BaseController extends Controller {
 	public static final String RESPONSE = "Response";
 	public static final String SUCCESS = "Success";
 
-	
+
 	public CompletionStage<Result> handleRequest() {
 		startTrace("handelRequest");
 		CompletableFuture<JsonNode> future = new CompletableFuture<>();
@@ -98,7 +98,7 @@ public class BaseController extends Controller {
 	 * @param operation
 	 * @return
 	 */
-	public CompletionStage<Result> handleRequest(play.mvc.Http.Request req, Function validatorFunction,
+	public CompletionStage<Result> handleRequest(play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
 			String operation) {
 		try {
 			Request request = new Request();
