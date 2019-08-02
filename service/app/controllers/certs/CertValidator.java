@@ -52,7 +52,7 @@ public class CertValidator {
                     ResponseCode.CLIENT_ERROR.getCode());
         }
         for(Map<String, Object> map:data){
-            checkMandatoryParamsPresent(map,keys,parentKey);
+            checkChildrenMapMandatoryParams(map,keys,parentKey);
         }
 
     }
@@ -64,10 +64,10 @@ public class CertValidator {
                     MessageFormat.format(IResponseMessage.MANDATORY_PARAMETER_MISSING,parentKey),
                     ResponseCode.CLIENT_ERROR.getCode());
         }
-        checkMandatoryParamsPresent(data,keys,parentKey);
+        checkChildrenMapMandatoryParams(data,keys,parentKey);
     }
 
-    private static void checkMandatoryParamsPresent(Map<String, Object> data,List<String> keys, String parentKey) throws BaseException {
+    private static void checkChildrenMapMandatoryParams(Map<String, Object> data,List<String> keys, String parentKey) throws BaseException {
 
         for (String key : keys) {
             if (StringUtils.isEmpty((String) data.get(key))) {
