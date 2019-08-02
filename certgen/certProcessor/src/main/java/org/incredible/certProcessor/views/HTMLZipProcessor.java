@@ -95,8 +95,6 @@ public class HTMLZipProcessor extends HTMLTemplateProvider {
         try {
             IOUtils.copy(inputStream, writer, "UTF-8");
             content = writer.toString();
-            System.out.println(content);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
