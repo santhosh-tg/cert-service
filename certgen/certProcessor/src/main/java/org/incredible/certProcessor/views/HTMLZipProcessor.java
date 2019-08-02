@@ -90,7 +90,7 @@ public class HTMLZipProcessor extends HTMLTemplateProvider {
         return content;
     }
 
-    void convertToString(InputStream inputStream) {
+   private void convertToString(InputStream inputStream) {
         StringWriter writer = new StringWriter();
         try {
             IOUtils.copy(inputStream, writer, "UTF-8");
