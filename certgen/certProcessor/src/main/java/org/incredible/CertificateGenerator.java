@@ -2,7 +2,6 @@ package org.incredible;
 
 import com.google.zxing.NotFoundException;
 import com.google.zxing.WriterException;
-import org.apache.velocity.runtime.directive.Parse;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.CertificateFactory;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
@@ -24,17 +23,11 @@ import java.util.HashMap;
 public class CertificateGenerator {
 
 
-    /**
-     * context file url
-     **/
-    private final String context;
-
     private static Logger logger = LoggerFactory.getLogger(CertificateFactory.class);
 
     private HashMap<String, String> properties;
 
-    public CertificateGenerator(String context, HashMap<String, String> properties) {
-        this.context = context;
+    public CertificateGenerator(HashMap<String, String> properties) {
         this.properties = properties;
     }
 
@@ -42,7 +35,7 @@ public class CertificateGenerator {
 
 
     public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider) throws InvalidDateFormatException {
-        CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, context, properties);
+        CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties);
         generateQRCodeForCertificate(certificateExtension);
         if (htmlTemplateProvider.checkHtmlTemplateIsValid(htmlTemplateProvider.getTemplateContent())) {
             HTMLGenerator htmlGenerator = new HTMLGenerator(htmlTemplateProvider.getTemplateContent());

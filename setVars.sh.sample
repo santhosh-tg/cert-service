@@ -7,8 +7,9 @@ export ASSESSED_DOMAIN=http://localhost:8080/_schemas/extensions/AssessedEvidenc
 export BADGE_URL=http://localhost:8080/_schemas/Badge.json
 export ISSUER_URL=http://localhost:8080/_schemas/Issuer.json
 export TEMPLATE_URL=http://localhost:8080/_schemas/template.html
-export CONTEXT=http://localhost:8080/_schemas
+export CONTEXT=http://localhost:8080/_schemas/context.json
 export VERIFICATION_TYPE=SignedBadge
+export PUBLIC_KEY_URL=http://localhost:8080/_schemas/publicKey.json
 
 export CONTAINER_NAME=certs
 export CLOUD_STORAGE_TYPE=azure

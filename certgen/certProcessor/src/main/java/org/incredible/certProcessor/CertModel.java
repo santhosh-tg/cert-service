@@ -36,6 +36,7 @@ public class CertModel {
     private String expiry;
     private Profile[] signatoryList;
     private String assessedOn;
+    private String identifier;
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -158,6 +159,14 @@ public class CertModel {
     }
 
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
     @Override
     public String toString() {
         String stringRep = null;
@@ -168,4 +177,5 @@ public class CertModel {
         }
         return stringRep;
     }
+
 }

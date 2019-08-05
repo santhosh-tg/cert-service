@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.incredible.pojos.ob.SignedVerification;
 import org.incredible.pojos.ob.VerificationObject;
 import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.slf4j.Logger;
@@ -34,37 +35,33 @@ public class CertificateFactory {
 
     private static SignatureHelper signatureHelper;
 
-    public CertificateExtension createCertificate(CertModel certModel, String context, HashMap<String, String> properties) throws InvalidDateFormatException {
+    public CertificateExtension createCertificate(CertModel certModel, HashMap<String, String> properties) throws InvalidDateFormatException {
 
         uuid = properties.get("DOMAIN_PATH") + UUID.randomUUID().toString();
 
-        CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(context);
-        CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(context);
-        BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(context);
-        AssessedEvidenceBuilder assessedEvidenceBuilder = new AssessedEvidenceBuilder(properties.get("ASSESSED_DOMAIN"));
-        IssuerBuilder issuerBuilder = new IssuerBuilder(context);
-        SignatureBuilder signatureBuilder = new SignatureBuilder();
+        CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(properties.get("CONTEXT"));
+        CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(properties.get("CONTEXT"));
+        BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(properties.get("CONTEXT"));
+        IssuerBuilder issuerBuilder = new IssuerBuilder(properties.get("CONTEXT"));
+        SignedVerification signedVerification = new SignedVerification();
 
 
         Criteria criteria = new Criteria();
         criteria.setNarrative("For exhibiting outstanding performance");
         criteria.setId(uuid);
 
-        RankAssessment rankAssessment = new RankAssessment();
-        rankAssessment.setValue(8);
-        rankAssessment.setMaxValue(1);
-
 
         //todo decide hosted or signed badge based on config
-
-        String[] type = new String[]{properties.get("VERIFICATION_TYPE")};
-        VerificationObject verificationObject = new VerificationObject();
-        verificationObject.setType(type);
+        if (properties.get("VERIFICATION_TYPE").equals("hosted")) {
+            signedVerification.setType(new String[]{properties.get("VERIFICATION_TYPE")});
+        } else {
+            signedVerification.setCreator(properties.get("PUBLIC_KEY_URL"));
+        }
 
         /**
          *  recipent object
          *  **/
-        compositeIdentityObjectBuilder.setName(certModel.getRecipientName()).setId(certModel.getRecipientPhone())
+        compositeIdentityObjectBuilder.setName(certModel.getRecipientName()).setId(certModel.getIdentifier())
                 .setHashed(false).
                 setType(new String[]{"phone"});
 
@@ -79,24 +76,14 @@ public class CertificateFactory {
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
 
-
-        /**
-         *  assessed evidence object
-         **/
-        AssessmentBuilder assessmentBuilder = new AssessmentBuilder(context);
-        assessmentBuilder.setValue(21);
-
-        assessedEvidenceBuilder.setAssessedBy("https://dgt.example.gov.in/iti-assessor.json").setId(uuid)
-                .setAssessedOn(certModel.getAssessedOn()).setAssessment(assessmentBuilder.build());
-
         /**
          *
          * Certificate extension object
          */
         certificateExtensionBuilder.setId(uuid).setRecipient(compositeIdentityObjectBuilder.build())
-                .setBadge(badgeClassBuilder.build()).setEvidence(assessedEvidenceBuilder.build())
+                .setBadge(badgeClassBuilder.build())
                 .setIssuedOn(certModel.getIssuedDate()).setExpires(certModel.getExpiry())
-                .setValidFrom(certModel.getValidFrom()).setVerification(verificationObject);
+                .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification);
 
 
 //        /**
