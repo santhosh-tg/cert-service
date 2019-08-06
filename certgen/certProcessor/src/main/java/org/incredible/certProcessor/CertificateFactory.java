@@ -1,10 +1,8 @@
 package org.incredible.certProcessor;
 
 import org.incredible.builders.*;
-import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.signature.SignatureHelper;
 import org.incredible.pojos.CertificateExtension;
-import org.incredible.pojos.RankAssessment;
 import org.incredible.pojos.ob.Criteria;
 
 import java.io.IOException;
@@ -14,12 +12,11 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
 import org.incredible.pojos.ob.SignedVerification;
-import org.incredible.pojos.ob.VerificationObject;
 import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +32,7 @@ public class CertificateFactory {
 
     private static SignatureHelper signatureHelper;
 
-    public CertificateExtension createCertificate(CertModel certModel, HashMap<String, String> properties) throws InvalidDateFormatException {
+    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties) throws InvalidDateFormatException {
 
         uuid = properties.get("DOMAIN_PATH") + UUID.randomUUID().toString();
 
@@ -63,7 +60,7 @@ public class CertificateFactory {
          *  **/
         compositeIdentityObjectBuilder.setName(certModel.getRecipientName()).setId(certModel.getIdentifier())
                 .setHashed(false).
-                setType(new String[]{"phone"});
+                setType(new String[]{"Identifier"});
 
 
         issuerBuilder.setId(properties.get("ISSUER_URL")).setName(certModel.getIssuer().getName());
@@ -83,7 +80,7 @@ public class CertificateFactory {
         certificateExtensionBuilder.setId(uuid).setRecipient(compositeIdentityObjectBuilder.build())
                 .setBadge(badgeClassBuilder.build())
                 .setIssuedOn(certModel.getIssuedDate()).setExpires(certModel.getExpiry())
-                .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification);
+                .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification).setSignatory(certModel.getSignatoryList());
 
 
 //        /**

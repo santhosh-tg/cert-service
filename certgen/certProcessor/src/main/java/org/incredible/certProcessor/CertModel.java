@@ -34,7 +34,7 @@ public class CertModel {
     private Issuer issuer;
     private String validFrom;
     private String expiry;
-    private Profile[] signatoryList;
+    private Issuer[] signatoryList;
     private String assessedOn;
     private String identifier;
 
@@ -116,11 +116,11 @@ public class CertModel {
         return this;
     }
 
-    public Profile[] getSignatoryList() {
+    public Issuer[] getSignatoryList() {
         return signatoryList;
     }
 
-    public void setSignatoryList(Profile[] signatoryList) {
+    public void setSignatoryList(Issuer[] signatoryList) {
         this.signatoryList = signatoryList;
     }
 

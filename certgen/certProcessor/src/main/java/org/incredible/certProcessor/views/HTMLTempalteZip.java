@@ -29,7 +29,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     private static final int bufferSize = 4096;
 
     /**
-     * This  method is to download a zip file from the URL in the specified target directory.
+     *  download a zip file from the URL in the specified target directory.
      *
      * @param targetDirectory
      * @throws IOException
@@ -48,7 +48,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     }
 
     /**
-     * This method is used to Extract each file in the zipEntry (zipFile)
+     * To Extract each file in the zipEntry (zipFile)
      *
      * @param inputStream
      * @param outputStream
@@ -66,7 +66,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     }
 
     /**
-     * This method is to unzip the zip file
+     *  unzip the zip file
      *
      * @param zip             zip file to extract
      * @param targetDirectory directory to store Unzip files
@@ -101,7 +101,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     }
 
     /**
-     * This method is used to check whether the directory exists or not, if not it creates the directory
+     * Creates a directory if it not exists
      *
      * @param file file to check is exists or not
      * @return
@@ -111,7 +111,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     }
 
     /**
-     * This method is used to get Html file content in string format
+     *  get Html file content in string format
      *
      * @return html string
      */
@@ -129,7 +129,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     }
 
     /**
-     * This method is used to convert file inputstream to string
+     *  convert file inputstream to string
      *
      * @param inputStream
      */
@@ -144,7 +144,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     }
 
     /**
-     * This method is to check the number of .html extension files present is a zip file
+     *  to check the number of .html extension files present is a zip file
      *
      * @param ZipEntries
      * @return
