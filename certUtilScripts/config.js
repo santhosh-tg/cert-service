@@ -2,7 +2,7 @@ const config = {
     "issuer": {
         "name": "" || process.env.ISSUER_NAME,
         "url": "" || process.env.ISSUER_URL,
-        "description": "" || process.env.ISSUER_DESCRIPTION,
+        "email": "" || process.env.ISSUER_EMAIL,
         "type": "Issuer",
         "image": "" || process.env.ISSUER_IMAGE,
         "publicKey": [""] || [process.env.PUBLICKEY_URL]

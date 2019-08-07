@@ -16,7 +16,7 @@ var issuer = {
     "type": "Issuer",
     "id": config.domainUrl + "/issuer.json",
     "name": config.issuer.name,
-    "description": config.issuer.description,
+    "email": config.issuer.email
     "url": config.issuer.url, 
     "image": config.issuer.image,
     "publicKey": config.issuer.publicKey
