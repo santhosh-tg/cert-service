@@ -60,7 +60,7 @@ public class CertificateFactory {
          *  **/
         compositeIdentityObjectBuilder.setName(certModel.getRecipientName()).setId(certModel.getIdentifier())
                 .setHashed(false).
-                setType(new String[]{"Identifier"});
+                setType(new String[]{"id"});
 
 
         issuerBuilder.setId(properties.get("ISSUER_URL")).setName(certModel.getIssuer().getName());
@@ -72,6 +72,7 @@ public class CertificateFactory {
                 .setId(properties.get("BADGE_URL")).setCriteria(criteria)
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
+
 
         /**
          *
