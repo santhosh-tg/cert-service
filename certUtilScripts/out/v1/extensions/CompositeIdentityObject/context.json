@@ -1,0 +1,25 @@
+{
+  "title": "CompositeIdentityObject",
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+    "obi": "https://w3id.org/openbadges#",
+    "compositeIdentityObject": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/CompositeIdentityObject#",
+    "schema": "http://schema.org/",
+    "components": "compositeIdentityObject:components",
+    "type": "compositeIdentityObject:type",
+    "name": "compositeIdentityObject:name",
+    "photo": "compositeIdentityObject:photo",
+    "dob": "compositeIdentityObject:dob",
+    "gender": "compositeIdentityObject:gender",
+    "tag": "compositeIdentityObject:tag",
+    "urn": "compositeIdentityObject:urn",
+    "url": "compositeIdentityObject:url"
+  },
+  "obi:validation": [
+    {
+      "obi:validatesType": "extensions:CompositeIdentityObject",
+      "obi:validationSchema": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/CompositeIdentityObject/schema.json"
+    }
+  ]
+}
