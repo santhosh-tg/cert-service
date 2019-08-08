@@ -16,12 +16,13 @@ public class PdfConverter {
 
         File file = new File(id + ".pdf");
         try {
-            ConverterProperties converterProperties = new ConverterProperties();
-            PdfWriter pdfWriter = new PdfWriter(file);
-            PdfDocument pdfDocument = new PdfDocument(pdfWriter);
-            pdfDocument.setDefaultPageSize(PageSize.A4.rotate());
-            HtmlConverter.convertToPdf(new FileInputStream(htmlSource),
-                    pdfDocument, converterProperties);
+//            ConverterProperties converterProperties = new ConverterProperties();
+//            PdfWriter pdfWriter = new PdfWriter(file);
+//            PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+//            pdfDocument.setDefaultPageSize(PageSize.A4.rotate());
+//            HtmlConverter.convertToPdf(new FileInputStream(htmlSource),
+//                    pdfDocument, converterProperties);
+            HtmlConverter.convertToPdf(htmlSource, file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
