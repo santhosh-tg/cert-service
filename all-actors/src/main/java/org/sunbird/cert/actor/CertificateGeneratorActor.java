@@ -76,12 +76,12 @@ public class CertificateGeneratorActor extends BaseActor {
 		for(CertModel certModel : certModelList){
 			String certUUID = "";
 			try {
-				//certUUID = certificateGenerator.createCertificate(certModel,htmlTempalteZip);
+				certUUID = certificateGenerator.createCertificate(certModel,htmlTempalteZip);
 			} catch (Exception ex) {
 				logger.info("CertificateGeneratorActor : generateCertificate :Exception Occurred while generating certificate.",ex);
 				throw new  BaseException("INVALID_REQUESTED_DATA", IResponseMessage.INVALID_REQUESTED_DATA, ResponseCode.CLIENT_ERROR.getCode());
 			}
-			//certUrlList.add(uploadCertificate(certUUID));
+			certUrlList.add(uploadCertificate(certUUID));
 		}
 		Response response = new Response();
 		response.getResult().put("response", certUrlList);
