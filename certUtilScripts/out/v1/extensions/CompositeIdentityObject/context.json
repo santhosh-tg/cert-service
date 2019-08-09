@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "compositeIdentityObject": "https://www.sunbirdev.org/certs/v1/extensions/CompositeIdentityObject#",
+    "compositeIdentityObject": "https://dev.sunbirdev.org/certs/v1/extensions/CompositeIdentityObject#",
     "schema": "http://schema.org/",
     "components": "compositeIdentityObject:components",
     "name": "compositeIdentityObject:name",
@@ -18,7 +18,7 @@
   "obi:validation": [
     {
       "obi:validatesType": "extensions:CompositeIdentityObject",
-      "obi:validationSchema": "https://www.sunbirdev.org/certs/v1/extensions/CompositeIdentityObject/schema.json"
+      "obi:validationSchema": "https://dev.sunbirdev.org/certs/v1/extensions/CompositeIdentityObject/schema.json"
     }
   ]
 }
