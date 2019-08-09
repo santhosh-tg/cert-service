@@ -2,32 +2,30 @@ const config = require("./config.js");
 var fs = require('fs');
 
 var badge = {
-    "id":  config.domainUrl + config.badge.batchId + "/badge.json",
+    "id": config.domainUrl + "/" + process.env.CONTAINER_NAME+ "/"+ process.env.ROOT_ORG_ID + "/" + config.badge.batchId + "/badge.json",
     "type": "BadgeClass",
-    "@context": process.env.PROTO + process.env.DOMAIN_URL + "/" + process.env.CONTAINER_NAME + "container/v1context.json",
+    "@context": config.domainUrl + "/" + process.env.CONTAINER_NAME + "container/v1/context.json",
     "name": config.badge.name,
     "description": config.badge.description,
     "image": config.badge.image,
     "criteria": config.badge.criteria,
-    "issuer": config.domainUrl + process.env.ROOT_ORG_ID + "/issuer.json"
+    "issuer": config.domainUrl + "/" +process.env.CONTAINER_NAME+ "/"+ process.env.ROOT_ORG_ID + "/issuer.json"
 }
 var issuer = {
-    "@context": config.contextUrl,
+    "@context": config.domainUrl + "/" + process.env.CONTAINER_NAME + "container/v1/context.json",
     "type": "Issuer",
-    "id": config.domainUrl + process.env.ROOT_ORG_ID + "/issuer.json",
+    "id": config.domainUrl + "/" + process.env.CONTAINER_NAME+ "/"+ process.env.ROOT_ORG_ID + "/issuer.json",
     "name": config.issuer.name,
-    "email": config.issuer.email,
-    "url": config.issuer.url, 
-    "image": config.issuer.image,
+    "url": config.issuer.url,
     "publicKey": config.issuer.publicKey
 }
 
 
 var publicKey = {
-    "@context": config.contextUrl,
+    "@context": config.domainUrl + "/" + process.env.CONTAINER_NAME + "container/v1/context.json",
     "type": "CryptographicKey",
-    "id": config.domainUrl + "/" + process.env.ROOT_ORG_ID + "_publickey.json",
-    "owner": config.domainUrl + "/" + process.env.ROOT_ORG_ID + "_issuer.json",
+    "id": config.domainUrl + "/" + process.env.CONTAINER_NAME+ "/"+ process.env.ROOT_ORG_ID + "_publickey.json",
+    "owner": config.domainUrl + "/" +  process.env.CONTAINER_NAME+ "/"+process.env.ROOT_ORG_ID + "_issuer.json",
     "publicKeyPem": ""
 }
 
@@ -35,6 +33,10 @@ var outDirName = "./out";
 
 var methods = {
     createPublicKeyJson: function () {
+        let publicDir = outDirName + "/" + process.env.ROOT_ORG_ID
+        if (!fs.existsSync(publicDir)) {
+            fs.mkdirSync(publicDir);
+        }
         if (writeToFile(outDirName + "/" + process.env.ROOT_ORG_ID + "_publicKey.json", publicKey)) {
             console.log("publicKey json is created")
         }

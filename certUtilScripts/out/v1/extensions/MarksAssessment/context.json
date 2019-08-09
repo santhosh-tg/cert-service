@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "marksAssessment": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/MarksAssessment#",
+    "marksAssessment": "https://localhost/ecreds/v1/extensions/MarksAssessment#",
     "schema": "http://schema.org/",
     "minValue": "marksAssessment:minValue",
     "maxValue": "marksAssessment:maxValue",
@@ -13,7 +13,7 @@
   "obi:validation": [
     {
       "obi:validatesType": "extensions:MarksAssessment",
-      "obi:validationSchema": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/MarksAssessment/schema.json"
+      "obi:validationSchema": "https://localhost/ecreds/v1/extensions/MarksAssessment/schema.json"
     }
   ]
 }

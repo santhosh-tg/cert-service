@@ -4,15 +4,14 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "assessment": "https://localhost/container/v1/_schemas/Extensions/Assessment#",
+    "assessment": "https://localhost/container/v1/extensions/Assessment#",
     "schema": "http://schema.org/",
-    "type": "assessedEvidence:type",
     "value": "assessedEvidence:value"
   },
   "obi:validation": [
     {
       "obi:validatesType": "extensions:Assessment",
-      "obi:validationSchema": "https://localhost/container/v1/_schemas/Extensions/Assessment/schema.json"
+      "obi:validationSchema": "https://localhost/container/extensions/Assessment/schema.json"
     }
   ]
 }

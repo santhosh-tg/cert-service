@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "certificateExtension": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/CertificateExtensions#",
+    "certificateExtension": "https://localhost/ecreds/v1/extensions/CertificateExtensions#",
     "schema": "http://schema.org/",
     "awardedThrough": "certificateExtension:awardedThrough",
     "signatory": "certificateExtension:signatory",
@@ -15,7 +15,7 @@
   "obi:validation": [
     {
       "obi:validatesType": "extensions:CertificateExtension",
-      "obi:validationSchema": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/CertificateExtension/schema.json"
+      "obi:validationSchema": "https://localhost/ecreds/v1/extensions/CertificateExtension/schema.json"
     }
   ]
 }

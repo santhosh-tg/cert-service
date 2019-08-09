@@ -4,9 +4,9 @@
 
 # The environment where this is being used.
 export PROTO=https://
-export DOMAINL=dev.sunbirded.org
+export DOMAIN=dev.sunbirded.org
 
-# Bage related
+# Badge related
 export BADGE_NAME="Course Completion Certificate"
 export BADGE_DESCRIPTION="Successfully completed course on Sunbird"
 export BADGE_IMAGE=""

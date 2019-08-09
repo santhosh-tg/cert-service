@@ -25,11 +25,12 @@ public class StorageParams {
         if (StringUtils.equalsIgnoreCase(cloudStoreType, "azure")) {
             String storageKey = properties.get("AZURE_STORAGE_KEY");
             String storageSecret = properties.get("AZURE_STORAGE_SECRET");
-            storageService = StorageServiceFactory.getStorageService(new StorageConfig(cloudStoreType, storageKey, storageSecret));
-        } else if (StringUtils.equalsIgnoreCase(cloudStoreType, "aws")) {
-            String storageKey = properties.get("AWS_STORAGE_KEY");
-            String storageSecret = properties.get("AWS_STORAGE_SECRET");
-            storageService = StorageServiceFactory.getStorageService(new StorageConfig(cloudStoreType, storageKey, storageSecret));
+            StorageConfig storageConfig = new StorageConfig(cloudStoreType, storageKey, storageSecret);
+            storageService = StorageServiceFactory.getStorageService(storageConfig);
+            } else if (StringUtils.equalsIgnoreCase(cloudStoreType, "aws")) {
+                String storageKey = properties.get("AWS_STORAGE_KEY");
+                String storageSecret = properties.get("AWS_STORAGE_SECRET");
+                storageService = StorageServiceFactory.getStorageService(new StorageConfig(cloudStoreType, storageKey, storageSecret));
         } else {
 //            throw new ServerException("ERR_INVALID_CLOUD_STORAGE Error while initialising cloud storage");
         }

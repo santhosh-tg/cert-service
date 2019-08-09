@@ -4,14 +4,14 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "rankAssessment": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/RankAssessment#",
+    "rankAssessment": "https://localhost/ecreds/v1/extensions/RankAssessment#",
     "schema": "http://schema.org/",
     "maxValue": "rankAssessment:maxValue"
   },
   "obi:validation": [
     {
       "obi:validatesType": "extensions:RankAssessment",
-      "obi:validationSchema": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/RankAssessment/schema.json"
+      "obi:validationSchema": "https://localhost/ecreds/v1/extensions/RankAssessment/schema.json"
     }
   ]
 }

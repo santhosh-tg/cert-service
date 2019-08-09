@@ -11,8 +11,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class HTMLTempalteZip extends HTMLTemplateProvider {
+
+
     private String content = null;
+
     private static Logger logger = LoggerFactory.getLogger(HTMLTempalteZip.class);
+
     /**
      * html zip file url
      */
@@ -37,17 +41,18 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         HttpURLConnection connection = (HttpURLConnection) zipUrl.openConnection();
         connection.setRequestMethod("GET");
         InputStream in = connection.getInputStream();
-        String zipPath = targetDirectory.getAbsolutePath() + "/arc" + System.nanoTime() + ".zip";
+        String zipPath = targetDirectory.getAbsolutePath()+"/arc"+System.nanoTime()+".zip";
         FileOutputStream out = new FileOutputStream(zipPath);
         copy(in, out, 1024);
         out.close();
         in.close();
+
         unzip(zipPath, targetDirectory.getAbsolutePath());
         readIndexHtmlFile(targetDirectory.getAbsolutePath());
     }
 
     private void readIndexHtmlFile(String absolutePath) throws IOException {
-        FileInputStream fis = new FileInputStream(absolutePath + "/index.html");
+        FileInputStream fis = new FileInputStream(absolutePath+"/index.html");
         content = IOUtils.toString(fis, "UTF-8");
         fis.close();
     }
@@ -55,7 +60,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     private static void unzip(String zipFilePath, String destDir) {
         File dir = new File(destDir);
         // create output directory if it doesn't exist
-        if (!dir.exists()) dir.mkdirs();
+        if(!dir.exists()) dir.mkdirs();
         FileInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
@@ -82,6 +87,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
@@ -104,6 +110,8 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         output.flush();
     }
 
+
+
     /**
      * This method is used to check whether the directory exists or not, if not it creates the directory
      *
@@ -123,7 +131,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     public String getTemplateContent() {
         if (content == null) {
             try {
-                getZipFileFromURl(new File("src/main/resources/certificate"));
+                getZipFileFromURl(new File("conf/certificate"));
             } catch (Exception e) {
                 logger.info("Exception while unzip the zip file {}", e.getMessage());
                 e.printStackTrace();
@@ -131,4 +139,5 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         }
         return content;
     }
+
 }
