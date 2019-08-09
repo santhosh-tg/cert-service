@@ -1,11 +1,5 @@
 package org.incredible.certProcessor.views;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Iterator;
-
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.RuntimeConstants;
@@ -13,6 +7,15 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.incredible.pojos.CertificateExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Iterator;
 
 
 public class HTMLGenerator {
@@ -54,7 +57,7 @@ public class HTMLGenerator {
                 Method method = htmlVarResolver.getClass().getMethod("get" + capitalize(macro));
                 method.setAccessible(true);
                 context.put(macro, method.invoke(htmlVarResolver));
-                createHTMLFile(context, certificateExtension.getId().split("Certificate/")[1] + ".html");
+                createHTMLFile(context, certificateExtension.getId().split("Certificate/")[1] );
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 logger.info("exception while generating html for certificate {}", e.getMessage());
@@ -65,7 +68,7 @@ public class HTMLGenerator {
 
     private void createHTMLFile(VelocityContext context, String id) {
         try {
-            File file = new File("conf",id);
+            File file = new File("conf/certificate",id+ ".html");
             Writer writer = new FileWriter(file);
             Velocity.evaluate(context, writer, "velocity", HtmlString);
             writer.flush();

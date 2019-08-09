@@ -106,19 +106,6 @@
             <artifactId>play-test_2.12</artifactId>
             <version>2.6.7</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.scalatest</groupId>
-                    <artifactId>scalatest_2.10</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest -->
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.12</artifactId>
-            <version>3.2.0-SNAP9</version>
-            <scope>test</scope>
         </dependency>
 
     </dependencies>

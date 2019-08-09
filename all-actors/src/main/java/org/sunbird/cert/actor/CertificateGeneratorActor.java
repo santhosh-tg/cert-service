@@ -54,14 +54,8 @@ public class CertificateGeneratorActor extends BaseActor {
 	public void onReceive(Request request) throws Throwable {
 		String operation = request.getOperation();
 		logger.info("onReceive method call start for operation " + operation);
-		switch (operation) {
-		case "generateCert":
+		if("generateCert".equalsIgnoreCase(operation)){
 			generateCertificate(request);
-			break;
-
-		default:
-			onReceiveUnsupportedMessage(this.getClass().getName());
-			break;
 		}
 		logger.info("onReceive method call End");
 	}
@@ -82,58 +76,58 @@ public class CertificateGeneratorActor extends BaseActor {
 		for(CertModel certModel : certModelList){
 			String certUUID = "";
 			try {
-				certUUID = certificateGenerator.createCertificate(certModel,htmlTempalteZip);
-			} catch (InvalidDateFormatException ex) {
+				//certUUID = certificateGenerator.createCertificate(certModel,htmlTempalteZip);
+			} catch (Exception ex) {
 				logger.info("CertificateGeneratorActor : generateCertificate :Exception Occurred while generating certificate.",ex);
 				throw new  BaseException("INVALID_REQUESTED_DATA", IResponseMessage.INVALID_REQUESTED_DATA, ResponseCode.CLIENT_ERROR.getCode());
 			}
-			certUrlList.add(uploadCertificate(certUUID));
+			//certUrlList.add(uploadCertificate(certUUID));
 		}
 		Response response = new Response();
 		response.getResult().put("response", certUrlList);
 		sender().tell(response, getSelf());
+		cleanup();
 		logger.info("onReceive method call End");
+	}
+
+	private void cleanup() {
+		try {
+			File file = new File("conf/certificate");
+			FileUtils.deleteDirectory(file);
+		} catch (Exception ex) {
+			logger.info(ex.getMessage(),ex);
+		}
 	}
 
 	private Map<String,String> uploadCertificate(String certUUID) {
 		Map<String,String> resMap = new HashMap<>();
-		//upload html certificate
 		String certFileName = certUUID+".html";
 		resMap.put(certFileName,upload(certFileName));
-		//TODO : need to upload PDF and JSON certificate too.
-		/*certFileName = certUUID+".json";
-		resMap.put(certFileName,upload(certFileName));
 		certFileName = certUUID+".pdf";
-		resMap.put(certFileName,upload(certFileName));*/
+		resMap.put(certFileName,upload(certFileName));
+		certFileName = certUUID+".json";
+		resMap.put(certFileName,upload(certFileName));
 		return resMap;
 	}
 
 	private String upload(String certFileName) {
 		try {
-			HashMap<String,String> properties = new HashMap<>();
-			properties.put(JsonKey.CONTAINER_NAME,System.getenv(JsonKey.CONTAINER_NAME));
-			properties.put(JsonKey.CLOUD_STORAGE_TYPE,System.getenv(JsonKey.CLOUD_STORAGE_TYPE));
-			properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,System.getenv(JsonKey.CLOUD_UPLOAD_RETRY_COUNT));
-			properties.put(JsonKey.AZURE_STORAGE_SECRET,System.getenv(JsonKey.AZURE_STORAGE_SECRET));
-			properties.put(JsonKey.AZURE_STORAGE_KEY,System.getenv(JsonKey.AZURE_STORAGE_KEY));
+			//TODO  Un comment this to use cloud storage jar to upload file to azure as of now
+			// not using because of jar conflict issue
+
+			//HashMap<String,String> properties = new HashMap<>();
+			//properties.put(JsonKey.CONTAINER_NAME,System.getenv(JsonKey.CONTAINER_NAME));
+			//properties.put(JsonKey.CLOUD_STORAGE_TYPE,System.getenv(JsonKey.CLOUD_STORAGE_TYPE));
+			//properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,System.getenv(JsonKey.CLOUD_UPLOAD_RETRY_COUNT));
+			//properties.put(JsonKey.AZURE_STORAGE_SECRET,System.getenv(JsonKey.AZURE_STORAGE_SECRET));
+			//properties.put(JsonKey.AZURE_STORAGE_KEY,System.getenv(JsonKey.AZURE_STORAGE_KEY));
 
 			//StorageParams storageParams = new StorageParams(properties);
 			//storageParams.init();
-
-			Collection<File> files = FileUtils.listFiles(new File("conf/"), null, false);
-			Iterator<File> itr = files.iterator();
-			File file = null;
-			while(itr.hasNext()){
-				 file = itr.next();
-				if(file.getName().equalsIgnoreCase(certFileName)){
-					System.out.println(file.getName());
-					break;
-				}
-			}
-			//File file = FileUtils.getFile("conf/"+certFileName);
-			//return AzureFileUtility.uploadFile("cert",file);
-			return AzureFileUtility.uploadFile(System.getenv(JsonKey.CONTAINER_NAME),file);
 			//return storageParams.upload(System.getenv(JsonKey.CONTAINER_NAME), "/", file, false);
+
+			File file = FileUtils.getFile("conf/certificate"+certFileName);
+			return AzureFileUtility.uploadFile(System.getenv(JsonKey.CONTAINER_NAME),file);
 		}catch (Exception ex) {
 			logger.info("CertificateGeneratorActor:upload: Exception occurred while uploading certificate.",ex);
 		}
