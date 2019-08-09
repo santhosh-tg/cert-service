@@ -49,7 +49,7 @@ public class CertificateFactory {
 
 
         //todo decide hosted or signed badge based on config
-        if (properties.get(jsonKey.VERIFICATION_TYPE).equals("hosted")) {
+        if ((jsonKey.VERIFICATION_TYPE).equals("hosted")) {
             signedVerification.setType(new String[]{jsonKey.VERIFICATION_TYPE});
         } else {
             signedVerification.setCreator(jsonKey.PUBLIC_KEY_URL);
