@@ -1,4 +1,4 @@
- Certificate utilities
+#Certificate utilities
 This is a utility to create badge, issuer and public key jsons.
 
 ### Setup
