@@ -66,7 +66,7 @@ public class HTMLGenerator {
     private void createHTMLFile(VelocityContext context, String id) {
         try {
             File file = new File("conf",id);
-            Writer writer = new FileWriter();
+            Writer writer = new FileWriter(file);
             Velocity.evaluate(context, writer, "velocity", HtmlString);
             writer.flush();
             writer.close();
