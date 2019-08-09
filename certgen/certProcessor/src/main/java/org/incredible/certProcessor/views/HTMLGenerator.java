@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -57,13 +59,25 @@ public class HTMLGenerator {
                 Method method = htmlVarResolver.getClass().getMethod("get" + capitalize(macro));
                 method.setAccessible(true);
                 context.put(macro, method.invoke(htmlVarResolver));
-                createHTMLFile(context, certificateExtension.getId().split("Certificate/")[1] );
+                createHTMLFile(context, getUUID(certificateExtension.getId()) );
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 logger.info("exception while generating html for certificate {}", e.getMessage());
             }
         }
 
+    }
+
+    private String getUUID(String id) {
+        try {
+            URI uri = new URI(id);
+            String path = uri.getPath();
+            String idStr = path.substring(path.lastIndexOf('/') + 1);
+            return idStr;
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void createHTMLFile(VelocityContext context, String id) {
