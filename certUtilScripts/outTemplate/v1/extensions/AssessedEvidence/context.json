@@ -3,7 +3,7 @@
   "@context": {
     "id": "@id",
     "obi": "https://w3id.org/openbadges#",
-    "assessedEvidence": "https://localhost/container/v1/_schemas/Extensions/AssessedEvidence#",
+    "assessedEvidence": "https://localhost/container/v1/extensions/AssessedEvidence#",
     "schema": "http://schema.org/",
     "subject": "assessedEvidence:subject",
     "assessedBy": "assessedEvidence:assessedBy",
@@ -16,7 +16,7 @@
   "obi:validation": [
     {
       "obi:validatesType": "extensions:AssessedEvidence",
-      "obi:validationSchema": "https://localhost/container/v1/_schemas/Extensions/AssessedEvidence/schema.json"
+      "obi:validationSchema": "https://localhost/container/v1/extensions/AssessedEvidence/schema.json"
     }
   ]
 }

@@ -16,6 +16,8 @@ public class SignatoryExtension extends IdentityObject {
 
     private CryptographicKey publicKey;
 
+    private String name;
+
     public SignatoryExtension(String ctx) {
         String[] type = new String[]{"Extension", "extensions:SignatoryExtension"};
         setType(type);
@@ -43,5 +45,13 @@ public class SignatoryExtension extends IdentityObject {
 
     public void setPublicKey(CryptographicKey publicKey) {
         this.publicKey = publicKey;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

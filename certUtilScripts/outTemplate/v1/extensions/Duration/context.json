@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "duration": "https://localhost/container/v1/_schemas/Extensions/Duration#",
+    "duration": "https://localhost/container/extensions/Duration#",
     "schema": "http://schema.org/",
     "startDate": "duration:startDate",
     "endDate": "duration:endDate"
@@ -12,7 +12,7 @@
   "obi:validation": [
     {
       "obi:validatesType": "extensions:Duration",
-      "obi:validationSchema": "https://localhost/container/v1/_schemas/Extensions/Duration/schema.json"
+      "obi:validationSchema": "https://localhost/container/extensions/Duration/schema.json"
     }
   ]
 }

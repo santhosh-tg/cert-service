@@ -3,6 +3,8 @@ package org.incredible.certProcessor.views;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.incredible.pojos.CertificateExtension;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,18 +21,26 @@ public class HTMLVarResolver {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public String getRecipient() {
+    public String getRecipientName() {
         return certificateExtension.getRecipient().getName();
     }
 
 
-    public String getCourse() {
+    public String getCourseName() {
         return certificateExtension.getBadge().getName();
     }
 
 
-    public String getImg() {
-        return certificateExtension.getId().split("Certificate/")[1] + ".png";
+    public String getQrCodeImage() {
+        try {
+            URI uri = new URI(certificateExtension.getId());
+            String path = uri.getPath();
+            String idStr = path.substring(path.lastIndexOf('/') + 1);
+            return idStr + ".png";
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -44,7 +54,7 @@ public class HTMLVarResolver {
     }
 
 
-    public String getDateInFormatOfWords() {
+    public String getIssuedDate() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String dateInFormat;
         try {
@@ -59,12 +69,17 @@ public class HTMLVarResolver {
         }
     }
 
-//    public String getSignatoryName() {
-//        return certificateExtension.getSignatory()[1].getName();
-//    }
-//
-//    public String getSignatory() {
-//        return certificateExtension.getSignatory()[1].getId();
-//    }
+    public String getSignatory0Image() {
+        return certificateExtension.getSignatory()[0].getImage();
+    }
+
+    public String getSignatory0Designation() {
+        return certificateExtension.getSignatory()[0].getDesignation();
+    }
+
+    public String getCertificateName() {
+        return certificateExtension.getBadge().getName();
+    }
+
 
 }

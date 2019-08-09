@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "signatoryExtension": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/SignatoryExtension#",
+    "signatoryExtension": "https://dev.sunbirdev.org/certs/v1/extensions/SignatoryExtension#",
     "schema": "http://schema.org/",
     "designation": "signatoryExtension:designation",
     "image": "signatoryExtension:image",
@@ -13,7 +13,7 @@
   "obi:validation": [
     {
       "obi:validatesType": "extensions:SignatoryExtension",
-      "obi:validationSchema": "https://dev.sunbirded.org/certs/v1/_schemas/Extensions/SignatoryExtension/schema.json"
+      "obi:validationSchema": "https://dev.sunbirdev.org/certs/v1/extensions/SignatoryExtension/schema.json"
     }
   ]
 }
