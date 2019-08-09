@@ -1,14 +1,17 @@
 package org.incredible.certProcessor.views;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 public class HTMLTempalteZip extends HTMLTemplateProvider {
 
@@ -38,67 +41,79 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
         }
-        InputStream inputStream = new BufferedInputStream(zipUrl.openStream());
-//         make sure we get the actual file
-        File zipFile = File.createTempFile("arc", ".zip", targetDirectory);
-        OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(zipFile));
-        extractFile(inputStream, outputStream);
-        outputStream.close();
-        unzip(zipFile, targetDirectory);
+        HttpURLConnection connection = (HttpURLConnection) zipUrl.openConnection();
+        connection.setRequestMethod("GET");
+        InputStream in = connection.getInputStream();
+        String zipPath = targetDirectory.getAbsolutePath()+"/arc"+System.nanoTime()+".zip";
+        FileOutputStream out = new FileOutputStream(zipPath);
+        copy(in, out, 1024);
+        out.close();
+        in.close();
+
+        unzip(zipPath, targetDirectory.getAbsolutePath());
+        readIndexHtmlFile(targetDirectory.getAbsolutePath());
     }
 
-    /**
-     * This method is used to Extract each file in the zipEntry (zipFile)
-     *
-     * @param inputStream
-     * @param outputStream
-     * @throws IOException
-     */
-    private void extractFile(InputStream inputStream, OutputStream outputStream) throws IOException {
-        byte[] buffer = new byte[bufferSize];
-        int length = inputStream.read(buffer);
-        while (length >= 0) {
-            outputStream.write(buffer, 0, length);
-            length = inputStream.read(buffer);
-        }
-        inputStream.close();
-        outputStream.close();
+    private void readIndexHtmlFile(String absolutePath) throws IOException {
+        FileInputStream fis = new FileInputStream(absolutePath+"/index.html");
+        content = IOUtils.toString(fis, "UTF-8");
+        fis.close();
     }
 
-    /**
-     * This method is to unzip the zip file
-     *
-     * @param zip             zip file to extract
-     * @param targetDirectory directory to store Unzip files
-     * @throws IOException
-     */
-    private void unzip(File zip, File targetDirectory) throws Exception {
-        if (!zip.exists())
-            throw new IOException(zip.getAbsolutePath() + " does not exist");
-        if (!isDirectoryExists(targetDirectory))
-            throw new IOException("Could not create directory: " + targetDirectory);
-        ZipFile zipFile = new ZipFile(zip);
-        if (isZipFileIsValid(zipFile.entries())) {
-            for (Enumeration entries = zipFile.entries(); entries.hasMoreElements(); ) {
-                ZipEntry entry = (ZipEntry) entries.nextElement();
-                File file = new File(targetDirectory, File.separator + entry.getName());
-                if (!isDirectoryExists(file.getParentFile()))
-                    throw new IOException("Could not create directory: " + file.getParentFile());
+    private static void unzip(String zipFilePath, String destDir) {
+        File dir = new File(destDir);
+        // create output directory if it doesn't exist
+        if(!dir.exists()) dir.mkdirs();
+        FileInputStream fis;
+        //buffer for read and write data to file
+        byte[] buffer = new byte[1024];
+        try {
+            fis = new FileInputStream(zipFilePath);
+            ZipInputStream zipIn = new ZipInputStream(fis);
+            ZipEntry entry = zipIn.getNextEntry();
+            // iterates over entries in the zip file
+            while (entry != null) {
+                String filePath = destDir + File.separator + entry.getName();
                 if (!entry.isDirectory()) {
-                    extractFile(zipFile.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(file)));
-                    if (entry.getName().endsWith(".html")) {
-                        convertToString(zipFile.getInputStream(entry));
-                    }
+                    // if the entry is a file, extracts it
+                    extractFile(zipIn, filePath);
                 } else {
-                    if (!isDirectoryExists(file)) {
-                        throw new IOException("Could not create directory: " + file);
-                    }
+                    // if the entry is a directory, make the directory
+                    File subDir = new File(filePath);
+                    subDir.mkdir();
                 }
+                zipIn.closeEntry();
+                entry = zipIn.getNextEntry();
             }
-        } else throw new Exception("Zip file is not valid");
+            zipIn.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        zipFile.close();
     }
+
+    private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+        byte[] bytesIn = new byte[4096];
+        int read = 0;
+        while ((read = zipIn.read(bytesIn)) != -1) {
+            bos.write(bytesIn, 0, read);
+        }
+        bos.close();
+    }
+
+    public static void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
+        byte[] buf = new byte[bufferSize];
+        int n = input.read(buf);
+        while (n >= 0) {
+            output.write(buf, 0, n);
+            n = input.read(buf);
+        }
+        output.flush();
+    }
+
+
 
     /**
      * This method is used to check whether the directory exists or not, if not it creates the directory
@@ -119,7 +134,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     public String getTemplateContent() {
         if (content == null) {
             try {
-                getZipFileFromURl(new File("src/main/resources/certificate"));
+                getZipFileFromURl(new File("conf/certificate"));
             } catch (Exception e) {
                 logger.info("Exception while unzip the zip file {}", e.getMessage());
                 e.printStackTrace();
@@ -128,36 +143,4 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         return content;
     }
 
-    /**
-     * This method is used to convert file inputstream to string
-     *
-     * @param inputStream
-     */
-    private void convertToString(InputStream inputStream) {
-        StringWriter writer = new StringWriter();
-        try {
-            IOUtils.copy(inputStream, writer, "UTF-8");
-            content = writer.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * This method is to check the number of .html extension files present is a zip file
-     *
-     * @param ZipEntries
-     * @return
-     */
-    private boolean isZipFileIsValid(Enumeration<? extends ZipEntry> ZipEntries) {
-        int noOfHTMLFiles = 0;
-        for (Enumeration entries = ZipEntries; entries.hasMoreElements(); ) {
-            ZipEntry entry = (ZipEntry) entries.nextElement();
-            if (entry.getName().endsWith(".html")) noOfHTMLFiles++;
-            System.out.println(entry.getName());
-        }
-        if (noOfHTMLFiles == 1) return true;
-        else return false;
-
-    }
 }

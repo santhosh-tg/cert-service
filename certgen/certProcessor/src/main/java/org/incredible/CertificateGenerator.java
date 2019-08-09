@@ -50,7 +50,7 @@ public class CertificateGenerator {
         File Qrcode;
         QRCodeGenerationModel qrCodeGenerationModel = new QRCodeGenerationModel();
         qrCodeGenerationModel.setText(accessCodeGenerator.generate());
-        qrCodeGenerationModel.setFileName(id);
+        qrCodeGenerationModel.setFileName("conf/"+id);
         qrCodeGenerationModel.setData(certificateExtension.getId() + ".json");
         try {
             Qrcode = QRCodeImageGenerator.createQRImages(qrCodeGenerationModel);

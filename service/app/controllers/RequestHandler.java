@@ -16,7 +16,7 @@ import play.mvc.Result;
 import play.mvc.Results;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
-import utils.JsonKey;
+import org.sunbird.JsonKey;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;

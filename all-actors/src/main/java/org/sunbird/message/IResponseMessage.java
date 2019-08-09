@@ -12,4 +12,5 @@ public interface IResponseMessage {
   String INTERNAL_ERROR = "INTERNAL_ERROR";
   String UNAUTHORIZED = "UNAUTHORIZED";
   String MANDATORY_PARAMETER_MISSING = "Mandatory parameter {0} is missing.";
+  String INVALID_PARAM_VALUE = "Invalid value {0} for parameter {1}.";
 }
