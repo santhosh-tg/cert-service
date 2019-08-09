@@ -64,6 +64,7 @@ public class CertificateGeneratorActor extends BaseActor {
 			try {
 				certUUID = certificateGenerator.createCertificate(certModel,htmlTempalteZip);
 			} catch (Exception ex) {
+				cleanup();
 				logger.info("CertificateGeneratorActor : generateCertificate :Exception Occurred while generating certificate.",ex);
 				throw new  BaseException("INVALID_REQUESTED_DATA", IResponseMessage.INVALID_REQUESTED_DATA, ResponseCode.CLIENT_ERROR.getCode());
 			}
