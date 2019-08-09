@@ -113,7 +113,7 @@ public class CertificateGeneratorActor extends BaseActor {
 			//storageParams.init();
 			//return storageParams.upload(System.getenv(JsonKey.CONTAINER_NAME), "/", file, false);
 
-			File file = FileUtils.getFile("conf/certificate"+certFileName);
+			File file = FileUtils.getFile("conf/certificate/"+certFileName);
 			return AzureFileUtility.uploadFile(System.getenv(JsonKey.CONTAINER_NAME),file);
 		}catch (Exception ex) {
 			logger.info("CertificateGeneratorActor:upload: Exception occurred while uploading certificate.",ex);
