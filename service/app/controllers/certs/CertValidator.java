@@ -7,7 +7,7 @@ import org.sunbird.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
-import utils.JsonKey;
+import org.sunbird.JsonKey;
 
 import java.text.MessageFormat;
 import java.util.Arrays;

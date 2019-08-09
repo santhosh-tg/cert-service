@@ -2,6 +2,7 @@ package org.incredible.certProcessor.views;
 
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.io.util.FileUtil;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -14,7 +15,7 @@ public class PdfConverter {
 
     public static void convertor(File htmlSource, String id) {
 
-        File file = new File(id + ".pdf");
+        File file = new File("conf/certificate",id + ".pdf");
         try {
 //            ConverterProperties converterProperties = new ConverterProperties();
 //            PdfWriter pdfWriter = new PdfWriter(file);
