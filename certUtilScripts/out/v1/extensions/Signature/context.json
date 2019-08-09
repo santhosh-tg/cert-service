@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "signature": "https://localhost/ecreds/v1/extensions/Signature#",
+    "signature": "https://www.sunbirddev.org/ecreds/v1/extensions/Signature#",
     "schema": "http://schema.org/",
     "creator": "signature:creator",
     "created": "signature:created",
@@ -13,7 +13,7 @@
   "obi:validation": [
     {
       "obi:validatesType": "extensions:Signature",
-      "obi:validationSchema": "https://localhost/ecreds/v1/extensions/Signature/schema.json"
+      "obi:validationSchema": "https://www.sunbirddev.org/ecreds/v1/extensions/Signature/schema.json"
     }
   ]
 }

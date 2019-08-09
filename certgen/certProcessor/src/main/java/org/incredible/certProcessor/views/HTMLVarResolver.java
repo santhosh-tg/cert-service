@@ -3,6 +3,8 @@ package org.incredible.certProcessor.views;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.incredible.pojos.CertificateExtension;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,7 +32,15 @@ public class HTMLVarResolver {
 
 
     public String getQrCodeImage() {
-        return certificateExtension.getId().split("Certificate/")[1] + ".png";
+        try {
+            URI uri = new URI(certificateExtension.getId());
+            String path = uri.getPath();
+            String idStr = path.substring(path.lastIndexOf('/') + 1);
+            return idStr + ".png";
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -67,10 +77,9 @@ public class HTMLVarResolver {
         return certificateExtension.getSignatory()[0].getDesignation();
     }
 
-    public  String getCertificateName() {
+    public String getCertificateName() {
         return certificateExtension.getBadge().getName();
     }
-
 
 
 }

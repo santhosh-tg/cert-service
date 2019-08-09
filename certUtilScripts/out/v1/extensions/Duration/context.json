@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "duration": "https://localhost/ecreds/extensions/Duration#",
+    "duration": "https://www.sunbirddev.org/ecreds/extensions/Duration#",
     "schema": "http://schema.org/",
     "startDate": "duration:startDate",
     "endDate": "duration:endDate"
@@ -12,7 +12,7 @@
   "obi:validation": [
     {
       "obi:validatesType": "extensions:Duration",
-      "obi:validationSchema": "https://localhost/ecreds/extensions/Duration/schema.json"
+      "obi:validationSchema": "https://www.sunbirddev.org/ecreds/extensions/Duration/schema.json"
     }
   ]
 }
