@@ -51,7 +51,7 @@
     "publicKey": { "@id": "sec:publicKey", "@type": "@id" },
     "publicKeyPem": { "@id": "sec:publicKeyPem" },
     "related": { "@id": "dc:relation", "@type": "@id" },
-    "startsWith": { "@id": "http://purl.org/dqm-vocabularyecreds/v1dqm#startsWith" },
+    "startsWith": { "@id": "http://purl.org/dqm-vocabularycerts/v1dqm#startsWith" },
     "tags": { "@id": "schema:keywords" },
     "targetDescription": { "@id": "schema:targetDescription" },
     "targetFramework": { "@id": "schema:targetFramework" },

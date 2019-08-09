@@ -4,7 +4,7 @@
     "id": "@id",
     "type": "@type",
     "obi": "https://w3id.org/openbadges#",
-    "trainingEvidence": "https://www.sunbirddev.org/ecreds/v1/extensions/TrainingEvidence#",
+    "trainingEvidence": "https://www.sunbirdev.org/certs/v1/extensions/TrainingEvidence#",
     "schema": "http://schema.org/",
     "subject": "trainingEvidence:subject",
     "trainedBy": "trainingEvidence:trainedBy",
@@ -14,7 +14,7 @@
   "obi:validation": [
     {
       "obi:validatesType": "extensions:AssessedEvidence",
-      "obi:validationSchema": "https://www.sunbirddev.org/ecreds/v1/extensions/TrainingEvidence/schema.json"
+      "obi:validationSchema": "https://www.sunbirdev.org/certs/v1/extensions/TrainingEvidence/schema.json"
     }
   ]
 }
