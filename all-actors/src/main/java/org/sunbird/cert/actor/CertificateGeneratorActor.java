@@ -1,17 +1,10 @@
 package org.sunbird.cert.actor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.incredible.CertificateGenerator;
 import org.incredible.certProcessor.CertModel;
-import org.incredible.certProcessor.store.CloudStorage;
-import org.incredible.certProcessor.store.StorageParams;
 import org.incredible.certProcessor.views.HTMLTempalteZip;
-import org.incredible.certProcessor.views.HTMLTemplateFile;
-import org.incredible.certProcessor.views.HTMLTemplateProvider;
-import org.incredible.certProcessor.views.PdfConverter;
-import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
 import org.sunbird.CertMapper;
@@ -22,21 +15,14 @@ import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
-import sun.misc.ClassLoaderUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.*;
-
-import static org.incredible.certProcessor.store.CloudStorage.uploadFile;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This actor is responsible for certificate generation.
