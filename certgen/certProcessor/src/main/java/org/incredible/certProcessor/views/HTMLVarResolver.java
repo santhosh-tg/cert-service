@@ -19,17 +19,17 @@ public class HTMLVarResolver {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public String getRecipient() {
+    public String getRecipientName() {
         return certificateExtension.getRecipient().getName();
     }
 
 
-    public String getCourse() {
+    public String getCourseName() {
         return certificateExtension.getBadge().getName();
     }
 
 
-    public String getImg() {
+    public String getQrCodeImage() {
         return certificateExtension.getId().split("Certificate/")[1] + ".png";
     }
 
@@ -44,7 +44,7 @@ public class HTMLVarResolver {
     }
 
 
-    public String getDateInFormatOfWords() {
+    public String getIssuedDate() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String dateInFormat;
         try {
@@ -59,12 +59,18 @@ public class HTMLVarResolver {
         }
     }
 
-//    public String getSignatoryName() {
-//        return certificateExtension.getSignatory()[1].getName();
-//    }
-//
-//    public String getSignatory() {
-//        return certificateExtension.getSignatory()[1].getId();
-//    }
+    public String getSignatory0Image() {
+        return certificateExtension.getSignatory()[0].getImage();
+    }
+
+    public String getSignatory0Designation() {
+        return certificateExtension.getSignatory()[0].getDesignation();
+    }
+
+    public  String getCertificateName() {
+        return certificateExtension.getBadge().getName();
+    }
+
+
 
 }

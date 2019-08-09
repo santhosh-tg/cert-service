@@ -56,7 +56,7 @@ public class CertificateFactory {
         }
 
         /**
-         *  recipent object
+         *  recipient object
          *  **/
         compositeIdentityObjectBuilder.setName(certModel.getRecipientName()).setId(certModel.getIdentifier())
                 .setHashed(false).

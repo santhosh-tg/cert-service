@@ -7,15 +7,16 @@ import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 
 public class StorageParams {
 
 
     private static BaseStorageService storageService = null;
 
-    private static HashMap<String, String> properties;
+    private static Map<String, String> properties;
 
-    public StorageParams(HashMap<String, String> properties) {
+    public StorageParams(Map<String, String> properties) {
         this.properties = properties;
     }
 
