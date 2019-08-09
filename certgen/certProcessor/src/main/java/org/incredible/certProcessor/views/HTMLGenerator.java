@@ -65,11 +65,12 @@ public class HTMLGenerator {
 
     private void createHTMLFile(VelocityContext context, String id) {
         try {
-
-            Writer writer = new FileWriter(new File("conf",id));
+            File file = new File("conf",id);
+            Writer writer = new FileWriter();
             Velocity.evaluate(context, writer, "velocity", HtmlString);
             writer.flush();
             writer.close();
+            PdfConverter.convertor(file, id);
         } catch (IOException e) {
             logger.info("IO exception while creating html file :{}", e.getMessage());
         }

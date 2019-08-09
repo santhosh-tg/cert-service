@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 
 
 public class CertificateGenerator {
@@ -25,9 +25,9 @@ public class CertificateGenerator {
 
     private static Logger logger = LoggerFactory.getLogger(CertificateFactory.class);
 
-    private HashMap<String, String> properties;
+    private Map<String, String> properties;
 
-    public CertificateGenerator(HashMap<String, String> properties) {
+    public CertificateGenerator(Map<String, String> properties) {
         this.properties = properties;
     }
 

@@ -15,4 +15,33 @@ public class SignatoryExtension extends IdentityObject {
     private String image;
 
     private CryptographicKey publicKey;
+
+    public SignatoryExtension(String ctx) {
+        String[] type = new String[]{"Extension", "extensions:SignatoryExtension"};
+        setType(type);
+        setContext(ctx);
+    }
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public CryptographicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(CryptographicKey publicKey) {
+        this.publicKey = publicKey;
+    }
 }
