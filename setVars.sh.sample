@@ -1,12 +1,10 @@
 #Sets up all environment vars.
 
 ################### CERT_SERVICE configuration ###################################
-export keyA=valA
+
 export DOMAIN_PATH=http://localhost:8080/_schemas/Certificate/
-export ASSESSED_DOMAIN=http://localhost:8080/_schemas/extensions/AssessedEvidence/context.json
 export BADGE_URL=http://localhost:8080/_schemas/Badge.json
 export ISSUER_URL=http://localhost:8080/_schemas/Issuer.json
-export TEMPLATE_URL=http://localhost:8080/_schemas/template.html
 export CONTEXT=http://localhost:8080/_schemas/context.json
 export VERIFICATION_TYPE=SignedBadge
 export PUBLIC_KEY_URL=http://localhost:8080/_schemas/publicKey.json
@@ -19,9 +17,9 @@ export CONTAINER_NAME=certs
 export AZURE_STORAGE_KEY=sb
 
 export ACCESS_CODE_LENGTH=6
-export HEALTH_CHECK_URL=http://localhost:8013/
-export SIGN_URL=http://localhost:8013/sign
-export VERIFY_URL=http://localhost:8013/verify
-export SIGN_CREATOR="Diksha"
+#export SIGN_HEALTH_CHECK_URL=http://localhost:8013/
+#export SIGN_URL=http://localhost:8013/sign
+#export SIGN_VERIFY_URL=http://localhost:8013/verify
+export SIGN_CREATOR=https://example.com/i/pat/keys/5
 
 ################### END -  configuration #############################

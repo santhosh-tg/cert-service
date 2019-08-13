@@ -41,6 +41,8 @@ public class CertMapper {
         //signatoryExt.setName((String)signatory.get(JsonKey.NAME));
         signatoryExt.setIdentity((String)signatory.get(JsonKey.ID));
         signatoryExt.setDesignation((String)signatory.get(JsonKey.DESIGNATION));
+        signatoryExt.setImage((String) signatory.get(JsonKey.SIGNATORY_IMAGE));
+
         return signatoryExt;
     }
 

@@ -27,7 +27,7 @@ import java.util.*;
  * @author manzarul
  */
 @ActorConfig(
-        tasks = {"generateCert"},
+        tasks = {JsonKey.GENERATE_CERT},
         asyncTasks = {}
 )
 public class CertificateGeneratorActor extends BaseActor {
@@ -37,7 +37,7 @@ public class CertificateGeneratorActor extends BaseActor {
     public void onReceive(Request request) throws Throwable {
         String operation = request.getOperation();
         logger.info("onReceive method call start for operation " + operation);
-        if ("generateCert".equalsIgnoreCase(operation)) {
+        if (JsonKey.GENERATE_CERT.equalsIgnoreCase(operation)) {
             generateCertificate(request);
         }
         logger.info("onReceive method call End");
@@ -62,10 +62,10 @@ public class CertificateGeneratorActor extends BaseActor {
                 certUUID = certificateGenerator.createCertificate(certModel, htmlTempalteZip);
             } catch (Exception ex) {
                 cleanup();
-                logger.info("CertificateGeneratorActor : generateCertificate :Exception Occurred while generating certificate.", ex);
+                logger.error("CertificateGeneratorActor : generateCertificate :Exception Occurred while generating certificate.", ex);
                 throw new BaseException("INVALID_REQUESTED_DATA", IResponseMessage.INVALID_REQUESTED_DATA, ResponseCode.CLIENT_ERROR.getCode());
             }
-            certUrlList.add(uploadCertificate(certUUID));
+            certUrlList.add(uploadCertificate(certUUID, certModel.getIdentifier()));
         }
         Response response = new Response();
         response.getResult().put("response", certUrlList);
@@ -83,14 +83,14 @@ public class CertificateGeneratorActor extends BaseActor {
         }
     }
 
-    private Map<String, String> uploadCertificate(String certUUID) {
+    private Map<String, String> uploadCertificate(String certUUID, String recipientID) {
         Map<String, String> resMap = new HashMap<>();
-        String certFileName = certUUID + ".html";
-        resMap.put(certFileName, upload(certFileName));
-        certFileName = certUUID + ".pdf";
-        resMap.put(certFileName, upload(certFileName));
+        String certFileName = certUUID + ".pdf";
+        resMap.put(JsonKey.PDF_URL, upload(certFileName));
         certFileName = certUUID + ".json";
-        resMap.put(certFileName, upload(certFileName));
+        resMap.put(JsonKey.JSON_URL, upload(certFileName));
+        resMap.put(JsonKey.UNIQUE_ID, certUUID);
+        resMap.put(JsonKey.RECIPIENT_ID, recipientID);
         return resMap;
     }
 
@@ -131,7 +131,7 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.ACCESS_CODE_LENGTH, System.getenv(JsonKey.ACCESS_CODE_LENGTH));
         properties.put(JsonKey.SIGN_CREATOR, System.getenv(JsonKey.SIGN_CREATOR));
         properties.put(JsonKey.SIGN_URL, System.getenv(JsonKey.SIGN_URL));
-        properties.put(JsonKey.VERIFY_URL, System.getenv(JsonKey.VERIFY_URL));
+        properties.put(JsonKey.SIGN_VERIFY_URL, System.getenv(JsonKey.SIGN_VERIFY_URL));
         logger.info("CertificateGeneratorActor:getProperties:properties got from env ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;
     }

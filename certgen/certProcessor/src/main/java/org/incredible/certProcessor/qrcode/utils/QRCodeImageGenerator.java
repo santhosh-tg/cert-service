@@ -10,6 +10,8 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.FontMetrics;
@@ -30,7 +32,10 @@ import java.util.ArrayList;
 
 public class QRCodeImageGenerator {
 
+    private static Logger logger = LoggerFactory.getLogger(QRCodeImageGenerator.class);
+
     static QRCodeWriter qrCodeWriter = new QRCodeWriter();
+
 
     public static File createQRImages(QRCodeGenerationModel qrGenRequest) throws WriterException, IOException, NotFoundException, FontFormatException {
 
@@ -67,7 +72,7 @@ public class QRCodeImageGenerator {
         File finalImageFile = new File(fileName + "." + imageFormat);
         ImageIO.write(qrImage, imageFormat, finalImageFile);
         fileList.add(finalImageFile);
-
+        logger.info("qr code is created for the certificate");
         return finalImageFile;
 
     }

@@ -3,6 +3,7 @@ package org.incredible;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.WriterException;
+import org.apache.commons.lang.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.CertificateFactory;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
@@ -56,7 +57,7 @@ public class CertificateGenerator {
             URI uri = new URI(id);
             String path = uri.getPath();
             String idStr = path.substring(path.lastIndexOf('/') + 1);
-            return idStr;
+            return StringUtils.substringBefore(idStr, ".");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return null;
@@ -68,6 +69,7 @@ public class CertificateGenerator {
         checkDirectoryExists();
         try {
             objectMapper.writeValue(file, certificateExtension);
+            logger.info("Json file has been generated for the certificate");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,10 +87,9 @@ public class CertificateGenerator {
         QRCodeGenerationModel qrCodeGenerationModel = new QRCodeGenerationModel();
         qrCodeGenerationModel.setText(accessCodeGenerator.generate());
         qrCodeGenerationModel.setFileName(directory + getUUID(certificateExtension.getId()));
-        qrCodeGenerationModel.setData(certificateExtension.getId() + ".json");
+        qrCodeGenerationModel.setData(certificateExtension.getId());
         try {
             File Qrcode = QRCodeImageGenerator.createQRImages(qrCodeGenerationModel);
-
         } catch (IOException | WriterException | FontFormatException | NotFoundException e) {
             logger.error("Exception while generating QRcode {}", e.getMessage());
         }

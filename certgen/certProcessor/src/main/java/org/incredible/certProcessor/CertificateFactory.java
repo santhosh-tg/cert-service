@@ -10,11 +10,11 @@ import org.incredible.pojos.CertificateExtension;
 import org.incredible.pojos.ob.Criteria;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import org.incredible.pojos.ob.SignedVerification;
@@ -37,7 +37,7 @@ public class CertificateFactory {
 
     public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties) throws InvalidDateFormatException {
 
-        uuid = JsonKey.DOMAIN_PATH + UUID.randomUUID().toString();
+        uuid = JsonKey.DOMAIN_PATH + UUID.randomUUID().toString() + ".json";
 
         CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(JsonKey.CONTEXT);
         CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(JsonKey.CONTEXT);
@@ -66,17 +66,15 @@ public class CertificateFactory {
                 .setHashed(false).
                 setType(new String[]{"id"});
 
-
-        issuerBuilder.setId(JsonKey.ISSUER_URL).setName(certModel.getIssuer().getName());
+        issuerBuilder.setId(JsonKey.ISSUER_URL).setName(certModel.getIssuer().getName())
+                .setUrl(certModel.getIssuer().getUrl()).setPublicKey(certModel.getIssuer().getPublicKey());
         /**
          * badge class object
          * **/
-
         badgeClassBuilder.setName(certModel.getCourseName()).setDescription(certModel.getCertificateDescription())
                 .setId(JsonKey.BADGE_URL).setCriteria(criteria)
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
-
 
         /**
          *
@@ -90,13 +88,12 @@ public class CertificateFactory {
         /** certificate  signature value **/
         String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties);
 
-//        logger.info("signed certificate is valid {}", verifySignature(certificateExtensionBuilder.build(), signatureValue, properties));
-
+        logger.info("signed certificate is valid {}", verifySignature(certificateExtensionBuilder.build(), signatureValue, properties));
 
         /**
          * to assign signature value
          */
-        signatureBuilder.setCreated(Instant.now().toString()).setCreator(properties.get("SIGN_CREATOR"))
+        signatureBuilder.setCreated(Instant.now().toString()).setCreator(properties.get(JsonKey.SIGN_CREATOR))
                 .setSignatureValue(signatureValue);
 
         certificateExtensionBuilder.setSignature(signatureBuilder.build());
@@ -104,20 +101,6 @@ public class CertificateFactory {
         logger.info("certificate extension => {}", certificateExtensionBuilder.build());
         return certificateExtensionBuilder.build();
     }
-
-
-    public Properties readPropertiesFile() {
-        ClassLoader loader = CertificateFactory.class.getClassLoader();
-        Properties properties = new Properties();
-        try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
-            properties.load(resourceStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.info("Exception while reading application.properties {}", e.getMessage());
-        }
-        return properties;
-    }
-
 
     /**
      * to verify signature value
@@ -132,15 +115,15 @@ public class CertificateFactory {
         SignatureHelper signatureHelper = new SignatureHelper(properties);
         try {
             Map signReq = new HashMap<String, Object>();
-            signReq.put("claim", certificate);
-            signReq.put("signatureValue", signatureValue);
-            signReq.put("keyId", 2);
+            signReq.put(JsonKey.CLAIM, certificate);
+            signReq.put(JsonKey.SIGNATURE_VALUE, signatureValue);
+            signReq.put(JsonKey.KEY_ID, getKeyId(properties.get(JsonKey.SIGN_CREATOR)));
             JsonNode jsonNode = mapper.valueToTree(signReq);
             isValid = signatureHelper.verify(jsonNode);
-            return isValid;
         } catch (SignatureException.UnreachableException | SignatureException.VerificationException e) {
-            return isValid;
+            logger.error("exception while verifying Signature : {}", e.getMessage());
         }
+        return isValid;
     }
 
     /**
@@ -158,8 +141,7 @@ public class CertificateFactory {
             String request = mapper.writeValueAsString(certificateExtension);
             JsonNode jsonNode = mapper.readTree(request);
             signMap = signatureHelper.generateSignature(jsonNode);
-            return (String) signMap.get("signatureValue");
-
+            return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
         } catch (IOException | SignatureException.UnreachableException | SignatureException.CreationException e) {
             logger.debug("Exception while generating signature for certificate : {}", e.getMessage());
             e.printStackTrace();
@@ -167,6 +149,23 @@ public class CertificateFactory {
         }
     }
 
+    /**
+     * to get the KeyId from the sign_creator url , key id used for verifying signature
+     *
+     * @param creator
+     * @return
+     */
+    private int getKeyId(String creator) {
+        String idStr = null;
+        try {
+            URI uri = new URI(creator);
+            String path = uri.getPath();
+            idStr = path.substring(path.lastIndexOf('/') + 1);
+        } catch (URISyntaxException e) {
+            logger.debug("Exception while getting key id from the sign-creator url : {}", e.getMessage());
+        }
+        return Integer.parseInt(idStr);
+    }
 
 }
 

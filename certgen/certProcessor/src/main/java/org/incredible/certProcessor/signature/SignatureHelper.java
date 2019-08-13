@@ -12,6 +12,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public class SignatureHelper {
         Map signReq = new HashMap<String, Object>();
         signReq.put("entity", rootNode);
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(properties.get("SIGN_URL"));
+        HttpPost httpPost = new HttpPost(properties.get(JsonKey.SIGN_URL));
         try {
             StringEntity entity = new StringEntity(mapper.writeValueAsString(signReq));
             httpPost.setEntity(entity);
@@ -61,7 +62,7 @@ public class SignatureHelper {
             logger.error("ClientProtocolException when signing: {}", e.getMessage());
             throw new SignatureException().new UnreachableException(e.getMessage());
         } catch (IOException e) {
-            logger.error("RestClientException when signing: ", e);
+            logger.error("RestClientException when signing: {}", e.getMessage());
             throw new SignatureException().new CreationException(e.getMessage());
 
         }
@@ -78,7 +79,7 @@ public class SignatureHelper {
         boolean isSignServiceUp = false;
         try {
             CloseableHttpClient client = HttpClients.createDefault();
-            HttpGet httpGet = new HttpGet(properties.get("HEALTH_CHECK_URL"));
+            HttpGet httpGet = new HttpGet(properties.get(JsonKey.SIGN_HEALTH_CHECK_URL));
             httpGet.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
             CloseableHttpResponse response = client.execute(httpGet);
             String result = mapper.readValue(response.getEntity().getContent(),
@@ -103,7 +104,7 @@ public class SignatureHelper {
         signReq.put("entity", rootNode);
         boolean result = false;
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(properties.get("VERIFY_URL"));
+        HttpPost httpPost = new HttpPost(properties.get(JsonKey.SIGN_VERIFY_URL));
         httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         try {
             StringEntity entity = new StringEntity(mapper.writeValueAsString(signReq));

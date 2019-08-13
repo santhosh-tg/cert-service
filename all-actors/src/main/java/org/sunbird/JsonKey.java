@@ -39,6 +39,7 @@ public interface JsonKey {
     String URL = "url";
     String SIGNATORY_LIST = "signatoryList";
     String DESIGNATION = "designation";
+    String SIGNATORY_IMAGE = "image";
 
     String DOMAIN_PATH = "DOMAIN_PATH";
     String ASSESSED_DOMAIN = "ASSESSED_DOMAIN";
@@ -67,10 +68,14 @@ public interface JsonKey {
     String AZURE_STORAGE_KEY = "AZURE_STORAGE_KEY";
     String ACCESS_CODE_LENGTH = "ACCESS_CODE_LENGTH";
 
-    String HEALTH_CHECK_URL = "HEALTH_CHECK_URL";
+    String SIGN_HEALTH_CHECK_URL = "SIGN_HEALTH_CHECK_URL";
     String SIGN_URL = "SIGN_URL";
-    String VERIFY_URL = "VERIFY_URL";
+    String SIGN_VERIFY_URL = "SIGN_VERIFY_URL";
     String SIGN_CREATOR = "SIGN_CREATOR";
 
+    String JSON_URL = "jsonUrl";
+    String PDF_URL = "pdfUrl";
+    String UNIQUE_ID = "id";
+    String GENERATE_CERT = "generateCert";
 
 }
