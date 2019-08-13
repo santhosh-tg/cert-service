@@ -1,6 +1,6 @@
 package org.incredible.certProcessor;
 
-public interface jsonKey {
+public interface JsonKey {
 
    String CONTEXT="http://localhost:8080/container/v1/context.json";
    String DOMAIN_PATH="http://localhost:8080/";

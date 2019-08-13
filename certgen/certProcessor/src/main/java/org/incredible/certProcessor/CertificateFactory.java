@@ -1,17 +1,18 @@
 package org.incredible.certProcessor;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.incredible.builders.*;
 import org.incredible.certProcessor.signature.SignatureHelper;
+import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.pojos.CertificateExtension;
 import org.incredible.pojos.ob.Criteria;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -32,15 +33,18 @@ public class CertificateFactory {
 
     private static SignatureHelper signatureHelper;
 
+    private ObjectMapper mapper = new ObjectMapper();
+
     public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties) throws InvalidDateFormatException {
 
-        uuid = jsonKey.DOMAIN_PATH + UUID.randomUUID().toString();
+        uuid = JsonKey.DOMAIN_PATH + UUID.randomUUID().toString();
 
-        CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(jsonKey.CONTEXT);
-        CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(jsonKey.CONTEXT);
-        BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(jsonKey.CONTEXT);
-        IssuerBuilder issuerBuilder = new IssuerBuilder(jsonKey.CONTEXT);
+        CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(JsonKey.CONTEXT);
+        CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(JsonKey.CONTEXT);
+        BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(JsonKey.CONTEXT);
+        IssuerBuilder issuerBuilder = new IssuerBuilder(JsonKey.CONTEXT);
         SignedVerification signedVerification = new SignedVerification();
+        SignatureBuilder signatureBuilder = new SignatureBuilder();
 
 
         Criteria criteria = new Criteria();
@@ -49,10 +53,10 @@ public class CertificateFactory {
 
 
         //todo decide hosted or signed badge based on config
-        if ((jsonKey.VERIFICATION_TYPE).equals("hosted")) {
-            signedVerification.setType(new String[]{jsonKey.VERIFICATION_TYPE});
+        if ((JsonKey.VERIFICATION_TYPE).equals("hosted")) {
+            signedVerification.setType(new String[]{JsonKey.VERIFICATION_TYPE});
         } else {
-            signedVerification.setCreator(jsonKey.PUBLIC_KEY_URL);
+            signedVerification.setCreator(JsonKey.PUBLIC_KEY_URL);
         }
 
         /**
@@ -63,13 +67,13 @@ public class CertificateFactory {
                 setType(new String[]{"id"});
 
 
-        issuerBuilder.setId(jsonKey.ISSUER_URL).setName(certModel.getIssuer().getName());
+        issuerBuilder.setId(JsonKey.ISSUER_URL).setName(certModel.getIssuer().getName());
         /**
          * badge class object
          * **/
 
         badgeClassBuilder.setName(certModel.getCourseName()).setDescription(certModel.getCertificateDescription())
-                .setId(jsonKey.BADGE_URL).setCriteria(criteria)
+                .setId(JsonKey.BADGE_URL).setCriteria(criteria)
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
 
@@ -83,21 +87,20 @@ public class CertificateFactory {
                 .setIssuedOn(certModel.getIssuedDate()).setExpires(certModel.getExpiry())
                 .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification).setSignatory(certModel.getSignatoryList());
 
+        /** certificate  signature value **/
+        String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties);
 
-//        /**
-//         * to assign signature value
-//         */
-//        initSignatureHelper(certModel.getSignatoryList());
-//        /** certificate before signature value **/
-//        String toSignCertificate = certificateExtensionBuilder.build().toString();
-//
-//        String signatureValue = getSignatureValue(toSignCertificate);
-//
-//        signatureBuilder.setCreated(Instant.now().toString()).setCreator("https://dgt.example.gov.in/keys/awarding_body.json")
-//                .setSignatureValue(signatureValue);
-//        certificateExtensionBuilder.setSignature(signatureBuilder.build());
-//
-//        logger.info("signed certificate is valid {}", verifySignature(toSignCertificate, signatureValue));
+//        logger.info("signed certificate is valid {}", verifySignature(certificateExtensionBuilder.build(), signatureValue, properties));
+
+
+        /**
+         * to assign signature value
+         */
+        signatureBuilder.setCreated(Instant.now().toString()).setCreator(properties.get("SIGN_CREATOR"))
+                .setSignatureValue(signatureValue);
+
+        certificateExtensionBuilder.setSignature(signatureBuilder.build());
+
         logger.info("certificate extension => {}", certificateExtensionBuilder.build());
         return certificateExtensionBuilder.build();
     }
@@ -115,38 +118,55 @@ public class CertificateFactory {
         return properties;
     }
 
-    public static boolean verifySignature(String certificate, String signatureValue) {
+
+    /**
+     * to verify signature value
+     *
+     * @param certificate
+     * @param signatureValue
+     * @param properties
+     * @return
+     */
+    public boolean verifySignature(CertificateExtension certificate, String signatureValue, Map<String, String> properties) {
         boolean isValid = false;
+        SignatureHelper signatureHelper = new SignatureHelper(properties);
         try {
-            isValid = signatureHelper.verify(certificate.getBytes(),
-                    signatureValue);
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        }
-        return isValid;
-    }
-
-    private static void initSignatureHelper(KeyPair keyPair) {
-
-        try {
-            signatureHelper = new SignatureHelper("SHA1withRSA", keyPair);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            Map signReq = new HashMap<String, Object>();
+            signReq.put("claim", certificate);
+            signReq.put("signatureValue", signatureValue);
+            signReq.put("keyId", 2);
+            JsonNode jsonNode = mapper.valueToTree(signReq);
+            isValid = signatureHelper.verify(jsonNode);
+            return isValid;
+        } catch (SignatureException.UnreachableException | SignatureException.VerificationException e) {
+            return isValid;
         }
     }
 
-
-    private static String getSignatureValue(String toSignCertificate) {
+    /**
+     * to get signature value of certificate
+     *
+     * @param certificateExtension
+     * @param properties
+     * @return
+     */
+    private String getSignatureValue(CertificateExtension certificateExtension, Map<String, String> properties) {
+        SignatureHelper signatureHelper = new SignatureHelper(properties);
+        Map<String, Object> signMap;
         try {
-            String signatureValue = signatureHelper.sign(toSignCertificate.getBytes());
-            return signatureValue;
-        } catch (SignatureException | UnsupportedEncodingException | InvalidKeyException e) {
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            String request = mapper.writeValueAsString(certificateExtension);
+            JsonNode jsonNode = mapper.readTree(request);
+            signMap = signatureHelper.generateSignature(jsonNode);
+            return (String) signMap.get("signatureValue");
+
+        } catch (IOException | SignatureException.UnreachableException | SignatureException.CreationException e) {
+            logger.debug("Exception while generating signature for certificate : {}", e.getMessage());
             e.printStackTrace();
             return null;
         }
-
     }
+
+
 }
 

@@ -18,7 +18,10 @@ export AZURE_STORAGE_SECRET=someKey
 export CONTAINER_NAME=certs
 export AZURE_STORAGE_KEY=sb
 
-
 export ACCESS_CODE_LENGTH=6
+export HEALTH_CHECK_URL=http://localhost:8013/
+export SIGN_URL=http://localhost:8013/sign
+export VERIFY_URL=http://localhost:8013/verify
+export SIGN_CREATOR="Diksha"
 
 ################### END -  configuration #############################

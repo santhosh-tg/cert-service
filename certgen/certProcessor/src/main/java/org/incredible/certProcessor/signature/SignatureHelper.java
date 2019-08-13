@@ -1,41 +1,127 @@
 package org.incredible.certProcessor.signature;
 
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.incredible.certProcessor.signature.exceptions.SignatureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
-import java.security.SignatureException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignatureHelper {
-    private Signature signature;
-    private KeyPair keyPair;
+
+    private Map<String, String> properties;
+
+
+    public SignatureHelper(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+    private ObjectMapper mapper = new ObjectMapper();
+
+
+    private static Logger logger = LoggerFactory.getLogger(SignatureHelper.class);
+
+
     /**
-     * For a list of RSA-based Signature Algorithms, with MD2, MD5 or SHA-1,
-     * refer to https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#Algorithm
-     * @param hashAlgorithm, valid values are MD2withRSA, MD5withRSA and SHA1withRSA
-     * @throws NoSuchAlgorithmException
+     * This method calls signature service for signing the object
+     *
+     * @param rootNode - contains input need to be signed
+     * @return - signed data with key
+     * @throws SignatureException.UnreachableException
+     * @throws SignatureException.CreationException
      */
-    public SignatureHelper(String hashAlgorithm, KeyPair keyPair) throws NoSuchAlgorithmException {
-        signature = Signature.getInstance(hashAlgorithm);
-        this.keyPair = keyPair;
+    public Map<String, Object> generateSignature(JsonNode rootNode)
+            throws SignatureException.UnreachableException, SignatureException.CreationException {
+        Map signReq = new HashMap<String, Object>();
+        signReq.put("entity", rootNode);
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(properties.get("SIGN_URL"));
+        try {
+            StringEntity entity = new StringEntity(mapper.writeValueAsString(signReq));
+            httpPost.setEntity(entity);
+            httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+            CloseableHttpResponse response = client.execute(httpPost);
+            return mapper.readValue(response.getEntity().getContent(),
+                    new TypeReference<Map<String, Object>>() {
+                    });
+        } catch (ClientProtocolException e) {
+            logger.error("ClientProtocolException when signing: {}", e.getMessage());
+            throw new SignatureException().new UnreachableException(e.getMessage());
+        } catch (IOException e) {
+            logger.error("RestClientException when signing: ", e);
+            throw new SignatureException().new CreationException(e.getMessage());
+
+        }
+
     }
 
-    public String sign(byte[] data) throws SignatureException, InvalidKeyException, UnsupportedEncodingException {
-        // After doing a sign, the keys are going to be reset. So do this everytime.
-        signature.initSign(keyPair.getPrivate());
-        signature.update(data);
-        byte[] signed = signature.sign();
-        return Base64.encode(signed);
+    /**
+     * This method checks signature service is available or not
+     *
+     * @return - true or false
+     * @throws SignatureException.UnreachableException
+     */
+    public boolean checkServiceIsUp() throws SignatureException.UnreachableException {
+        boolean isSignServiceUp = false;
+        try {
+            CloseableHttpClient client = HttpClients.createDefault();
+            HttpGet httpGet = new HttpGet(properties.get("HEALTH_CHECK_URL"));
+            httpGet.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+            CloseableHttpResponse response = client.execute(httpGet);
+            String result = mapper.readValue(response.getEntity().getContent(),
+                    new TypeReference<String>() {
+                    });
+            if (result.equalsIgnoreCase("UP")) {
+                isSignServiceUp = true;
+                logger.debug("Signature service running !");
+            }
+        } catch (IOException e) {
+            logger.error("ClientProtocolException when checking the health of the  signature service:{} ", e.getMessage());
+            throw new SignatureException().new UnreachableException(e.getMessage());
+        }
+        return isSignServiceUp;
     }
 
-    public boolean verify(byte[] data, String signatureData) throws InvalidKeyException, SignatureException {
-        signature.initVerify(keyPair.getPublic());
-        signature.update(data);
-        byte[] decodedSignature = new Base64().decode(signatureData);
-        return signature.verify(decodedSignature);
+
+    public boolean verify(JsonNode rootNode)
+            throws SignatureException.UnreachableException, SignatureException.VerificationException {
+        logger.debug("verify method starts with value {}", rootNode);
+        Map signReq = new HashMap<String, Object>();
+        signReq.put("entity", rootNode);
+        boolean result = false;
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(properties.get("VERIFY_URL"));
+        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+        try {
+            StringEntity entity = new StringEntity(mapper.writeValueAsString(signReq));
+            httpPost.setEntity(entity);
+            CloseableHttpResponse response = client.execute(httpPost);
+            result = mapper.readValue(response.getEntity().getContent(),
+                    new TypeReference<Boolean>() {
+                    });
+
+        } catch (ClientProtocolException ex) {
+            logger.error("ClientProtocolException when verifying: ", ex);
+            throw new SignatureException().new UnreachableException(ex.getMessage());
+        } catch (Exception e) {
+            logger.error("ClientProtocolException when verifying: ", e);
+            throw new SignatureException().new VerificationException(e.getMessage());
+        }
+        logger.debug("verify method ends with value {}", result);
+        return result;
     }
+
 }
