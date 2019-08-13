@@ -132,7 +132,7 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.SIGN_CREATOR, System.getenv(JsonKey.SIGN_CREATOR));
         properties.put(JsonKey.SIGN_URL, System.getenv(JsonKey.SIGN_URL));
         properties.put(JsonKey.VERIFY_URL, System.getenv(JsonKey.VERIFY_URL));
-        logger.info("CertificateGeneratorActor:getProperties:ENV variables GOT WITH SIZE".concat(properties + ""));
+        logger.info("CertificateGeneratorActor:getProperties:properties got from env ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;
     }
 
