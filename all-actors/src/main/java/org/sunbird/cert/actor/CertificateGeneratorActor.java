@@ -19,10 +19,7 @@ import org.sunbird.response.Response;
 import java.io.File;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This actor is responsible for certificate generation.
@@ -132,6 +129,7 @@ public class CertificateGeneratorActor extends BaseActor {
 		properties.put(JsonKey.CONTEXT,System.getenv(JsonKey.CONTEXT));
 		properties.put(JsonKey.VERIFICATION_TYPE,System.getenv(JsonKey.VERIFICATION_TYPE));
 		properties.put(JsonKey.ACCESS_CODE_LENGTH,System.getenv(JsonKey.ACCESS_CODE_LENGTH));
+		logger.info("CertificateGeneratorActor:getProperties:properties got from env ".concat(Collections.singleton(properties.toString())+""));
 		return properties;
 	}
 
