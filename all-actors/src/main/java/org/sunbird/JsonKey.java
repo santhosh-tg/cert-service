@@ -40,7 +40,7 @@ public interface JsonKey {
   String SIGNATORY_LIST = "signatoryList";
   String DESIGNATION = "designation";
 
-  String DOMAIN_PATH="DOMAIN_PATH";
+  String DOMAIN_URL="DOMAIN_URL";
   String ASSESSED_DOMAIN="ASSESSED_DOMAIN";
   String BADGE_URL="BADGE_URL";
   String ISSUER_URL="ISSUER_URL";
@@ -66,6 +66,9 @@ public interface JsonKey {
   String AZURE_STORAGE_SECRET = "AZURE_STORAGE_SECRET";
   String AZURE_STORAGE_KEY = "AZURE_STORAGE_KEY";
   String ACCESS_CODE_LENGTH = "ACCESS_CODE_LENGTH";
+  String CERT_SERVICE_BASE_URL="CERT_SERVICE_BASE_URL";
+  String ROOT_ORG_ID="rootOrgId";
+
 
 
 

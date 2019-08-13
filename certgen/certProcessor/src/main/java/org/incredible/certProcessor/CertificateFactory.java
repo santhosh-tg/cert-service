@@ -34,12 +34,12 @@ public class CertificateFactory {
 
     public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties) throws InvalidDateFormatException {
 
-        uuid = jsonKey.DOMAIN_PATH + UUID.randomUUID().toString();
+        uuid = properties.get(JsonKey.DOMAIN_URL).concat("/")+ UUID.randomUUID().toString();
 
-        CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(jsonKey.CONTEXT);
-        CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(jsonKey.CONTEXT);
-        BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(jsonKey.CONTEXT);
-        IssuerBuilder issuerBuilder = new IssuerBuilder(jsonKey.CONTEXT);
+        CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(properties.get(JsonKey.CONTEXT));
+        CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(properties.get(JsonKey.CONTEXT));
+        BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(properties.get(JsonKey.CONTEXT));
+        IssuerBuilder issuerBuilder = new IssuerBuilder(properties.get(JsonKey.CONTEXT));
         SignedVerification signedVerification = new SignedVerification();
 
 
@@ -49,10 +49,10 @@ public class CertificateFactory {
 
 
         //todo decide hosted or signed badge based on config
-        if ((jsonKey.VERIFICATION_TYPE).equals("hosted")) {
-            signedVerification.setType(new String[]{jsonKey.VERIFICATION_TYPE});
+        if (properties.get(JsonKey.VERIFICATION_TYPE).equals("hosted")) {
+            signedVerification.setType(new String[]{properties.get(JsonKey.VERIFICATION_TYPE)});
         } else {
-            signedVerification.setCreator(jsonKey.PUBLIC_KEY_URL);
+            signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
         }
 
         /**
@@ -63,13 +63,13 @@ public class CertificateFactory {
                 setType(new String[]{"id"});
 
 
-        issuerBuilder.setId(jsonKey.ISSUER_URL).setName(certModel.getIssuer().getName());
+        issuerBuilder.setId(properties.get(JsonKey.ISSUER_URL)).setName(certModel.getIssuer().getName());
         /**
          * badge class object
          * **/
 
         badgeClassBuilder.setName(certModel.getCourseName()).setDescription(certModel.getCertificateDescription())
-                .setId(jsonKey.BADGE_URL).setCriteria(criteria)
+                .setId(properties.get(JsonKey.BADGE_URL)).setCriteria(criteria)
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
 
