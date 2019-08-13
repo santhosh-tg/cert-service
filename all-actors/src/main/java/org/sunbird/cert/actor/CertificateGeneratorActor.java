@@ -5,10 +5,7 @@ import org.apache.log4j.Logger;
 import org.incredible.CertificateGenerator;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.views.HTMLTempalteZip;
-import org.sunbird.BaseActor;
-import org.sunbird.BaseException;
-import org.sunbird.CertMapper;
-import org.sunbird.JsonKey;
+import org.sunbird.*;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.azure.AzureFileUtility;
 import org.sunbird.message.IResponseMessage;
@@ -121,15 +118,15 @@ public class CertificateGeneratorActor extends BaseActor {
 	private HashMap<String,String> getProperties(){
 		// properties need to populate from env
 		HashMap<String,String> properties = new HashMap<>();
-		properties.put(JsonKey.DOMAIN_PATH,System.getenv(JsonKey.DOMAIN_PATH));
-		properties.put(JsonKey.ASSESSED_DOMAIN,System.getenv(JsonKey.ASSESSED_DOMAIN));
-		properties.put(JsonKey.BADGE_URL,System.getenv(JsonKey.BADGE_URL));
-		properties.put(JsonKey.ISSUER_URL,System.getenv(JsonKey.ISSUER_URL));
-		properties.put(JsonKey.TEMPLATE_URL,System.getenv(JsonKey.TEMPLATE_URL));
-		properties.put(JsonKey.CONTEXT,System.getenv(JsonKey.CONTEXT));
-		properties.put(JsonKey.VERIFICATION_TYPE,System.getenv(JsonKey.VERIFICATION_TYPE));
-		properties.put(JsonKey.ACCESS_CODE_LENGTH,System.getenv(JsonKey.ACCESS_CODE_LENGTH));
-		logger.info("CertificateGeneratorActor:getProperties:properties got from env ".concat(Collections.singleton(properties.toString())+""));
+		properties.put(JsonKey.DOMAIN_PATH, Constant.DOMAIN_PATH);
+		properties.put(JsonKey.ASSESSED_DOMAIN,Constant.ASSESSED_DOMAIN);
+		properties.put(JsonKey.BADGE_URL,Constant.BADGE_URL);
+		properties.put(JsonKey.ISSUER_URL,Constant.ISSUER_URL);
+		properties.put(JsonKey.TEMPLATE_URL,Constant.TEMPLATE_URL);
+		properties.put(JsonKey.CONTEXT,Constant.CONTEXT);
+		properties.put(JsonKey.VERIFICATION_TYPE,Constant.VERIFICATION_TYPE);
+		properties.put(JsonKey.ACCESS_CODE_LENGTH,Constant.ACCESS_CODE_LENGTH);
+		logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString())+""));
 		return properties;
 	}
 
