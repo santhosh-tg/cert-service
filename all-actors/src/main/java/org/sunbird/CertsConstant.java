@@ -87,9 +87,8 @@ public class CertsConstant {
 
     private static String getEncServiceUrl() {
         String encServiceUrl = getPropertyFromEnv(JsonKey.ENC_SERVICE_URL);
-        return StringUtils.isNotBlank(encServiceUrl) ? encServiceUrl : "";
-//        validateEnvProperty(encServiceUrl);
-//        return encServiceUrl;
+        validateEnvProperty(encServiceUrl);
+        return encServiceUrl;
 
     }
 
