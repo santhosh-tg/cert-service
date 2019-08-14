@@ -66,5 +66,5 @@ public interface JsonKey {
   String AZURE_STORAGE_SECRET = "AZURE_STORAGE_SECRET";
   String AZURE_STORAGE_KEY = "AZURE_STORAGE_KEY";
   String ACCESS_CODE_LENGTH = "ACCESS_CODE_LENGTH";
-  String ROOT_ORG_ID="rootOrgId";
+  String ORG_ID="orgId";
 }
