@@ -8,7 +8,7 @@ public interface JsonKey {
     String SIGN_URL = "SIGN_URL";
     String SIGN_HEALTH_CHECK_URL = "SIGN_HEALTH_CHECK_URL";
     String SIGN_VERIFY_URL = "SIGN_VERIFY_URL";
-    String DOMAIN_URL = "DOMAIN_URL";
+    String DOMAIN_URL = "sunbird_cert_domain_url";
     String BADGE_URL = "BADGE_URL";
     String ISSUER_URL = "ISSUER_URL";
     String CONTEXT = "CONTEXT";

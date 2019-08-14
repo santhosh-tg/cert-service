@@ -3,7 +3,7 @@
 ################### CERT_SERVICE configuration ###################################
 
 
-export DOMAIN_PATH=http://localhost:8080
+export sunbird_cert_domain_url=http://localhost:8080
 
 export CONTAINER_NAME=certs
 export CLOUD_STORAGE_TYPE=azure
@@ -12,7 +12,7 @@ export CONTAINER_NAME=certs
 export AZURE_STORAGE_KEY=sb
 
 export ACCESS_CODE_LENGTH=6
-export ENC_SERVICE_URL=http://localhost:8013
+export sunbird_cert_enc_service_url=http://localhost:8013
 
 
 ################### END -  configuration #############################
