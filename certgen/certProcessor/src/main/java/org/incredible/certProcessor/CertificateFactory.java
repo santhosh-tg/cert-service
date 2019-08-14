@@ -45,7 +45,6 @@ public class CertificateFactory {
         SignatureBuilder signatureBuilder = new SignatureBuilder();
 
         Criteria criteria = new Criteria();
-        criteria.setNarrative("For exhibiting outstanding performance");
         criteria.setId(uuid);
 
 
@@ -54,7 +53,7 @@ public class CertificateFactory {
          *  **/
         compositeIdentityObjectBuilder.setName(certModel.getRecipientName()).setId(certModel.getIdentifier())
                 .setHashed(false).
-                setType(new String[]{"id"});
+                setType(new String[]{JsonKey.ID});
 
 
         issuerBuilder.setId(properties.get(JsonKey.ISSUER_URL)).setName(certModel.getIssuer().getName())
@@ -84,12 +83,10 @@ public class CertificateFactory {
 
         } else {
             signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
-            logger.info("properties.get(JsonKey.PUBLIC_KEY_URL)"+properties.get(JsonKey.PUBLIC_KEY_URL));
 
             /** certificate  signature value **/
             String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, keyID);
 
-//            logger.info("signed certificate is valid {}", verifySignature(certificateExtensionBuilder.build(), signatureValue, properties));
             /**
              * to assign signature value
              */
@@ -105,7 +102,7 @@ public class CertificateFactory {
 
 
     /**
-     * to verify signature value
+     * to verifySignature signature value
      *
      * @param certificate
      * @param signatureValue
@@ -121,7 +118,7 @@ public class CertificateFactory {
             signReq.put(JsonKey.SIGNATURE_VALUE, signatureValue);
             signReq.put(JsonKey.KEY_ID, getKeyId(properties.get(JsonKey.SIGN_CREATOR)));
             JsonNode jsonNode = mapper.valueToTree(signReq);
-            isValid = signatureHelper.verify(jsonNode);
+            isValid = signatureHelper.verifySignature(jsonNode);
         } catch (SignatureException.UnreachableException | SignatureException.VerificationException e) {
             logger.error("exception while verifying Signature : {}", e.getMessage());
         }

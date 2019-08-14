@@ -18,4 +18,6 @@ public interface JsonKey {
     String CONTAINER_NAME = "CONTAINER_NAME";
     String ROOT_ORG_ID = "orgId";
     String TAG = "tag";
+    String ID = "id";
+    String ENTITY = "entity";
 }
