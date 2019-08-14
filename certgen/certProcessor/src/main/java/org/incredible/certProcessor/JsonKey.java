@@ -7,4 +7,5 @@ public interface JsonKey {
     String CONTEXT="CONTEXT";
     String VERIFICATION_TYPE="VERIFICATION_TYPE";
     String PUBLIC_KEY_URL="PUBLIC_KEY_URL";
+    String HOSTED="hosted";
 }

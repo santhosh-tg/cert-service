@@ -2,7 +2,7 @@
 
 ################### CERT_SERVICE configuration ###################################
 export keyA=valA
-export CERT_SERVICE_BASE_URL=http://localhost:8080
+export DOMAIN_URL=http://localhost:8080
 export CLOUD_STORAGE_TYPE=azure
 export AZURE_STORAGE_SECRET=someKey
 export CONTAINER_NAME=certs

@@ -57,7 +57,7 @@ public class CertsConstant {
     }
 
     private  String getDomainUrlFromEnv(){
-        String domainUrl=getPropertyFromEnv(JsonKey.CERT_SERVICE_BASE_URL);
+        String domainUrl=getPropertyFromEnv(JsonKey.DOMAIN_URL);
         validateEnvProperty(domainUrl);
         return domainUrl;
     }

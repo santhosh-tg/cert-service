@@ -49,7 +49,7 @@ public class CertificateFactory {
 
 
         //todo decide hosted or signed badge based on config
-        if (properties.get(JsonKey.VERIFICATION_TYPE).equals("hosted")) {
+        if (properties.get(JsonKey.VERIFICATION_TYPE).equals(JsonKey.HOSTED)) {
             signedVerification.setType(new String[]{properties.get(JsonKey.VERIFICATION_TYPE)});
         } else {
             signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
@@ -98,7 +98,7 @@ public class CertificateFactory {
 //        certificateExtensionBuilder.setSignature(signatureBuilder.build());
 //
 //        logger.info("signed certificate is valid {}", verifySignature(toSignCertificate, signatureValue));
-        logger.info("certificate extension => {}", certificateExtensionBuilder.build());
+        logger.info("CertificateFactory:createCertificate:certificate extension => {}", certificateExtensionBuilder.build());
         return certificateExtensionBuilder.build();
     }
 
@@ -110,7 +110,7 @@ public class CertificateFactory {
             properties.load(resourceStream);
         } catch (IOException e) {
             e.printStackTrace();
-            logger.info("Exception while reading application.properties {}", e.getMessage());
+            logger.error("CertificateFactory:readPropertiesFile:Exception while reading application.properties {}", e.getMessage());
         }
         return properties;
     }

@@ -1,6 +1,7 @@
 package org.sunbird.cert.actor;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.incredible.CertificateGenerator;
 import org.incredible.certProcessor.CertModel;
@@ -50,7 +51,7 @@ public class CertificateGeneratorActor extends BaseActor {
 		try {
 			htmlTempalteZip = new HTMLTempalteZip(new URL(url));
 		} catch (Exception ex) {
-			logger.info("CertificateGeneratorActor : generateCertificate :Exception Occurred while creating HtmlTemplate provider.",ex);
+			logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while creating HtmlTemplate provider.",ex);
 			throw new  BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,url,JsonKey.HTML_TEMPLATE), ResponseCode.CLIENT_ERROR.getCode());
 		}
 		List<Map<String,String>> certUrlList = new ArrayList<>();
@@ -60,7 +61,7 @@ public class CertificateGeneratorActor extends BaseActor {
 				certUUID = certificateGenerator.createCertificate(certModel,htmlTempalteZip);
 			} catch (Exception ex) {
 				cleanup();
-				logger.info("CertificateGeneratorActor : generateCertificate :Exception Occurred while generating certificate.",ex);
+				logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate.",ex);
 				throw new  BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.INTERNAL_ERROR, ResponseCode.SERVER_ERROR.getCode());
 			}
 			certUrlList.add(uploadCertificate(certUUID));
@@ -114,15 +115,15 @@ public class CertificateGeneratorActor extends BaseActor {
 		}catch (Exception ex) {
 			logger.info("CertificateGeneratorActor:upload: Exception occurred while uploading certificate.",ex);
 		}
-		return "";
+		return StringUtils.EMPTY;
 	}
 
 	private HashMap<String,String> populatePropertiesMap(Request request){
 		String rootOrgId=(String)((Map)request.get(JsonKey.CERTIFICATE)).get(JsonKey.ROOT_ORG_ID);
-		String batchId=(String) ((Map)request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
+		String tag=(String) ((Map)request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
 		HashMap<String,String> properties = new HashMap<>();
 		properties.put(JsonKey.DOMAIN_URL, certVar.getDOMAIN_URL());
-		properties.put(JsonKey.BADGE_URL,certVar.getBADGE_URL(rootOrgId,batchId));
+		properties.put(JsonKey.BADGE_URL,certVar.getBADGE_URL(rootOrgId,tag));
 		properties.put(JsonKey.ISSUER_URL,certVar.getISSUER_URL(rootOrgId));
 		properties.put(JsonKey.CONTEXT,certVar.getCONTEXT());
 		properties.put(JsonKey.VERIFICATION_TYPE,certVar.getVERIFICATION_TYPE());
