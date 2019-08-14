@@ -57,9 +57,9 @@ public class CertsConstant {
         return CONTAINER_NAME;
     }
 
-    private static String getDomainUrlFromEnv(){
-       String domainUrl=getPropertyFromEnv(JsonKey.DOMAIN_URL);
-       return StringUtils.isNotBlank(domainUrl)?domainUrl:"https://dev.sunbirded.org";
+    private static String getDomainUrlFromEnv() {
+        String domainUrl = getPropertyFromEnv(JsonKey.DOMAIN_URL);
+        return StringUtils.isNotBlank(domainUrl) ? domainUrl : "https://dev.sunbirded.org";
 //        validateEnvProperty(domainUrl);
 //        return domainUrl;
     }
@@ -87,7 +87,7 @@ public class CertsConstant {
 
     private static String getEncServiceUrl() {
         String encServiceUrl = getPropertyFromEnv(JsonKey.ENC_SERVICE_URL);
-        return StringUtils.isNotBlank(encServiceUrl)?encServiceUrl:"";
+        return StringUtils.isNotBlank(encServiceUrl) ? encServiceUrl : "";
 //        validateEnvProperty(encServiceUrl);
 //        return encServiceUrl;
 
@@ -105,6 +105,10 @@ public class CertsConstant {
 
     public String getSignCreator(String keyId) {
         return String.format("%s/%s/%s", DOMAIN_URL, JsonKey.KEYS, keyId);
+    }
+
+    public String getEncryptionServiceUrl() {
+        return getEncServiceUrl();
     }
 
 }

@@ -140,6 +140,7 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.SIGN_CREATOR, certVar.getSignCreator(keyId));
         properties.put(JsonKey.SIGN_URL, certVar.getEncSignUrl());
         properties.put(JsonKey.SIGN_VERIFY_URL, certVar.getEncSignVerifyUrl());
+        properties.put(JsonKey.ENC_SERVICE_URL, certVar.getEncryptionServiceUrl());
 
         logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;
