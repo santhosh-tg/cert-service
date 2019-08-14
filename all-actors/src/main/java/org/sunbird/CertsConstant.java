@@ -57,10 +57,10 @@ public class CertsConstant {
     }
 
     private static String getDomainUrlFromEnv(){
-//        String domainUrl=getPropertyFromEnv(JsonKey.DOMAIN_URL);
+       String domainUrl=getPropertyFromEnv(JsonKey.DOMAIN_URL);
+       return StringUtils.isNotBlank(domainUrl)?domainUrl:"https://dev.sunbirded.org";
 //        validateEnvProperty(domainUrl);
 //        return domainUrl;
-        return "https://dev.sunbirded.org";
     }
 
     private static String getContainerNameFromEnv(){
