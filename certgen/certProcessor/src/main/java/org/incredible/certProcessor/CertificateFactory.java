@@ -35,7 +35,7 @@ public class CertificateFactory {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties) throws InvalidDateFormatException {
+    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties, String keyID) throws InvalidDateFormatException {
 
         uuid = JsonKey.DOMAIN_PATH + UUID.randomUUID().toString() + ".json";
 
@@ -51,13 +51,6 @@ public class CertificateFactory {
         criteria.setNarrative("For exhibiting outstanding performance");
         criteria.setId(uuid);
 
-
-        //todo decide hosted or signed badge based on config
-        if ((JsonKey.VERIFICATION_TYPE).equals("hosted")) {
-            signedVerification.setType(new String[]{JsonKey.VERIFICATION_TYPE});
-        } else {
-            signedVerification.setCreator(JsonKey.PUBLIC_KEY_URL);
-        }
 
         /**
          *  recipient object
@@ -85,18 +78,28 @@ public class CertificateFactory {
                 .setIssuedOn(certModel.getIssuedDate()).setExpires(certModel.getExpiry())
                 .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification).setSignatory(certModel.getSignatoryList());
 
-        /** certificate  signature value **/
-        String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties);
+        if (keyID.isEmpty()) {
+            signedVerification.setType(new String[]{JsonKey.VERIFICATION_TYPE});
 
-        logger.info("signed certificate is valid {}", verifySignature(certificateExtensionBuilder.build(), signatureValue, properties));
+        } else {
+            signedVerification.setCreator(JsonKey.PUBLIC_KEY_URL);
 
-        /**
-         * to assign signature value
-         */
-        signatureBuilder.setCreated(Instant.now().toString()).setCreator(properties.get(JsonKey.SIGN_CREATOR))
-                .setSignatureValue(signatureValue);
+            /** certificate  signature value **/
+            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, keyID);
+            logger.info("signed certificate is valid {}", verifySignature(certificateExtensionBuilder.build(), signatureValue, properties));
+            /**
+             * to assign signature value
+             */
+            signatureBuilder.setCreated(Instant.now().toString()).setCreator(properties.get(JsonKey.SIGN_CREATOR))
+                    .setSignatureValue(signatureValue);
 
-        certificateExtensionBuilder.setSignature(signatureBuilder.build());
+            certificateExtensionBuilder.setSignature(signatureBuilder.build());
+        }
+//        if ((JsonKey.VERIFICATION_TYPE).equals("hosted")) {
+//            signedVerification.setType(new String[]{JsonKey.VERIFICATION_TYPE});
+//        } else {
+//
+//        }
 
         logger.info("certificate extension => {}", certificateExtensionBuilder.build());
         return certificateExtensionBuilder.build();
@@ -133,14 +136,14 @@ public class CertificateFactory {
      * @param properties
      * @return
      */
-    private String getSignatureValue(CertificateExtension certificateExtension, Map<String, String> properties) {
+    private String getSignatureValue(CertificateExtension certificateExtension, Map<String, String> properties, String keyID) {
         SignatureHelper signatureHelper = new SignatureHelper(properties);
         Map<String, Object> signMap;
         try {
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             String request = mapper.writeValueAsString(certificateExtension);
             JsonNode jsonNode = mapper.readTree(request);
-            signMap = signatureHelper.generateSignature(jsonNode);
+            signMap = signatureHelper.generateSignature(jsonNode, keyID);
             return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
         } catch (IOException | SignatureException.UnreachableException | SignatureException.CreationException e) {
             logger.debug("Exception while generating signature for certificate : {}", e.getMessage());

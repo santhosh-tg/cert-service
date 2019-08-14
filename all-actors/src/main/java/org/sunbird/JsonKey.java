@@ -60,6 +60,7 @@ public interface JsonKey {
     String LOGO = "logo";
     String ISSUED_DATE = "issuedDate";
     String USER = "user";
+    String KEYS = "keys";
 
     String CONTAINER_NAME = "CONTAINER_NAME";
     String CLOUD_STORAGE_TYPE = "CLOUD_STORAGE_TYPE";
@@ -67,11 +68,12 @@ public interface JsonKey {
     String AZURE_STORAGE_SECRET = "AZURE_STORAGE_SECRET";
     String AZURE_STORAGE_KEY = "AZURE_STORAGE_KEY";
     String ACCESS_CODE_LENGTH = "ACCESS_CODE_LENGTH";
-
+    String ENC_SERVICE_URL = "SIGN_DOMAIN";
     String SIGN_HEALTH_CHECK_URL = "SIGN_HEALTH_CHECK_URL";
     String SIGN_URL = "SIGN_URL";
     String SIGN_VERIFY_URL = "SIGN_VERIFY_URL";
     String SIGN_CREATOR = "SIGN_CREATOR";
+
 
     String JSON_URL = "jsonUrl";
     String PDF_URL = "pdfUrl";

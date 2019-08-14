@@ -52,14 +52,14 @@ public class CertificateGeneratorActor extends BaseActor {
         try {
             htmlTempalteZip = new HTMLTempalteZip(new URL(url));
         } catch (Exception ex) {
-            logger.info("CertificateGeneratorActor : generateCertificate :Exception Occurred while creating HtmlTemplate provider.", ex);
+            logger.error("CertificateGeneratorActor : generateCertificate :Exception Occurred while creating HtmlTemplate provider.", ex);
             throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE, url, JsonKey.HTML_TEMPLATE), ResponseCode.CLIENT_ERROR.getCode());
         }
         List<Map<String, String>> certUrlList = new ArrayList<>();
         for (CertModel certModel : certModelList) {
             String certUUID = "";
             try {
-                certUUID = certificateGenerator.createCertificate(certModel, htmlTempalteZip);
+                certUUID = certificateGenerator.createCertificate(certModel, htmlTempalteZip, (String) ((Map<String, Object>) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS)).get("id"));
             } catch (Exception ex) {
                 cleanup();
                 logger.error("CertificateGeneratorActor : generateCertificate :Exception Occurred while generating certificate.", ex);

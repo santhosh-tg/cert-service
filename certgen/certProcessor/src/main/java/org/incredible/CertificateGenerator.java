@@ -41,8 +41,9 @@ public class CertificateGenerator {
     private CertificateFactory certificateFactory = new CertificateFactory();
 
 
-    public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider) throws InvalidDateFormatException {
-        CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties);
+    public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider, String signatureConfig) throws InvalidDateFormatException {
+        logger.info("key id : " + signatureConfig);
+        CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties, signatureConfig);
         generateCertificateJson(certificateExtension);
         generateQRCodeForCertificate(certificateExtension);
         if (htmlTemplateProvider.checkHtmlTemplateIsValid(htmlTemplateProvider.getTemplateContent())) {

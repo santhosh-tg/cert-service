@@ -44,12 +44,12 @@ public class SignatureHelper {
      * @throws SignatureException.UnreachableException
      * @throws SignatureException.CreationException
      */
-    public Map<String, Object> generateSignature(JsonNode rootNode)
+    public Map<String, Object> generateSignature(JsonNode rootNode, String keyId)
             throws SignatureException.UnreachableException, SignatureException.CreationException {
         Map signReq = new HashMap<String, Object>();
         signReq.put("entity", rootNode);
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(properties.get(JsonKey.SIGN_URL));
+        HttpPost httpPost = new HttpPost(properties.get(JsonKey.SIGN_URL) + "/" + keyId);
         try {
             StringEntity entity = new StringEntity(mapper.writeValueAsString(signReq));
             httpPost.setEntity(entity);
