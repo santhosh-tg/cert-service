@@ -1,6 +1,5 @@
 package org.sunbird;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.pojos.SignatoryExtension;
@@ -13,9 +12,13 @@ import java.util.stream.Collectors;
 
 public class CertMapper {
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private static Map<String, String> properties;
 
-    public static List<CertModel> toList(Map<String, Object> request) {
+    public CertMapper(Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+    public List<CertModel> toList(Map<String, Object> request) {
         Map<String, Object> json = (Map<String, Object>) request.get(JsonKey.CERTIFICATE);
         List<Map<String, Object>> dataList = (List<Map<String, Object>>) json.get(JsonKey.DATA);
         Issuer issuer = getIssuer((Map<String, Object>) json.get(JsonKey.ISSUER));
@@ -38,8 +41,7 @@ public class CertMapper {
     }
 
     private static SignatoryExtension getSignatory(Map<String, Object> signatory) {
-        SignatoryExtension signatoryExt = new SignatoryExtension(System.getenv(JsonKey.CONTEXT));
-        //signatoryExt.setName((String)signatory.get(JsonKey.NAME));
+        SignatoryExtension signatoryExt = new SignatoryExtension(properties.get(JsonKey.CONTEXT));
         signatoryExt.setIdentity((String) signatory.get(JsonKey.ID));
         signatoryExt.setDesignation((String) signatory.get(JsonKey.DESIGNATION));
         signatoryExt.setImage((String) signatory.get(JsonKey.SIGNATORY_IMAGE));
@@ -49,7 +51,7 @@ public class CertMapper {
 
 
     private static Issuer getIssuer(Map<String, Object> issuerData) {
-        Issuer issuer = new Issuer(System.getenv(JsonKey.CONTEXT));
+        Issuer issuer = new Issuer(properties.get(JsonKey.CONTEXT));
         issuer.setName((String) issuerData.get(JsonKey.NAME));
         issuer.setUrl((String) issuerData.get(JsonKey.URL));
         List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY));
@@ -69,7 +71,6 @@ public class CertMapper {
         certModel.setIdentifier((String) data.get(JsonKey.RECIPIENT_ID));
         certModel.setValidFrom((String) data.get(JsonKey.VALID_FROM));
         certModel.setExpiry((String) data.get(JsonKey.EXPIRY));
-        //certModel.setIdentifier((String)data.get(JsonKey.OLD_ID));
         return certModel;
     }
 
@@ -77,7 +78,7 @@ public class CertMapper {
         List<String> validatedPublicKeys = new ArrayList<>();
         publicKeys.forEach((publicKey) -> {
             if (!publicKey.startsWith("http")) {
-                validatedPublicKeys.add(System.getenv(JsonKey.ENC_SERVICE_URL) + "/" + JsonKey.KEYS + "/" + publicKey);
+                validatedPublicKeys.add(properties.get(JsonKey.ENC_SERVICE_URL) + "/" + JsonKey.KEYS + "/" + publicKey);
             } else {
                 validatedPublicKeys.add(publicKey);
             }

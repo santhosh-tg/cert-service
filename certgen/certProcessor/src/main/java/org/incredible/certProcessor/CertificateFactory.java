@@ -29,23 +29,20 @@ public class CertificateFactory {
 
     private static Logger logger = LoggerFactory.getLogger(CertificateFactory.class);
 
-    final String resourceName = "application.properties";
-
-    private static SignatureHelper signatureHelper;
 
     private ObjectMapper mapper = new ObjectMapper();
 
     public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties, String keyID) throws InvalidDateFormatException {
 
-        uuid = JsonKey.DOMAIN_PATH + UUID.randomUUID().toString() + ".json";
+        uuid = properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.CONTAINER_NAME).concat("/")
+                + properties.get(JsonKey.ROOT_ORG_ID).concat("/") + properties.get(JsonKey.TAG).concat("/") + UUID.randomUUID().toString();
 
-        CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(JsonKey.CONTEXT);
-        CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(JsonKey.CONTEXT);
-        BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(JsonKey.CONTEXT);
-        IssuerBuilder issuerBuilder = new IssuerBuilder(JsonKey.CONTEXT);
+        CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(properties.get(JsonKey.CONTEXT));
+        CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(properties.get(JsonKey.CONTEXT));
+        BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(properties.get(JsonKey.CONTEXT));
+        IssuerBuilder issuerBuilder = new IssuerBuilder(properties.get(JsonKey.CONTEXT));
         SignedVerification signedVerification = new SignedVerification();
         SignatureBuilder signatureBuilder = new SignatureBuilder();
-
 
         Criteria criteria = new Criteria();
         criteria.setNarrative("For exhibiting outstanding performance");
@@ -59,15 +56,19 @@ public class CertificateFactory {
                 .setHashed(false).
                 setType(new String[]{"id"});
 
-        issuerBuilder.setId(JsonKey.ISSUER_URL).setName(certModel.getIssuer().getName())
+
+        issuerBuilder.setId(properties.get(JsonKey.ISSUER_URL)).setName(certModel.getIssuer().getName())
                 .setUrl(certModel.getIssuer().getUrl()).setPublicKey(certModel.getIssuer().getPublicKey());
+        ;
         /**
          * badge class object
          * **/
+
         badgeClassBuilder.setName(certModel.getCourseName()).setDescription(certModel.getCertificateDescription())
-                .setId(JsonKey.BADGE_URL).setCriteria(criteria)
+                .setId(properties.get(JsonKey.BADGE_URL)).setCriteria(criteria)
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
+
 
         /**
          *
@@ -79,14 +80,16 @@ public class CertificateFactory {
                 .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification).setSignatory(certModel.getSignatoryList());
 
         if (keyID.isEmpty()) {
-            signedVerification.setType(new String[]{JsonKey.VERIFICATION_TYPE});
+            signedVerification.setType(new String[]{JsonKey.HOSTED});
 
         } else {
-            signedVerification.setCreator(JsonKey.PUBLIC_KEY_URL);
+            signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
+            logger.info("properties.get(JsonKey.PUBLIC_KEY_URL)"+properties.get(JsonKey.PUBLIC_KEY_URL));
 
             /** certificate  signature value **/
             String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, keyID);
-            logger.info("signed certificate is valid {}", verifySignature(certificateExtensionBuilder.build(), signatureValue, properties));
+
+//            logger.info("signed certificate is valid {}", verifySignature(certificateExtensionBuilder.build(), signatureValue, properties));
             /**
              * to assign signature value
              */
@@ -95,15 +98,11 @@ public class CertificateFactory {
 
             certificateExtensionBuilder.setSignature(signatureBuilder.build());
         }
-//        if ((JsonKey.VERIFICATION_TYPE).equals("hosted")) {
-//            signedVerification.setType(new String[]{JsonKey.VERIFICATION_TYPE});
-//        } else {
-//
-//        }
 
-        logger.info("certificate extension => {}", certificateExtensionBuilder.build());
+        logger.info("CertificateFactory:createCertificate:certificate extension => {}", certificateExtensionBuilder.build());
         return certificateExtensionBuilder.build();
     }
+
 
     /**
      * to verify signature value
@@ -171,4 +170,5 @@ public class CertificateFactory {
     }
 
 }
+
 

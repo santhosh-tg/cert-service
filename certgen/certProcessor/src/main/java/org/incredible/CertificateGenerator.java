@@ -1,5 +1,6 @@
 package org.incredible;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.WriterException;
@@ -42,7 +43,6 @@ public class CertificateGenerator {
 
 
     public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider, String signatureConfig) throws InvalidDateFormatException {
-        logger.info("key id : " + signatureConfig);
         CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties, signatureConfig);
         generateCertificateJson(certificateExtension);
         generateQRCodeForCertificate(certificateExtension);
@@ -69,6 +69,7 @@ public class CertificateGenerator {
         File file = new File(directory + getUUID(certificateExtension.getId()) + ".json");
         checkDirectoryExists();
         try {
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.writeValue(file, certificateExtension);
             logger.info("Json file has been generated for the certificate");
         } catch (IOException e) {

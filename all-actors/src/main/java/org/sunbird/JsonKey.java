@@ -41,7 +41,7 @@ public interface JsonKey {
     String DESIGNATION = "designation";
     String SIGNATORY_IMAGE = "image";
 
-    String DOMAIN_PATH = "DOMAIN_PATH";
+    String DOMAIN_URL = "DOMAIN_URL";
     String ASSESSED_DOMAIN = "ASSESSED_DOMAIN";
     String BADGE_URL = "BADGE_URL";
     String ISSUER_URL = "ISSUER_URL";
@@ -60,7 +60,6 @@ public interface JsonKey {
     String LOGO = "logo";
     String ISSUED_DATE = "issuedDate";
     String USER = "user";
-    String KEYS = "keys";
 
     String CONTAINER_NAME = "CONTAINER_NAME";
     String CLOUD_STORAGE_TYPE = "CLOUD_STORAGE_TYPE";
@@ -68,16 +67,20 @@ public interface JsonKey {
     String AZURE_STORAGE_SECRET = "AZURE_STORAGE_SECRET";
     String AZURE_STORAGE_KEY = "AZURE_STORAGE_KEY";
     String ACCESS_CODE_LENGTH = "ACCESS_CODE_LENGTH";
-    String ENC_SERVICE_URL = "SIGN_DOMAIN";
+    String ORG_ID = "orgId";
+    String KEYS = "keys";
+    String ENC_SERVICE_URL = "ENC_SERVICE_URL";
     String SIGN_HEALTH_CHECK_URL = "SIGN_HEALTH_CHECK_URL";
     String SIGN_URL = "SIGN_URL";
     String SIGN_VERIFY_URL = "SIGN_VERIFY_URL";
     String SIGN_CREATOR = "SIGN_CREATOR";
-
-
+    String SIGN = "sign";
+    String VERIFY = "verify";
+    String KEY_ID = "keyID";
     String JSON_URL = "jsonUrl";
     String PDF_URL = "pdfUrl";
     String UNIQUE_ID = "id";
     String GENERATE_CERT = "generateCert";
+    String PUBLIC_KEY_URL = "PUBLIC_KEY_URL";
 
 }
