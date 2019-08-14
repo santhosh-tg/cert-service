@@ -41,7 +41,7 @@ public interface JsonKey {
     String DESIGNATION = "designation";
     String SIGNATORY_IMAGE = "image";
 
-    String DOMAIN_URL = "DOMAIN_URL";
+    String DOMAIN_URL = "sunbird_cert_domain_url";
     String ASSESSED_DOMAIN = "ASSESSED_DOMAIN";
     String BADGE_URL = "BADGE_URL";
     String ISSUER_URL = "ISSUER_URL";
@@ -69,7 +69,7 @@ public interface JsonKey {
     String ACCESS_CODE_LENGTH = "ACCESS_CODE_LENGTH";
     String ORG_ID = "orgId";
     String KEYS = "keys";
-    String ENC_SERVICE_URL = "ENC_SERVICE_URL";
+    String ENC_SERVICE_URL = "sunbird_cert_enc_service_url";
     String SIGN_HEALTH_CHECK_URL = "SIGN_HEALTH_CHECK_URL";
     String SIGN_URL = "SIGN_URL";
     String SIGN_VERIFY_URL = "SIGN_VERIFY_URL";
