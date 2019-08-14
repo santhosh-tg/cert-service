@@ -119,16 +119,16 @@ public class CertificateGeneratorActor extends BaseActor {
 	}
 
 	private HashMap<String,String> populatePropertiesMap(Request request){
-		String rootOrgId=(String)((Map)request.get(JsonKey.CERTIFICATE)).get(JsonKey.ROOT_ORG_ID);
+		String orgId=(String)((Map)request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
 		String tag=(String) ((Map)request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
 		HashMap<String,String> properties = new HashMap<>();
 		properties.put(JsonKey.DOMAIN_URL, certVar.getDOMAIN_URL());
-		properties.put(JsonKey.BADGE_URL,certVar.getBADGE_URL(rootOrgId,tag));
-		properties.put(JsonKey.ISSUER_URL,certVar.getISSUER_URL(rootOrgId));
+		properties.put(JsonKey.BADGE_URL,certVar.getBADGE_URL(orgId,tag));
+		properties.put(JsonKey.ISSUER_URL,certVar.getISSUER_URL(orgId));
 		properties.put(JsonKey.CONTEXT,certVar.getCONTEXT());
 		properties.put(JsonKey.VERIFICATION_TYPE,certVar.getVERIFICATION_TYPE());
 		properties.put(JsonKey.ACCESS_CODE_LENGTH,certVar.getACCESS_CODE_LENGTH());
-		properties.put(JsonKey.PUBLIC_KEY,certVar.getPUBLIC_KEY_URL(rootOrgId));
+		properties.put(JsonKey.PUBLIC_KEY,certVar.getPUBLIC_KEY_URL(orgId));
 		logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString())+""));
 		return properties;
 	}
