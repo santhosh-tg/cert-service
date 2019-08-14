@@ -9,15 +9,15 @@ import org.apache.log4j.Logger;
 public class CertsConstant {
     private static Logger logger = Logger.getLogger(CertsConstant.class);
 
-    private String BADGE_URL = "Badge.json";
-    private String ISSUER_URL = "Issuer.json";
-    private String CONTEXT = "v1/context.json";
-    private String PUBLIC_KEY_URL="v1/PublicKey.json";
-    private String VERIFICATION_TYPE = "SignedBadge";
-    private String CLOUD_UPLOAD_RETRY_COUNT = "3";
-    private String ACCESS_CODE_LENGTH = "6";
-    private static String DOMAIN_URL = getDomainUrlFromEnv();
-    private static String CONTAINER_NAME=getContainerNameFromEnv();
+    private static final String BADGE_URL = "Badge.json";
+    private static final String ISSUER_URL = "Issuer.json";
+    private static final String CONTEXT = "v1/context.json";
+    private static final String PUBLIC_KEY_URL="v1/PublicKey.json";
+    private static final String VERIFICATION_TYPE = "SignedBadge";
+    private static final String CLOUD_UPLOAD_RETRY_COUNT = "3";
+    private static final String ACCESS_CODE_LENGTH = "6";
+    private static final String DOMAIN_URL = getDomainUrlFromEnv();
+    private static final String CONTAINER_NAME=getContainerNameFromEnv();
 
 
      public String getBADGE_URL(String rootOrgId, String batchId) {
