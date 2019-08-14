@@ -86,10 +86,10 @@ public class CertsConstant {
     }
 
     private static String getEncServiceUrl() {
-        String encServiceUrl = getPropertyFromEnv(JsonKey.ENC_SERVICE_URL);
-        validateEnvProperty(encServiceUrl);
-        return encServiceUrl;
-
+//        String encServiceUrl = getPropertyFromEnv(JsonKey.ENC_SERVICE_URL);
+//        validateEnvProperty(encServiceUrl);
+//        return encServiceUrl;
+            return "http://enc-service:8013";
     }
 
     public String getEncSignUrl() {
