@@ -35,7 +35,7 @@ public class CertificateFactory {
     public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties, String keyID) throws InvalidDateFormatException {
 
         uuid = properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.CONTAINER_NAME).concat("/")
-                + properties.get(JsonKey.ROOT_ORG_ID).concat("/") + properties.get(JsonKey.TAG).concat("/") + UUID.randomUUID().toString();
+                + properties.get(JsonKey.ROOT_ORG_ID).concat("/") + properties.get(JsonKey.TAG).concat("/") + UUID.randomUUID().toString() + ".json";
 
         CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(properties.get(JsonKey.CONTEXT));
         CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(properties.get(JsonKey.CONTEXT));
