@@ -1,5 +1,6 @@
 package org.incredible.certProcessor.views;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.RuntimeConstants;
@@ -59,7 +60,7 @@ public class HTMLGenerator {
                 Method method = htmlVarResolver.getClass().getMethod("get" + capitalize(macro));
                 method.setAccessible(true);
                 context.put(macro, method.invoke(htmlVarResolver));
-                createHTMLFile(context, getUUID(certificateExtension.getId()) );
+                createHTMLFile(context, getUUID(certificateExtension.getId()));
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 logger.info("exception while generating html for certificate {}", e.getMessage());
@@ -73,7 +74,7 @@ public class HTMLGenerator {
             URI uri = new URI(id);
             String path = uri.getPath();
             String idStr = path.substring(path.lastIndexOf('/') + 1);
-            return idStr;
+            return StringUtils.substringBefore(idStr, ".");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return null;
@@ -82,14 +83,15 @@ public class HTMLGenerator {
 
     private void createHTMLFile(VelocityContext context, String id) {
         try {
-            File file = new File("conf/certificate",id+ ".html");
+            File file = new File("conf/certificate", id + ".html");
             Writer writer = new FileWriter(file);
             Velocity.evaluate(context, writer, "velocity", HtmlString);
             writer.flush();
             writer.close();
+            logger.info("html file is created {}", file.getName());
             PdfConverter.convertor(file, id);
         } catch (IOException e) {
-            logger.info("IO exception while creating html file :{}", e.getMessage());
+            logger.error("IO exception while creating html file :{}", e.getMessage());
         }
     }
 

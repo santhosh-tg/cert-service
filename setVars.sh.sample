@@ -1,11 +1,18 @@
 #Sets up all environment vars.
 
 ################### CERT_SERVICE configuration ###################################
-export keyA=valA
-export DOMAIN_URL=http://localhost:8080
+
+
+export DOMAIN_PATH=http://localhost:8080
+
+export CONTAINER_NAME=certs
 export CLOUD_STORAGE_TYPE=azure
 export AZURE_STORAGE_SECRET=someKey
 export CONTAINER_NAME=certs
 export AZURE_STORAGE_KEY=sb
+
+export ACCESS_CODE_LENGTH=6
+export ENC_SERVICE_URL=http://localhost:8013
+
 
 ################### END -  configuration #############################

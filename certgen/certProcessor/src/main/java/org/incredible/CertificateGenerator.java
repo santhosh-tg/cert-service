@@ -1,8 +1,10 @@
 package org.incredible;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.WriterException;
+import org.apache.commons.lang.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.CertificateFactory;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
@@ -40,8 +42,8 @@ public class CertificateGenerator {
     private CertificateFactory certificateFactory = new CertificateFactory();
 
 
-    public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider) throws InvalidDateFormatException {
-        CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties);
+    public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider, String signatureConfig) throws InvalidDateFormatException {
+        CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties, signatureConfig);
         generateCertificateJson(certificateExtension);
         generateQRCodeForCertificate(certificateExtension);
         if (htmlTemplateProvider.checkHtmlTemplateIsValid(htmlTemplateProvider.getTemplateContent())) {
@@ -56,7 +58,7 @@ public class CertificateGenerator {
             URI uri = new URI(id);
             String path = uri.getPath();
             String idStr = path.substring(path.lastIndexOf('/') + 1);
-            return idStr;
+            return StringUtils.substringBefore(idStr, ".");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return null;
@@ -67,7 +69,9 @@ public class CertificateGenerator {
         File file = new File(directory + getUUID(certificateExtension.getId()) + ".json");
         checkDirectoryExists();
         try {
+            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.writeValue(file, certificateExtension);
+            logger.info("Json file has been generated for the certificate");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,10 +89,9 @@ public class CertificateGenerator {
         QRCodeGenerationModel qrCodeGenerationModel = new QRCodeGenerationModel();
         qrCodeGenerationModel.setText(accessCodeGenerator.generate());
         qrCodeGenerationModel.setFileName(directory + getUUID(certificateExtension.getId()));
-        qrCodeGenerationModel.setData(certificateExtension.getId() + ".json");
+        qrCodeGenerationModel.setData(certificateExtension.getId());
         try {
             File Qrcode = QRCodeImageGenerator.createQRImages(qrCodeGenerationModel);
-
         } catch (IOException | WriterException | FontFormatException | NotFoundException e) {
             logger.error("Exception while generating QRcode {}", e.getMessage());
         }

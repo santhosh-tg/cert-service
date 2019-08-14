@@ -1,19 +1,20 @@
 package org.incredible.certProcessor;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.incredible.builders.*;
 import org.incredible.certProcessor.signature.SignatureHelper;
+import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.pojos.CertificateExtension;
 import org.incredible.pojos.ob.Criteria;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import org.incredible.pojos.ob.SignedVerification;
@@ -28,42 +29,36 @@ public class CertificateFactory {
 
     private static Logger logger = LoggerFactory.getLogger(CertificateFactory.class);
 
-    final String resourceName = "application.properties";
 
-    private static SignatureHelper signatureHelper;
+    private ObjectMapper mapper = new ObjectMapper();
 
-    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties) throws InvalidDateFormatException {
+    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties, String keyID) throws InvalidDateFormatException {
 
-        uuid = properties.get(JsonKey.DOMAIN_URL).concat("/")+ UUID.randomUUID().toString();
+        uuid = properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.CONTAINER_NAME).concat("/")
+                + properties.get(JsonKey.ROOT_ORG_ID).concat("/") + properties.get(JsonKey.TAG).concat("/") + UUID.randomUUID().toString() + ".json";
 
         CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(properties.get(JsonKey.CONTEXT));
         CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(properties.get(JsonKey.CONTEXT));
         BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(properties.get(JsonKey.CONTEXT));
         IssuerBuilder issuerBuilder = new IssuerBuilder(properties.get(JsonKey.CONTEXT));
         SignedVerification signedVerification = new SignedVerification();
-
+        SignatureBuilder signatureBuilder = new SignatureBuilder();
 
         Criteria criteria = new Criteria();
-        criteria.setNarrative("For exhibiting outstanding performance");
         criteria.setId(uuid);
 
-
-        //todo decide hosted or signed badge based on config
-        if (properties.get(JsonKey.VERIFICATION_TYPE).equals(JsonKey.HOSTED)) {
-            signedVerification.setType(new String[]{properties.get(JsonKey.VERIFICATION_TYPE)});
-        } else {
-            signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
-        }
 
         /**
          *  recipient object
          *  **/
         compositeIdentityObjectBuilder.setName(certModel.getRecipientName()).setId(certModel.getIdentifier())
                 .setHashed(false).
-                setType(new String[]{"id"});
+                setType(new String[]{JsonKey.ID});
 
 
-        issuerBuilder.setId(properties.get(JsonKey.ISSUER_URL)).setName(certModel.getIssuer().getName());
+        issuerBuilder.setId(properties.get(JsonKey.ISSUER_URL)).setName(certModel.getIssuer().getName())
+                .setUrl(certModel.getIssuer().getUrl()).setPublicKey(certModel.getIssuer().getPublicKey());
+        ;
         /**
          * badge class object
          * **/
@@ -83,70 +78,94 @@ public class CertificateFactory {
                 .setIssuedOn(certModel.getIssuedDate()).setExpires(certModel.getExpiry())
                 .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification).setSignatory(certModel.getSignatoryList());
 
+        if (keyID.isEmpty()) {
+            signedVerification.setType(new String[]{JsonKey.HOSTED});
 
-//        /**
-//         * to assign signature value
-//         */
-//        initSignatureHelper(certModel.getSignatoryList());
-//        /** certificate before signature value **/
-//        String toSignCertificate = certificateExtensionBuilder.build().toString();
-//
-//        String signatureValue = getSignatureValue(toSignCertificate);
-//
-//        signatureBuilder.setCreated(Instant.now().toString()).setCreator("https://dgt.example.gov.in/keys/awarding_body.json")
-//                .setSignatureValue(signatureValue);
-//        certificateExtensionBuilder.setSignature(signatureBuilder.build());
-//
-//        logger.info("signed certificate is valid {}", verifySignature(toSignCertificate, signatureValue));
+        } else {
+            signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
+
+            /** certificate  signature value **/
+            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, keyID);
+
+            /**
+             * to assign signature value
+             */
+            signatureBuilder.setCreated(Instant.now().toString()).setCreator(properties.get(JsonKey.SIGN_CREATOR))
+                    .setSignatureValue(signatureValue);
+
+            certificateExtensionBuilder.setSignature(signatureBuilder.build());
+        }
+
         logger.info("CertificateFactory:createCertificate:certificate extension => {}", certificateExtensionBuilder.build());
         return certificateExtensionBuilder.build();
     }
 
 
-    public Properties readPropertiesFile() {
-        ClassLoader loader = CertificateFactory.class.getClassLoader();
-        Properties properties = new Properties();
-        try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
-            properties.load(resourceStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("CertificateFactory:readPropertiesFile:Exception while reading application.properties {}", e.getMessage());
-        }
-        return properties;
-    }
-
-    public static boolean verifySignature(String certificate, String signatureValue) {
+    /**
+     * to verifySignature signature value
+     *
+     * @param certificate
+     * @param signatureValue
+     * @param properties
+     * @return
+     */
+    public boolean verifySignature(CertificateExtension certificate, String signatureValue, Map<String, String> properties) {
         boolean isValid = false;
+        SignatureHelper signatureHelper = new SignatureHelper(properties);
         try {
-            isValid = signatureHelper.verify(certificate.getBytes(),
-                    signatureValue);
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
+            Map signReq = new HashMap<String, Object>();
+            signReq.put(JsonKey.CLAIM, certificate);
+            signReq.put(JsonKey.SIGNATURE_VALUE, signatureValue);
+            signReq.put(JsonKey.KEY_ID, getKeyId(properties.get(JsonKey.SIGN_CREATOR)));
+            JsonNode jsonNode = mapper.valueToTree(signReq);
+            isValid = signatureHelper.verifySignature(jsonNode);
+        } catch (SignatureException.UnreachableException | SignatureException.VerificationException e) {
+            logger.error("exception while verifying Signature : {}", e.getMessage());
         }
         return isValid;
     }
 
-    private static void initSignatureHelper(KeyPair keyPair) {
-
+    /**
+     * to get signature value of certificate
+     *
+     * @param certificateExtension
+     * @param properties
+     * @return
+     */
+    private String getSignatureValue(CertificateExtension certificateExtension, Map<String, String> properties, String keyID) {
+        SignatureHelper signatureHelper = new SignatureHelper(properties);
+        Map<String, Object> signMap;
         try {
-            signatureHelper = new SignatureHelper("SHA1withRSA", keyPair);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private static String getSignatureValue(String toSignCertificate) {
-        try {
-            String signatureValue = signatureHelper.sign(toSignCertificate.getBytes());
-            return signatureValue;
-        } catch (SignatureException | UnsupportedEncodingException | InvalidKeyException e) {
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            String request = mapper.writeValueAsString(certificateExtension);
+            JsonNode jsonNode = mapper.readTree(request);
+            signMap = signatureHelper.generateSignature(jsonNode, keyID);
+            return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
+        } catch (IOException | SignatureException.UnreachableException | SignatureException.CreationException e) {
+            logger.debug("Exception while generating signature for certificate : {}", e.getMessage());
             e.printStackTrace();
             return null;
         }
-
     }
+
+    /**
+     * to get the KeyId from the sign_creator url , key id used for verifying signature
+     *
+     * @param creator
+     * @return
+     */
+    private int getKeyId(String creator) {
+        String idStr = null;
+        try {
+            URI uri = new URI(creator);
+            String path = uri.getPath();
+            idStr = path.substring(path.lastIndexOf('/') + 1);
+        } catch (URISyntaxException e) {
+            logger.debug("Exception while getting key id from the sign-creator url : {}", e.getMessage());
+        }
+        return Integer.parseInt(idStr);
+    }
+
 }
+
 
