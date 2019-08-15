@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -154,6 +155,7 @@ public class AzureFileUtility {
     CloudBlockBlob blob = null;
     String fileUrl = null;
     FileInputStream fis = null;
+    String filePathUrl = null;
     try {
       blob = container.getBlockBlobReference(filePath + source.getName());
       // File source = new File(fileName);
@@ -163,6 +165,8 @@ public class AzureFileUtility {
       blob.getProperties().setContentType(mimeType);
       blob.upload(fis, source.length());
       fileUrl = blob.getUri().toString();
+      URL url = new URL(fileUrl);
+      filePathUrl = url.getFile();
     } catch (URISyntaxException | IOException e) {
       logger.info("Unable to upload file :" + source.getName(), e);
     } catch (Exception e) {
@@ -176,7 +180,8 @@ public class AzureFileUtility {
         }
       }
     }
-    return fileUrl;
+
+    return filePathUrl;
   }
 
   public static boolean downloadFile(String containerName, String blobName, String downloadFolder) {
