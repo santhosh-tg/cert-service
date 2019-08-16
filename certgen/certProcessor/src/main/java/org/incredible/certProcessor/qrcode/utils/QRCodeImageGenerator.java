@@ -215,6 +215,7 @@ public class QRCodeImageGenerator {
         logger.info("qr code font file name : " + fontFile);
         File file = new File("conf/");
         List<File> filesList = (List<File>) FileUtils.listFiles(file, new String[]{"ttf"}, true);
+
         Font basicFont = Font.createFont(Font.TRUETYPE_FONT, getFontFile(filesList));
 
         Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>();
@@ -265,8 +266,7 @@ public class QRCodeImageGenerator {
             File file = iterator.next();
             if (file.getName().equals("Verdana.ttf")) {
                 fontStream = new FileInputStream(file);
-                logger.info("File Name++++++++++++++++++++=" + file.getName());
-                logger.info("File absolute path++++++++++++++" + file.getAbsolutePath());
+                logger.info("Font file name" + file.getName() +  "File absolute path" + file.getAbsolutePath());
             }    }
             return fontStream;
     }
