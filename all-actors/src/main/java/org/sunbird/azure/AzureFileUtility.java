@@ -155,7 +155,7 @@ public class AzureFileUtility {
     CloudBlockBlob blob = null;
     String fileUrl = null;
     FileInputStream fis = null;
-    String filePathUrl = null;
+    String filePathUri = null;
     try {
       blob = container.getBlockBlobReference(filePath + source.getName());
       // File source = new File(fileName);
@@ -166,11 +166,13 @@ public class AzureFileUtility {
       blob.upload(fis, source.length());
       fileUrl = blob.getUri().toString();
       URL url = new URL(fileUrl);
-      filePathUrl = url.getFile();
+      filePathUri = url.getFile();
     } catch (URISyntaxException | IOException e) {
-      logger.info("Unable to upload file :" + source.getName(), e);
+      logger.error("Unable to upload file :" + source.getName(), e);
+      logger.error("Exception While Uploading File: "+ e.getMessage());
+
     } catch (Exception e) {
-      logger.info(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     } finally {
       if (null != fis) {
         try {
@@ -181,7 +183,7 @@ public class AzureFileUtility {
       }
     }
 
-    return filePathUrl;
+    return filePathUri;
   }
 
   public static boolean downloadFile(String containerName, String blobName, String downloadFolder) {
