@@ -31,6 +31,7 @@ public class CertMapper {
             cert.setCertificateDescription((String) json.get(JsonKey.DESCRIPTION));
             cert.setCertificateLogo((String) json.get(JsonKey.LOGO));
             cert.setIssuedDate((String) json.get(JsonKey.ISSUED_DATE));
+            cert.setCertificateName((String) json.get(JsonKey.CERTIFICATE_NAME));
         });
         return certList;
     }

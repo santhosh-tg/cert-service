@@ -46,6 +46,7 @@ public class CertificateFactory {
 
         Criteria criteria = new Criteria();
         criteria.setId(uuid);
+        criteria.setNarrative(certModel.getCertificateName());
 
 
         /**
