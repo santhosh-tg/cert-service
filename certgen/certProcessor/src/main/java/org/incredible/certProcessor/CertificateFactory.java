@@ -45,9 +45,9 @@ public class CertificateFactory {
         SignatureBuilder signatureBuilder = new SignatureBuilder();
 
         Criteria criteria = new Criteria();
-        criteria.setId(uuid);
+        criteria.setId(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.ROOT_ORG_ID).concat("/")
+                + properties.get(JsonKey.TAG));
         criteria.setNarrative(certModel.getCertificateDescription());
-
 
         /**
          *  recipient object
