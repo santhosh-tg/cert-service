@@ -24,15 +24,9 @@ public class CloudStorage {
         String url = storageService.upload(container,
                 file.getAbsolutePath(),
                 objectKey,
-                Option.apply(false),
                 Option.apply(isDirectory),
                 Option.apply(1),
-                Option.apply(retryCount), 1);
-        try{
-            URL blobUrl=new URL(url);
-            return blobUrl.getFile();
-        }
-        catch (Exception e){
-            return StringUtils.EMPTY;
-        } }
+                Option.apply(retryCount), Option.apply(1));
+        return url;
+         }
 }
