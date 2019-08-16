@@ -41,18 +41,18 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         HttpURLConnection connection = (HttpURLConnection) zipUrl.openConnection();
         connection.setRequestMethod("GET");
         InputStream in = connection.getInputStream();
-        String zipPath = targetDirectory.getAbsolutePath()+"/arc"+System.nanoTime()+".zip";
+        String zipPath = targetDirectory.getAbsolutePath() + "/arc" + System.nanoTime() + ".zip";
         FileOutputStream out = new FileOutputStream(zipPath);
         copy(in, out, 1024);
         out.close();
         in.close();
-
+        logger.info("Downloading Zip file from given url : success");
         unzip(zipPath, targetDirectory.getAbsolutePath());
         readIndexHtmlFile(targetDirectory.getAbsolutePath());
     }
 
     private void readIndexHtmlFile(String absolutePath) throws IOException {
-        FileInputStream fis = new FileInputStream(absolutePath+"/index.html");
+        FileInputStream fis = new FileInputStream(absolutePath + "/index.html");
         content = IOUtils.toString(fis, "UTF-8");
         fis.close();
     }
@@ -60,7 +60,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     private static void unzip(String zipFilePath, String destDir) {
         File dir = new File(destDir);
         // create output directory if it doesn't exist
-        if(!dir.exists()) dir.mkdirs();
+        if (!dir.exists()) dir.mkdirs();
         FileInputStream fis;
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
@@ -84,6 +84,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
             }
             zipIn.close();
             fis.close();
+            logger.info("Unzipping zip file is finished");
         } catch (IOException e) {
             e.printStackTrace();
         }
