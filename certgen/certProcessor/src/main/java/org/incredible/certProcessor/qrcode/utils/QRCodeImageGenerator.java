@@ -23,9 +23,7 @@ import java.awt.Graphics2D;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.awt.FontFormatException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 public class QRCodeImageGenerator {
@@ -215,9 +213,10 @@ public class QRCodeImageGenerator {
         //Font basicFont = new Font(fontName, Font.BOLD, fontSize);
         String fontFile = fontName + ".ttf";
         logger.info("qr code font file name : " + fontFile);
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream fontStream = classLoader.getResourceAsStream(fontFile);
-        Font basicFont = Font.createFont(Font.TRUETYPE_FONT, fontStream);
+        File file = new File("conf/");
+        List<File> filesList = (List<File>) FileUtils.listFiles(file, new String[]{"ttf"}, true);
+
+        Font basicFont = Font.createFont(Font.TRUETYPE_FONT, getFontFile(filesList));
 
         Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>();
         attributes.put(TextAttribute.TRACKING, tracking);
@@ -257,5 +256,18 @@ public class QRCodeImageGenerator {
         } else {
             return BufferedImage.TYPE_BYTE_GRAY;
         }
+    }
+
+    private  InputStream getFontFile(List<File> files) throws FileNotFoundException {
+
+        Iterator<File> iterator = files.iterator();
+        InputStream fontStream=null;
+        while (iterator.hasNext()) {
+            File file = iterator.next();
+            if (file.getName().equals("Verdana.ttf")) {
+                fontStream = new FileInputStream(file);
+                logger.info("Font file name" + file.getName() +  "File absolute path" + file.getAbsolutePath());
+            }    }
+            return fontStream;
     }
 }
