@@ -9,6 +9,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import org.apache.commons.io.FileUtils;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,7 @@ import java.awt.FontFormatException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 public class QRCodeImageGenerator {
 
@@ -37,7 +35,7 @@ public class QRCodeImageGenerator {
     static QRCodeWriter qrCodeWriter = new QRCodeWriter();
 
 
-    public static File createQRImages(QRCodeGenerationModel qrGenRequest) throws WriterException, IOException, NotFoundException, FontFormatException {
+    public File createQRImages(QRCodeGenerationModel qrGenRequest) throws WriterException, IOException, NotFoundException, FontFormatException {
 
         List<File> fileList = new ArrayList<File>();
 
@@ -212,13 +210,13 @@ public class QRCodeImageGenerator {
     }
 
     //Sample = 2A42UH , Verdana, 11, 0.1, Grayscale
-    private static BufferedImage getTextImage(String text, String fontName, int fontSize, double tracking, String colorModel) throws IOException, FontFormatException {
+    private BufferedImage getTextImage(String text, String fontName, int fontSize, double tracking, String colorModel) throws IOException, FontFormatException {
         BufferedImage image = new BufferedImage(1, 1, getImageType(colorModel));
-
         //Font basicFont = new Font(fontName, Font.BOLD, fontSize);
-        String fontFile = "/" + fontName + ".ttf";
-
-        InputStream fontStream = QRCodeImageGenerator.class.getResourceAsStream(fontFile);
+        String fontFile = fontName + ".ttf";
+        logger.info("qr code font file name : " + fontFile);
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream fontStream = classLoader.getResourceAsStream(fontFile);
         Font basicFont = Font.createFont(Font.TRUETYPE_FONT, fontStream);
 
         Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>();

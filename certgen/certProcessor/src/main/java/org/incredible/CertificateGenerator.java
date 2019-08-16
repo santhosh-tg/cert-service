@@ -91,7 +91,8 @@ public class CertificateGenerator {
         qrCodeGenerationModel.setFileName(directory + getUUID(certificateExtension.getId()));
         qrCodeGenerationModel.setData(certificateExtension.getId());
         try {
-            File Qrcode = QRCodeImageGenerator.createQRImages(qrCodeGenerationModel);
+            QRCodeImageGenerator qrCodeImageGenerator = new QRCodeImageGenerator();
+            File Qrcode = qrCodeImageGenerator.createQRImages(qrCodeGenerationModel);
         } catch (IOException | WriterException | FontFormatException | NotFoundException e) {
             logger.error("Exception while generating QRcode {}", e.getMessage());
         }

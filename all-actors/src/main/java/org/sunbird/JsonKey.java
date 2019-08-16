@@ -60,6 +60,7 @@ public interface JsonKey {
     String LOGO = "logo";
     String ISSUED_DATE = "issuedDate";
     String USER = "user";
+    String CERTIFICATE_NAME = "name";
 
     String CONTAINER_NAME = "CONTAINER_NAME";
     String CLOUD_STORAGE_TYPE = "CLOUD_STORAGE_TYPE";
