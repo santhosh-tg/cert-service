@@ -42,7 +42,7 @@ public class CertificateGenerator {
     private CertificateFactory certificateFactory = new CertificateFactory();
 
 
-    public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider, String signatureConfig) throws InvalidDateFormatException {
+    public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider, String signatureConfig) throws InvalidDateFormatException, WriterException, FontFormatException, NotFoundException, IOException {
         CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties, signatureConfig);
         generateCertificateJson(certificateExtension);
         generateQRCodeForCertificate(certificateExtension);
@@ -84,17 +84,14 @@ public class CertificateGenerator {
         }
     }
 
-    private void generateQRCodeForCertificate(CertificateExtension certificateExtension) {
+    private void generateQRCodeForCertificate(CertificateExtension certificateExtension) throws WriterException, FontFormatException, NotFoundException, IOException {
         AccessCodeGenerator accessCodeGenerator = new AccessCodeGenerator(Double.valueOf(properties.get("ACCESS_CODE_LENGTH")));
         QRCodeGenerationModel qrCodeGenerationModel = new QRCodeGenerationModel();
         qrCodeGenerationModel.setText(accessCodeGenerator.generate());
         qrCodeGenerationModel.setFileName(directory + getUUID(certificateExtension.getId()));
         qrCodeGenerationModel.setData(certificateExtension.getId());
-        try {
+
             QRCodeImageGenerator qrCodeImageGenerator = new QRCodeImageGenerator();
             File Qrcode = qrCodeImageGenerator.createQRImages(qrCodeGenerationModel);
-        } catch (IOException | WriterException | FontFormatException | NotFoundException e) {
-            logger.error("Exception while generating QRcode {}", e.getMessage());
-        }
     }
 }
