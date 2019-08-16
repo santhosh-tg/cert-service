@@ -212,9 +212,16 @@ public class QRCodeImageGenerator {
         BufferedImage image = new BufferedImage(1, 1, getImageType(colorModel));
         //Font basicFont = new Font(fontName, Font.BOLD, fontSize);
         String fontFile = fontName + ".ttf";
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(fontFile);
-        Font basicFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+        InputStream inputStream = null;
+        Font basicFont = null;
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        try {
+        inputStream = classLoader.getResourceAsStream(fontFile);
+        logger.info ("input stream value is not null for fontfile " + fontFile + " " + inputStream);    
+        basicFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+        } catch (Exception e) {
+        logger.info ("Exception occured during font creation " + e);
+        }  
         Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>();
         attributes.put(TextAttribute.TRACKING, tracking);
         attributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
