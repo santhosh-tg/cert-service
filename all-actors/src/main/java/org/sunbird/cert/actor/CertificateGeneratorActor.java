@@ -98,8 +98,6 @@ public class CertificateGeneratorActor extends BaseActor {
 
     private String upload(String certFileName, String orgId, String batchId) {
         try {
-            //TODO  Un comment this to use cloud storage jar to upload file to azure as of now
-            // not using because of jar conflict issue
             File file = FileUtils.getFile("conf/certificate/" + certFileName);
             HashMap<String,String> properties = new HashMap<>();
             properties.put(JsonKey.CONTAINER_NAME,System.getenv(JsonKey.CONTAINER_NAME));
