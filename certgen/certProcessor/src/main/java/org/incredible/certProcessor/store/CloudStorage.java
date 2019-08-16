@@ -1,12 +1,10 @@
 package org.incredible.certProcessor.store;
 
 
-import org.apache.commons.lang3.StringUtils;
 import org.sunbird.cloud.storage.BaseStorageService;
 import scala.Option;
 
 import java.io.File;
-import java.net.URL;
 
 public class CloudStorage {
 
