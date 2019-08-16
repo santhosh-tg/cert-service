@@ -48,6 +48,7 @@ public class CertificateGeneratorActor extends BaseActor {
         List<CertModel> certModelList = certMapper.toList(request.getRequest());
         CertificateGenerator certificateGenerator = new CertificateGenerator(populatePropertiesMap(request));
         HTMLTempalteZip htmlTempalteZip = null;
+        String directory;
         String url = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
         try {
             htmlTempalteZip = new HTMLTempalteZip(new URL(url));
@@ -57,46 +58,52 @@ public class CertificateGeneratorActor extends BaseActor {
         }
         String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
         String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
+        directory = "conf/" + orgId.concat("_") + tag.concat("_") + htmlTempalteZip.getZipFileName().concat("/");
         List<Map<String, String>> certUrlList = new ArrayList<>();
         for (CertModel certModel : certModelList) {
             String certUUID = "";
             try {
                 certUUID = certificateGenerator.createCertificate(certModel, htmlTempalteZip, (String) ((Map<String, Object>) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS)).get(JsonKey.ID));
             } catch (Exception ex) {
-                cleanup();
-                logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate.", ex);
+                cleanup(directory, certUUID);
+                logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.INTERNAL_ERROR, ResponseCode.SERVER_ERROR.getCode());
             }
-            certUrlList.add(uploadCertificate(certUUID, certModel.getIdentifier(), orgId, tag));
+            certUrlList.add(uploadCertificate(certUUID, certModel.getIdentifier(), orgId, tag, directory));
+            cleanup(directory, certUUID);
         }
         Response response = new Response();
         response.getResult().put("response", certUrlList);
         sender().tell(response, getSelf());
-        cleanup();
         logger.info("onReceive method call End");
     }
 
-    private void cleanup() {
+    private void cleanup(String path, String fileName) {
         try {
-            File file = new File("conf/certificate");
-            FileUtils.deleteDirectory(file);
+            File directory = new File(path);
+            File[] files = directory.listFiles();
+            for (File file : files) {
+                if (file.getName().startsWith(fileName)) file.delete();
+            }
+            File file = new File(path);
+            file.delete();
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
     }
 
-    private Map<String, String> uploadCertificate(String certUUID, String recipientID, String orgId, String batchId) {
+    private Map<String, String> uploadCertificate(String certUUID, String recipientID, String orgId, String batchId, String directory) {
         Map<String, String> resMap = new HashMap<>();
         String certFileName = certUUID + ".pdf";
-        resMap.put(JsonKey.PDF_URL, upload(certFileName, orgId, batchId));
+        resMap.put(JsonKey.PDF_URL, upload(certFileName, orgId, batchId, directory));
         certFileName = certUUID + ".json";
-        resMap.put(JsonKey.JSON_URL, upload(certFileName, orgId, batchId));
+        resMap.put(JsonKey.JSON_URL, upload(certFileName, orgId, batchId, directory));
         resMap.put(JsonKey.UNIQUE_ID, certUUID);
         resMap.put(JsonKey.RECIPIENT_ID, recipientID);
         return resMap;
     }
 
-    private String upload(String certFileName, String orgId, String batchId) {
+    private String upload(String certFileName, String orgId, String batchId, String directory) {
         try {
             //TODO  Un comment this to use cloud storage jar to upload file to azure as of now
             // not using because of jar conflict issue
@@ -112,7 +119,7 @@ public class CertificateGeneratorActor extends BaseActor {
             //storageParams.init();
             //return storageParams.upload(System.getenv(JsonKey.CONTAINER_NAME), "/", file, false);
 
-            File file = FileUtils.getFile("conf/certificate/" + certFileName);
+            File file = FileUtils.getFile(directory + certFileName);
             logger.info("CertificateGeneratorActor:upload:container name got from env is: ".concat(certVar.getCONTAINER_NAME()));
             return AzureFileUtility.uploadFile(certVar.getCONTAINER_NAME() + "/" + orgId + "/" + batchId, file);
         } catch (Exception ex) {

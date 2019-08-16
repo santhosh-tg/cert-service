@@ -16,8 +16,8 @@ public class PdfConverter {
 
     private static Logger logger = LoggerFactory.getLogger(PdfConverter.class);
 
-    public static void convertor(File htmlSource, String id) {
-        File file = new File("conf/certificate", id + ".pdf");
+    public static void convertor(File htmlSource, String id, String directory) {
+        File file = new File(directory, id + ".pdf");
         try {
 //            ConverterProperties converterProperties = new ConverterProperties();
 //            PdfWriter pdfWriter = new PdfWriter(file);

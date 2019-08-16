@@ -30,24 +30,26 @@ node('build-slave') {
             echo "build_tag: " + build_tag
 
             stage('Build') {
-		currentDir = sh(returnStdout: true, script: 'pwd').trim()
+		        currentDir = sh(returnStdout: true, script: 'pwd').trim()
                 env.NODE_ENV = "build"
                 print "Environment will be : ${env.NODE_ENV}"
                 sh 'git log -1'
 	
-		sh "cd $currentDir"
-		// Build the dependencies for sunbird user-org service
+		        sh "cd $currentDir"
+		        // Build the dependencies for sunbird user-org service
                 sh 'mvn clean install'
             }
+
             stage('Package') {
-		// Create a deployment package
+		        // Create a deployment package
                 dir('service') {
                     sh 'mvn play2:dist'
-		    sh 'cp target/cert-service-1.0.0-dist.zip ../'
+		            sh 'cp target/cert-service-1.0.0-dist.zip ../'
                 }
                 sh('chmod 777 ./build.sh')
                 sh("./build.sh ${build_tag} ${env.NODE_NAME} ${hub_org}")
             }
+
             stage('ArchiveArtifacts') {
                 archiveArtifacts "metadata.json"
                 currentBuild.description = "${build_tag}"

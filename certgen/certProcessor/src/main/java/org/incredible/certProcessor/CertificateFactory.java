@@ -32,7 +32,8 @@ public class CertificateFactory {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties, String keyID) throws InvalidDateFormatException {
+    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties, String keyID)
+            throws InvalidDateFormatException, SignatureException.UnreachableException, IOException, SignatureException.CreationException {
 
         uuid = properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.CONTAINER_NAME).concat("/")
                 + properties.get(JsonKey.ROOT_ORG_ID).concat("/") + properties.get(JsonKey.TAG).concat("/") + UUID.randomUUID().toString() + ".json";
@@ -133,20 +134,16 @@ public class CertificateFactory {
      * @param properties
      * @return
      */
-    private String getSignatureValue(CertificateExtension certificateExtension, Map<String, String> properties, String keyID) {
+    private String getSignatureValue(CertificateExtension certificateExtension, Map<String, String> properties, String keyID) throws IOException, SignatureException.UnreachableException, SignatureException.CreationException {
         SignatureHelper signatureHelper = new SignatureHelper(properties);
         Map<String, Object> signMap;
-        try {
+
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             String request = mapper.writeValueAsString(certificateExtension);
             JsonNode jsonNode = mapper.readTree(request);
             signMap = signatureHelper.generateSignature(jsonNode, keyID);
             return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
-        } catch (IOException | SignatureException.UnreachableException | SignatureException.CreationException e) {
-            logger.debug("Exception while generating signature for certificate : {}", e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
+
     }
 
     /**
