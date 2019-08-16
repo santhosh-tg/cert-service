@@ -212,7 +212,7 @@ public class QRCodeImageGenerator {
         BufferedImage image = new BufferedImage(1, 1, getImageType(colorModel));
         //Font basicFont = new Font(fontName, Font.BOLD, fontSize);
         String fontFile = fontName + ".ttf";
-        ClassLoader classLoader = getClass().getClassLoader();
+        ClassLoader classLoader = this.getClass().getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(fontFile);
         Font basicFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
         Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>();
