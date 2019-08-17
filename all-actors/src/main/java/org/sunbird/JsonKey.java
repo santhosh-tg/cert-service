@@ -83,5 +83,6 @@ public interface JsonKey {
     String UNIQUE_ID = "id";
     String GENERATE_CERT = "generateCert";
     String PUBLIC_KEY_URL = "PUBLIC_KEY_URL";
-
+    String GET_SIGN_URL = "getSignUrl";
+    String SIGNED_URL = "signedUrl";
 }
