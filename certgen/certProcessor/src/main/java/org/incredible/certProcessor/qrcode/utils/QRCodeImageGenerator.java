@@ -212,12 +212,16 @@ public class QRCodeImageGenerator {
         BufferedImage image = new BufferedImage(1, 1, getImageType(colorModel));
         //Font basicFont = new Font(fontName, Font.BOLD, fontSize);
         String fontFile = fontName + ".ttf";
-        logger.info("qr code font file name : " + fontFile);
-        File file = new File("conf/");
-        List<File> filesList = (List<File>) FileUtils.listFiles(file, new String[]{"ttf"}, true);
-
-        Font basicFont = Font.createFont(Font.TRUETYPE_FONT, getFontFile(filesList));
-
+        InputStream inputStream = null;
+        Font basicFont = null;
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        try {
+        inputStream = classLoader.getResourceAsStream(fontFile);
+        logger.info ("input stream value is not null for fontfile " + fontFile + " " + inputStream);    
+        basicFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+        } catch (Exception e) {
+        logger.info ("Exception occured during font creation " + e);
+        }  
         Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>();
         attributes.put(TextAttribute.TRACKING, tracking);
         attributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
@@ -258,16 +262,4 @@ public class QRCodeImageGenerator {
         }
     }
 
-    private  InputStream getFontFile(List<File> files) throws FileNotFoundException {
-
-        Iterator<File> iterator = files.iterator();
-        InputStream fontStream=null;
-        while (iterator.hasNext()) {
-            File file = iterator.next();
-            if (file.getName().equals("Verdana.ttf")) {
-                fontStream = new FileInputStream(file);
-                logger.info("Font file name" + file.getName() +  "File absolute path" + file.getAbsolutePath());
-            }    }
-            return fontStream;
-    }
 }
