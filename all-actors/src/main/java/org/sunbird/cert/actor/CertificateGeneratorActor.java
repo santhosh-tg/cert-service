@@ -51,6 +51,7 @@ public class CertificateGeneratorActor extends BaseActor {
         String url = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
         try {
             htmlTempalteZip = new HTMLTempalteZip(new URL(url));
+            logger.info("CertificateGeneratorActor:generateCertificate:html zip generated");
         } catch (Exception ex) {
             logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while creating HtmlTemplate provider.", ex);
             throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE, url, JsonKey.HTML_TEMPLATE), ResponseCode.CLIENT_ERROR.getCode());
@@ -85,7 +86,7 @@ public class CertificateGeneratorActor extends BaseActor {
         }
     }
 
-    private Map<String, String> uploadCertificate(String certUUID, String recipientID, String orgId, String batchId) {
+    private Map<String, String> uploadCertificate(String certUUID, String recipientID, String orgId, String batchId) throws BaseException {
         Map<String, String> resMap = new HashMap<>();
         String certFileName = certUUID + ".pdf";
         resMap.put(JsonKey.PDF_URL, upload(certFileName, orgId, batchId));
@@ -93,6 +94,10 @@ public class CertificateGeneratorActor extends BaseActor {
         resMap.put(JsonKey.JSON_URL, upload(certFileName, orgId, batchId));
         resMap.put(JsonKey.UNIQUE_ID, certUUID);
         resMap.put(JsonKey.RECIPIENT_ID, recipientID);
+        if(StringUtils.isBlank(resMap.get(JsonKey.PDF_URL)) || StringUtils.isBlank(resMap.get(JsonKey.JSON_URL))){
+            logger.error("CertificateGeneratorActor:uploadCertificate:Exception Occurred while uploading certificate pdfUrl and jsonUrl is null");
+            throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.ERROR_UPLOADING_CERTIFICATE, ResponseCode.SERVER_ERROR.getCode());
+        }
         return resMap;
     }
 
@@ -107,7 +112,7 @@ public class CertificateGeneratorActor extends BaseActor {
             properties.put(JsonKey.AZURE_STORAGE_KEY,certVar.getAzureStorageKey());
             StorageParams storageParams = new StorageParams(properties);
             storageParams.init();
-            return storageParams.upload(certVar.getCONTAINER_NAME(), orgId + "/" + batchId+"/", file, false);
+            return storageParams.upload(orgId + "/" + batchId+"/", file, false);
         } catch (Exception ex) {
             logger.info("CertificateGeneratorActor:upload: Exception occurred while uploading certificate.", ex);
         }
