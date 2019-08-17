@@ -1,12 +1,12 @@
 package org.incredible.certProcessor.store;
 
 import org.apache.commons.lang3.StringUtils;
+import org.incredible.certProcessor.JsonKey;
 import org.sunbird.cloud.storage.BaseStorageService;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 public class StorageParams {
@@ -21,15 +21,15 @@ public class StorageParams {
     }
 
     public void init() {
-        String cloudStoreType = properties.get("CLOUD_STORAGE_TYPE");
-        if (StringUtils.equalsIgnoreCase(cloudStoreType, "azure")) {
-            String storageKey = properties.get("AZURE_STORAGE_KEY");
-            String storageSecret = properties.get("AZURE_STORAGE_SECRET");
+        String cloudStoreType = properties.get(JsonKey.CLOUD_STORAGE_TYPE);
+        if (StringUtils.equalsIgnoreCase(cloudStoreType, JsonKey.AZURE)) {
+            String storageKey = properties.get(JsonKey.AZURE_STORAGE_KEY);
+            String storageSecret = properties.get(JsonKey.AZURE_STORAGE_SECRET);
             StorageConfig storageConfig = new StorageConfig(cloudStoreType, storageKey, storageSecret);
             storageService = StorageServiceFactory.getStorageService(storageConfig);
-            } else if (StringUtils.equalsIgnoreCase(cloudStoreType, "aws")) {
-                String storageKey = properties.get("AWS_STORAGE_KEY");
-                String storageSecret = properties.get("AWS_STORAGE_SECRET");
+            } else if (StringUtils.equalsIgnoreCase(cloudStoreType,JsonKey.AWS)) {
+                String storageKey = properties.get(JsonKey.AWS_STORAGE_KEY);
+                String storageSecret = properties.get(JsonKey.AWS_STORAGE_SECRET);
                 storageService = StorageServiceFactory.getStorageService(new StorageConfig(cloudStoreType, storageKey, storageSecret));
         } else {
 //            throw new ServerException("ERR_INVALID_CLOUD_STORAGE Error while initialising cloud storage");
@@ -38,6 +38,7 @@ public class StorageParams {
 
     public String upload(String container, String path, File file, boolean isDirectory) {
         CloudStorage cloudStorage = new CloudStorage(storageService);
-        return cloudStorage.uploadFile(container, path, file, isDirectory);
+        int retryCount= Integer.parseInt(properties.get(JsonKey.CLOUD_UPLOAD_RETRY_COUNT));
+        return cloudStorage.uploadFile(container, path, file, isDirectory,retryCount);
     }
 }

@@ -100,14 +100,14 @@ public class CertificateGeneratorActor extends BaseActor {
         try {
             File file = FileUtils.getFile("conf/certificate/" + certFileName);
             HashMap<String,String> properties = new HashMap<>();
-            properties.put(JsonKey.CONTAINER_NAME,System.getenv(JsonKey.CONTAINER_NAME));
-            properties.put(JsonKey.CLOUD_STORAGE_TYPE,System.getenv(JsonKey.CLOUD_STORAGE_TYPE));
-            properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,System.getenv(JsonKey.CLOUD_UPLOAD_RETRY_COUNT));
-            properties.put(JsonKey.AZURE_STORAGE_SECRET,System.getenv(JsonKey.AZURE_STORAGE_SECRET));
-            properties.put(JsonKey.AZURE_STORAGE_KEY,System.getenv(JsonKey.AZURE_STORAGE_KEY));
+            properties.put(JsonKey.CONTAINER_NAME,certVar.getCONTAINER_NAME());
+            properties.put(JsonKey.CLOUD_STORAGE_TYPE,certVar.getCloudStorageType());
+            properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,certVar.getCLOUD_UPLOAD_RETRY_COUNT());
+            properties.put(JsonKey.AZURE_STORAGE_SECRET,certVar.getAzureStorageSecret());
+            properties.put(JsonKey.AZURE_STORAGE_KEY,certVar.getAzureStorageKey());
             StorageParams storageParams = new StorageParams(properties);
             storageParams.init();
-            return storageParams.upload(System.getenv(JsonKey.CONTAINER_NAME), orgId + "/" + batchId+"/", file, false);
+            return storageParams.upload(certVar.getCONTAINER_NAME(), orgId + "/" + batchId+"/", file, false);
         } catch (Exception ex) {
             logger.info("CertificateGeneratorActor:upload: Exception occurred while uploading certificate.", ex);
         }

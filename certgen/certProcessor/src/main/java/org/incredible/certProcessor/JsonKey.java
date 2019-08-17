@@ -20,4 +20,14 @@ public interface JsonKey {
     String TAG = "tag";
     String ID = "id";
     String ENTITY = "entity";
+    String CLOUD_STORAGE_TYPE = "CLOUD_STORAGE_TYPE";
+    String CLOUD_UPLOAD_RETRY_COUNT = "CLOUD_UPLOAD_RETRY_COUNT";
+    String AZURE_STORAGE_SECRET = "AZURE_STORAGE_SECRET";
+    String AZURE_STORAGE_KEY = "AZURE_STORAGE_KEY";
+    String AZURE="azure";
+    String AWS="aws";
+    String AWS_STORAGE_KEY="AWS_STORAGE_KEY";
+    String AWS_STORAGE_SECRET="AWS_STORAGE_SECRET";
+
+
 }

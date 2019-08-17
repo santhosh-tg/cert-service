@@ -1,6 +1,7 @@
 package org.incredible.certProcessor.store;
 
 
+import org.incredible.UrlManager;
 import org.sunbird.cloud.storage.BaseStorageService;
 import scala.Option;
 
@@ -16,8 +17,7 @@ public class CloudStorage {
     }
 
 
-    public static String uploadFile(String container, String path, File file, boolean isDirectory) {
-        int retryCount = 2;
+    public static String uploadFile(String container, String path, File file, boolean isDirectory,int retryCount) {
         String objectKey = path + file.getName();
         String url = storageService.upload(container,
                 file.getAbsolutePath(),
@@ -25,6 +25,6 @@ public class CloudStorage {
                 Option.apply(isDirectory),
                 Option.apply(1),
                 Option.apply(retryCount), Option.apply(1));
-        return url;
+        return UrlManager.getSharableUrl(url);
          }
 }
