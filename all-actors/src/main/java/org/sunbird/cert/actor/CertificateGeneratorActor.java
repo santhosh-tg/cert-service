@@ -5,10 +5,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.incredible.CertificateGenerator;
 import org.incredible.certProcessor.CertModel;
+import org.incredible.certProcessor.store.StorageParams;
 import org.incredible.certProcessor.views.HTMLTempalteZip;
 import org.sunbird.*;
 import org.sunbird.actor.core.ActorConfig;
-import org.sunbird.azure.AzureFileUtility;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 import org.sunbird.cloud.storage.IStorageService;
 import org.sunbird.cloud.storage.factory.StorageConfig;
@@ -53,8 +53,8 @@ public class CertificateGeneratorActor extends BaseActor {
 	private void generateSignUrl(Request request) {
 		String uri = (String) request.getRequest().get(JsonKey.PDF_URL);
 		logger.info("generate sign url method called for uri ");
-		IStorageService storageService = getStorageService(System.getenv(JsonKey.CLOUD_STORAGE_TYPE));
-		String signUrl = storageService.getSignedURL(System.getenv(JsonKey.CONTAINER_NAME), uri, Some.apply(getTimeoutInSeconds()),
+		IStorageService storageService = getStorageService(certVar.getCloudStorageType());
+		String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
 				Some.apply("r"));
 		Response response = new Response();
 		response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
@@ -63,8 +63,8 @@ public class CertificateGeneratorActor extends BaseActor {
 	}
 
     private static IStorageService getStorageService(String storageType) {
-        String storageKey = System.getenv(JsonKey.AZURE_STORAGE_SECRET);
-        String storageSecret = System.getenv(JsonKey.AZURE_STORAGE_SECRET);
+        String storageKey = CertsConstant.AZURE_STORAGE_KEY;
+        String storageSecret = CertsConstant.AZURE_STORAGE_SECRET;
         return getStorageService(storageType, storageKey, storageSecret);
       }
     
@@ -89,6 +89,7 @@ public class CertificateGeneratorActor extends BaseActor {
         String url = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
         try {
             htmlTempalteZip = new HTMLTempalteZip(new URL(url));
+            logger.info("CertificateGeneratorActor:generateCertificate:html zip generated");
         } catch (Exception ex) {
             logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while creating HtmlTemplate provider.", ex);
             throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE, url, JsonKey.HTML_TEMPLATE), ResponseCode.CLIENT_ERROR.getCode());
@@ -123,7 +124,7 @@ public class CertificateGeneratorActor extends BaseActor {
         }
     }
 
-    private Map<String, String> uploadCertificate(String certUUID, String recipientID, String orgId, String batchId) {
+    private Map<String, String> uploadCertificate(String certUUID, String recipientID, String orgId, String batchId) throws BaseException {
         Map<String, String> resMap = new HashMap<>();
         String certFileName = certUUID + ".pdf";
         resMap.put(JsonKey.PDF_URL, upload(certFileName, orgId, batchId));
@@ -131,28 +132,25 @@ public class CertificateGeneratorActor extends BaseActor {
         resMap.put(JsonKey.JSON_URL, upload(certFileName, orgId, batchId));
         resMap.put(JsonKey.UNIQUE_ID, certUUID);
         resMap.put(JsonKey.RECIPIENT_ID, recipientID);
+        if(StringUtils.isBlank(resMap.get(JsonKey.PDF_URL)) || StringUtils.isBlank(resMap.get(JsonKey.JSON_URL))){
+            logger.error("CertificateGeneratorActor:uploadCertificate:Exception Occurred while uploading certificate pdfUrl and jsonUrl is null");
+            throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.ERROR_UPLOADING_CERTIFICATE, ResponseCode.SERVER_ERROR.getCode());
+        }
         return resMap;
     }
 
     private String upload(String certFileName, String orgId, String batchId) {
         try {
-            //TODO  Un comment this to use cloud storage jar to upload file to azure as of now
-            // not using because of jar conflict issue
-
-            //HashMap<String,String> properties = new HashMap<>();
-            //properties.put(JsonKey.CONTAINER_NAME,System.getenv(JsonKey.CONTAINER_NAME));
-            //properties.put(JsonKey.CLOUD_STORAGE_TYPE,System.getenv(JsonKey.CLOUD_STORAGE_TYPE));
-            //properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,System.getenv(JsonKey.CLOUD_UPLOAD_RETRY_COUNT));
-            //properties.put(JsonKey.AZURE_STORAGE_SECRET,System.getenv(JsonKey.AZURE_STORAGE_SECRET));
-            //properties.put(JsonKey.AZURE_STORAGE_KEY,System.getenv(JsonKey.AZURE_STORAGE_KEY));
-
-            //StorageParams storageParams = new StorageParams(properties);
-            //storageParams.init();
-            //return storageParams.upload(System.getenv(JsonKey.CONTAINER_NAME), "/", file, false);
-
             File file = FileUtils.getFile("conf/certificate/" + certFileName);
-            logger.info("CertificateGeneratorActor:upload:container name got from env is: ".concat(certVar.getCONTAINER_NAME()));
-            return AzureFileUtility.uploadFile(certVar.getCONTAINER_NAME() + "/" + orgId + "/" + batchId, file);
+            HashMap<String,String> properties = new HashMap<>();
+            properties.put(JsonKey.CONTAINER_NAME,certVar.getCONTAINER_NAME());
+            properties.put(JsonKey.CLOUD_STORAGE_TYPE,certVar.getCloudStorageType());
+            properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,certVar.getCLOUD_UPLOAD_RETRY_COUNT());
+            properties.put(JsonKey.AZURE_STORAGE_SECRET,certVar.getAzureStorageSecret());
+            properties.put(JsonKey.AZURE_STORAGE_KEY,certVar.getAzureStorageKey());
+            StorageParams storageParams = new StorageParams(properties);
+            storageParams.init();
+            return storageParams.upload(orgId + "/" + batchId+"/", file, false);
         } catch (Exception ex) {
             logger.info("CertificateGeneratorActor:upload: Exception occurred while uploading certificate.", ex);
         }
