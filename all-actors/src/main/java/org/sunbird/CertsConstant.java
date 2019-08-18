@@ -19,6 +19,9 @@ public class CertsConstant {
     private static final String DOMAIN_URL = getDomainUrlFromEnv();
     private static final String CONTAINER_NAME = getContainerNameFromEnv();
     private static final String ENC_SERVICE_URL = getEncServiceUrl();
+    private static final String CLOUD_STORAGE_TYPE=getCloudStorageTypeFromEnv();
+    public static final String AZURE_STORAGE_SECRET=getStorageSecret();
+    public static final String AZURE_STORAGE_KEY=getStorageKey();
 
 
     public String getBADGE_URL(String rootOrgId, String batchId) {
@@ -42,7 +45,8 @@ public class CertsConstant {
     }
 
     public String getCLOUD_UPLOAD_RETRY_COUNT() {
-        return CLOUD_UPLOAD_RETRY_COUNT;
+        String retryCount = getPropertyFromEnv(JsonKey.CLOUD_UPLOAD_RETRY_COUNT);
+        return StringUtils.isNotBlank(retryCount)?retryCount:CLOUD_UPLOAD_RETRY_COUNT;
     }
 
     public String getACCESS_CODE_LENGTH() {
@@ -109,6 +113,37 @@ public class CertsConstant {
 
     public String getEncryptionServiceUrl() {
         return getEncServiceUrl();
+    }
+
+
+    private static String getCloudStorageTypeFromEnv() {
+        String cloudStorageType = getPropertyFromEnv(JsonKey.CLOUD_STORAGE_TYPE);
+        validateEnvProperty(cloudStorageType);
+        return cloudStorageType;
+    }
+
+    private static String getStorageKey() {
+        String storageKey = getPropertyFromEnv(JsonKey.AZURE_STORAGE_KEY);
+        validateEnvProperty(storageKey);
+        return storageKey;
+    }
+
+    private static String getStorageSecret() {
+        String storageSecret = getPropertyFromEnv(JsonKey.AZURE_STORAGE_SECRET);
+        validateEnvProperty(storageSecret);
+        return storageSecret;
+    }
+
+    public  String getCloudStorageType() {
+        return CLOUD_STORAGE_TYPE;
+    }
+
+    public  String getAzureStorageSecret() {
+        return AZURE_STORAGE_SECRET;
+    }
+
+    public  String getAzureStorageKey() {
+        return AZURE_STORAGE_KEY;
     }
 
 }
