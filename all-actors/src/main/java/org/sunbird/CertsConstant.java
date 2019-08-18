@@ -16,6 +16,8 @@ public class CertsConstant {
     private static final String VERIFICATION_TYPE = "SignedBadge";
     private static final String CLOUD_UPLOAD_RETRY_COUNT = "3";
     private static final String ACCESS_CODE_LENGTH = "6";
+    public static final String DOWNLOAD_LINK_EXPIRY_TIMEOUT = "download_link_expiry_timeout";
+    private static final String LINK_TIMEOUT = "10";
     private static final String DOMAIN_URL = getDomainUrlFromEnv();
     private static final String CONTAINER_NAME = getContainerNameFromEnv();
     private static final String ENC_SERVICE_URL = getEncServiceUrl();
@@ -23,12 +25,12 @@ public class CertsConstant {
     public static final String AZURE_STORAGE_SECRET=getStorageSecret();
     public static final String AZURE_STORAGE_KEY=getStorageKey();
 
-
     public String getBADGE_URL(String rootOrgId, String batchId) {
         return String.format("%s/%s/%s/%s/%s", DOMAIN_URL, CONTAINER_NAME, rootOrgId, batchId, BADGE_URL);
     }
 
-    public String getISSUER_URL(String rootOrgId) {
+
+	public String getISSUER_URL(String rootOrgId) {
         return String.format("%s/%s/%s/%s", DOMAIN_URL, CONTAINER_NAME, rootOrgId, ISSUER_URL);
     }
 
@@ -114,6 +116,10 @@ public class CertsConstant {
     public String getEncryptionServiceUrl() {
         return getEncServiceUrl();
     }
+    
+    public static String getExpiryLink(String key) {
+    	 return getPropertyFromEnv(key) != null ? getPropertyFromEnv(key) : LINK_TIMEOUT;
+	}
 
 
     private static String getCloudStorageTypeFromEnv() {

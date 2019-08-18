@@ -9,10 +9,16 @@ import org.incredible.certProcessor.store.StorageParams;
 import org.incredible.certProcessor.views.HTMLTempalteZip;
 import org.sunbird.*;
 import org.sunbird.actor.core.ActorConfig;
+import org.sunbird.cert.actor.operation.CertActorOperation;
+import org.sunbird.cloud.storage.IStorageService;
+import org.sunbird.cloud.storage.factory.StorageConfig;
+import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
+
+import scala.Some;
 
 import java.io.File;
 import java.net.URL;
@@ -25,7 +31,7 @@ import java.util.*;
  * @author manzarul
  */
 @ActorConfig(
-        tasks = {JsonKey.GENERATE_CERT},
+        tasks = {JsonKey.GENERATE_CERT,JsonKey.GET_SIGN_URL},
         asyncTasks = {}
 )
 public class CertificateGeneratorActor extends BaseActor {
@@ -38,11 +44,43 @@ public class CertificateGeneratorActor extends BaseActor {
         logger.info("onReceive method call start for operation " + operation);
         if (JsonKey.GENERATE_CERT.equalsIgnoreCase(operation)) {
             generateCertificate(request);
+        }else if (CertActorOperation.GET_SIGN_URL.getOperation().equalsIgnoreCase(operation)) {
+        	generateSignUrl (request) ;
         }
         logger.info("onReceive method call End");
     }
 
-    private void generateCertificate(Request request) throws BaseException {
+	private void generateSignUrl(Request request) {
+		String uri = (String) request.getRequest().get(JsonKey.PDF_URL);
+		logger.info("generate sign url method called for uri ");
+		IStorageService storageService = getStorageService(certVar.getCloudStorageType());
+		String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
+				Some.apply("r"));
+		Response response = new Response();
+		response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
+		response.put(JsonKey.SIGNED_URL, signUrl);
+		sender().tell(response, self());
+	}
+
+    private static IStorageService getStorageService(String storageType) {
+        String storageKey = CertsConstant.AZURE_STORAGE_KEY;
+        String storageSecret = CertsConstant.AZURE_STORAGE_SECRET;
+        return getStorageService(storageType, storageKey, storageSecret);
+      }
+    
+    private static IStorageService getStorageService(
+			String storageType, String storageKey, String storageSecret) {
+		StorageConfig storageConfig = new StorageConfig(storageType, storageKey, storageSecret);
+		IStorageService storageService = StorageServiceFactory.getStorageService(storageConfig);
+		return storageService;
+	}
+    
+    private static int getTimeoutInSeconds() {
+        String timeoutInSecondsStr = CertsConstant.getExpiryLink(CertsConstant.DOWNLOAD_LINK_EXPIRY_TIMEOUT);
+        return Integer.parseInt(timeoutInSecondsStr);
+      }
+    
+	private void generateCertificate(Request request) throws BaseException {
         logger.info("Request received==" + request.getRequest());
         CertMapper certMapper = new CertMapper(populatePropertiesMap(request));
         List<CertModel> certModelList = certMapper.toList(request.getRequest());
@@ -144,4 +182,4 @@ public class CertificateGeneratorActor extends BaseActor {
         return properties;
     }
 
-}
+ }

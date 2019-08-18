@@ -2,7 +2,6 @@ package controllers.certs;
 
 import java.util.concurrent.CompletionStage;
 
-import org.sunbird.BaseException;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 
 import controllers.BaseController;
@@ -33,5 +32,11 @@ public class CertsGenerationController  extends BaseController{
 	    return response;
 	  }
 	
+	  public CompletionStage<Result> generateSignUrl() {
+			CompletionStage<Result> response = handleRequest(request(),
+					null,
+					CertActorOperation.GET_SIGN_URL.getOperation());
+		    return response;
+		  }  
 
 }
