@@ -124,6 +124,7 @@ public class CertificateGeneratorActor extends BaseActor {
             for (File file : files) {
                 if (file.getName().startsWith(fileName)) file.delete();
             }
+            logger.info("CertificateGeneratorActor: cleanUp completed");
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }

@@ -141,6 +141,7 @@ public class CertificateFactory {
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             String request = mapper.writeValueAsString(certificateExtension);
             JsonNode jsonNode = mapper.readTree(request);
+            logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
             signMap = signatureHelper.generateSignature(jsonNode, keyID);
             return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
 
