@@ -85,4 +85,7 @@ public interface JsonKey {
     String PUBLIC_KEY_URL = "PUBLIC_KEY_URL";
     String GET_SIGN_URL = "getSignUrl";
     String SIGNED_URL = "signedUrl";
+
+    String ACCESS_CODE = "accessCode";
+    String JSON_DATA = "jsonData";
 }

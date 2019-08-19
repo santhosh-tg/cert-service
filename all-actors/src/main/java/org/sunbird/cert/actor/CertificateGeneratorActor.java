@@ -1,5 +1,6 @@
 package org.sunbird.cert.actor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +9,7 @@ import org.incredible.CertificateGenerator;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.store.StorageParams;
 import org.incredible.certProcessor.views.HTMLTempalteZip;
+import org.incredible.pojos.CertificateResponse;
 import org.sunbird.*;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cert.actor.operation.CertActorOperation;
@@ -22,6 +24,7 @@ import org.sunbird.response.Response;
 import scala.Some;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
@@ -38,6 +41,7 @@ import java.util.*;
 public class CertificateGeneratorActor extends BaseActor {
     private Logger logger = Logger.getLogger(CertificateGeneratorActor.class);
     private static CertsConstant certVar = new CertsConstant();
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void onReceive(Request request) throws Throwable {
@@ -96,18 +100,19 @@ public class CertificateGeneratorActor extends BaseActor {
         String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
         String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
         directory = "conf/" + orgId.concat("_") + tag.concat("_") + htmlTempalteZip.getZipFileName().concat("/");
-        List<Map<String, String>> certUrlList = new ArrayList<>();
+        List<Map<String, Object>> certUrlList = new ArrayList<>();
         for (CertModel certModel : certModelList) {
-            String certUUID = "";
+            CertificateResponse certificateResponse = null;
             try {
-                certUUID = certificateGenerator.createCertificate(certModel, htmlTempalteZip, directory, htmlTempalteZip.getZipFileName());
+                certificateResponse = certificateGenerator.createCertificate(certModel, htmlTempalteZip, directory, htmlTempalteZip.getZipFileName());
             } catch (Exception ex) {
-                cleanup(directory, certUUID);
+                cleanup(directory, certificateResponse.getUuid());
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.INTERNAL_ERROR, ResponseCode.SERVER_ERROR.getCode());
             }
-            certUrlList.add(uploadCertificate(certUUID, certModel.getIdentifier(), orgId, tag, directory));
-            cleanup(directory, certUUID);
+            certUrlList.add(uploadCertificate(certificateResponse, certModel.getIdentifier(), orgId, tag, directory));
+
+            cleanup(directory, certificateResponse.getUuid());
         }
         Response response = new Response();
         response.getResult().put("response", certUrlList);
@@ -128,15 +133,22 @@ public class CertificateGeneratorActor extends BaseActor {
         }
     }
 
-    private Map<String, String> uploadCertificate(String certUUID, String recipientID, String orgId, String batchId, String directory) throws BaseException {
-        Map<String, String> resMap = new HashMap<>();
-        String certFileName = certUUID + ".pdf";
+    private Map<String, Object> uploadCertificate(CertificateResponse certificateResponse
+            , String recipientID, String orgId, String batchId, String directory) throws BaseException {
+        Map<String, Object> resMap = new HashMap<>();
+        String certFileName = certificateResponse.getUuid() + ".pdf";
         resMap.put(JsonKey.PDF_URL, upload(certFileName, orgId, batchId, directory));
-        certFileName = certUUID + ".json";
+        certFileName = certificateResponse.getUuid() + ".json";
         resMap.put(JsonKey.JSON_URL, upload(certFileName, orgId, batchId, directory));
-        resMap.put(JsonKey.UNIQUE_ID, certUUID);
+        resMap.put(JsonKey.UNIQUE_ID, certificateResponse.getUuid());
         resMap.put(JsonKey.RECIPIENT_ID, recipientID);
-        if(StringUtils.isBlank(resMap.get(JsonKey.PDF_URL)) || StringUtils.isBlank(resMap.get(JsonKey.JSON_URL))){
+        resMap.put(JsonKey.ACCESS_CODE, certificateResponse.getAccessCode());
+        try {
+            resMap.put(JsonKey.JSON_DATA, mapper.readValue(certificateResponse.getJsonData(),Map.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(StringUtils.isBlank((String) resMap.get(JsonKey.PDF_URL)) || StringUtils.isBlank((String) resMap.get(JsonKey.JSON_URL))) {
             logger.error("CertificateGeneratorActor:uploadCertificate:Exception Occurred while uploading certificate pdfUrl and jsonUrl is null");
             throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.ERROR_UPLOADING_CERTIFICATE, ResponseCode.SERVER_ERROR.getCode());
         }
