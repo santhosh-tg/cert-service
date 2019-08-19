@@ -6,7 +6,7 @@
 GET  /health                                  @controllers.health.HealthController.getHealth()
 GET  /:service/health                      @controllers.health.HealthController.getServiceHealth(service:String)
 POST /v1/certs/generate                    @controllers.certs.CertsGenerationController.generateCerificate()
-POST private/cert/v1/certs/generate        @controllers.certs.CertsGenerationController.generateCerificate()
+POST /private/cert/v1/certs/generate        @controllers.certs.CertsGenerationController.generateCerificate()
 POST /v1/user/certs/download               @controllers.certs.CertsGenerationController.generateSignUrl()
 # Logs Management APIs
 # POST    /v1.3/system/log/update            @controllers.logsmanager.LogController.setLogLevel()
