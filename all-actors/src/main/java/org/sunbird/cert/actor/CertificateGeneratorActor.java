@@ -151,7 +151,7 @@ public class CertificateGeneratorActor extends BaseActor {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(StringUtils.isBlank(resMap.get(JsonKey.PDF_URL).toString()) || StringUtils.isBlank(resMap.get(JsonKey.JSON_URL).toString())){
+        if(StringUtils.isBlank((String) resMap.get(JsonKey.PDF_URL)) || StringUtils.isBlank((String) resMap.get(JsonKey.JSON_URL))) {
             logger.error("CertificateGeneratorActor:uploadCertificate:Exception Occurred while uploading certificate pdfUrl and jsonUrl is null");
             throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.ERROR_UPLOADING_CERTIFICATE, ResponseCode.SERVER_ERROR.getCode());
         }
