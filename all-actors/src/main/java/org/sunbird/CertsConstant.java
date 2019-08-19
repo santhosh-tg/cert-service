@@ -22,8 +22,8 @@ public class CertsConstant {
     private static final String CONTAINER_NAME = getContainerNameFromEnv();
     private static final String ENC_SERVICE_URL = getEncServiceUrl();
     private static final String CLOUD_STORAGE_TYPE=getCloudStorageTypeFromEnv();
-    public static final String AZURE_STORAGE_SECRET=getStorageSecret();
-    public static final String AZURE_STORAGE_KEY=getStorageKey();
+    private static final String AZURE_STORAGE_SECRET=getStorageSecret();
+    private static final String AZURE_STORAGE_KEY=getStorageKey();
 
     public String getBADGE_URL(String rootOrgId, String batchId) {
         return String.format("%s/%s/%s/%s/%s", DOMAIN_URL, CONTAINER_NAME, rootOrgId, batchId, BADGE_URL);

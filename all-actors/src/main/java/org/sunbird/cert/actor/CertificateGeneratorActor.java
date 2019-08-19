@@ -54,24 +54,20 @@ public class CertificateGeneratorActor extends BaseActor {
 	private void generateSignUrl(Request request) {
 		String uri = (String) request.getRequest().get(JsonKey.PDF_URL);
 		logger.info("CertificateGeneratorActor:generateSignUrl:generate sign url method called for uri: ".concat(uri));
-		IStorageService storageService = getStorageService(certVar.getCloudStorageType());
+		IStorageService storageService = getStorageService();
 		String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
 				Some.apply("r"));
+        logger.info("CertificateGeneratorActor:generateSignUrl:signedurl got: ".concat(signUrl));
 		Response response = new Response();
 		response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
 		response.put(JsonKey.SIGNED_URL, signUrl);
 		sender().tell(response, self());
 	}
 
-    private static IStorageService getStorageService(String storageType) {
-        String storageKey = CertsConstant.AZURE_STORAGE_KEY;
-        String storageSecret = CertsConstant.AZURE_STORAGE_SECRET;
-        return getStorageService(storageType, storageKey, storageSecret);
-      }
 
-    private static IStorageService getStorageService(
-			String storageType, String storageKey, String storageSecret) {
-		StorageConfig storageConfig = new StorageConfig(storageType, storageKey, storageSecret);
+    private IStorageService getStorageService() {
+		StorageConfig storageConfig = new StorageConfig(certVar.getCloudStorageType(), certVar.getAzureStorageKey(), certVar.getAzureStorageSecret());
+		logger.info("CertificateGeneratorActor:getStorageService:storage object formed:".concat(storageConfig.toString()));
 		IStorageService storageService = StorageServiceFactory.getStorageService(storageConfig);
 		return storageService;
 	}
