@@ -31,7 +31,7 @@ import java.util.*;
  * @author manzarul
  */
 @ActorConfig(
-        tasks = {JsonKey.GENERATE_CERT,JsonKey.GET_SIGN_URL},
+        tasks = {JsonKey.GENERATE_CERT, JsonKey.GET_SIGN_URL},
         asyncTasks = {}
 )
 public class CertificateGeneratorActor extends BaseActor {
@@ -67,19 +67,19 @@ public class CertificateGeneratorActor extends BaseActor {
         String storageSecret = CertsConstant.AZURE_STORAGE_SECRET;
         return getStorageService(storageType, storageKey, storageSecret);
       }
-    
+
     private static IStorageService getStorageService(
 			String storageType, String storageKey, String storageSecret) {
 		StorageConfig storageConfig = new StorageConfig(storageType, storageKey, storageSecret);
 		IStorageService storageService = StorageServiceFactory.getStorageService(storageConfig);
 		return storageService;
 	}
-    
+
     private static int getTimeoutInSeconds() {
         String timeoutInSecondsStr = CertsConstant.getExpiryLink(CertsConstant.DOWNLOAD_LINK_EXPIRY_TIMEOUT);
         return Integer.parseInt(timeoutInSecondsStr);
       }
-    
+
 	private void generateCertificate(Request request) throws BaseException {
         logger.info("Request received==" + request.getRequest());
         CertMapper certMapper = new CertMapper(populatePropertiesMap(request));
@@ -102,7 +102,7 @@ public class CertificateGeneratorActor extends BaseActor {
         for (CertModel certModel : certModelList) {
             String certUUID = "";
             try {
-                certUUID = certificateGenerator.createCertificate(certModel, htmlTempalteZip, (String) ((Map<String, Object>) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS)).get(JsonKey.ID));
+                certUUID = certificateGenerator.createCertificate(certModel, htmlTempalteZip, directory, htmlTempalteZip.getZipFileName());
             } catch (Exception ex) {
                 cleanup(directory, certUUID);
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
@@ -124,8 +124,6 @@ public class CertificateGeneratorActor extends BaseActor {
             for (File file : files) {
                 if (file.getName().startsWith(fileName)) file.delete();
             }
-            File file = new File(path);
-            file.delete();
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
@@ -148,20 +146,6 @@ public class CertificateGeneratorActor extends BaseActor {
 
     private String upload(String certFileName, String orgId, String batchId, String directory) {
         try {
-            //TODO  Un comment this to use cloud storage jar to upload file to azure as of now
-            // not using because of jar conflict issue
-
-            //HashMap<String,String> properties = new HashMap<>();
-            //properties.put(JsonKey.CONTAINER_NAME,System.getenv(JsonKey.CONTAINER_NAME));
-            //properties.put(JsonKey.CLOUD_STORAGE_TYPE,System.getenv(JsonKey.CLOUD_STORAGE_TYPE));
-            //properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,System.getenv(JsonKey.CLOUD_UPLOAD_RETRY_COUNT));
-            //properties.put(JsonKey.AZURE_STORAGE_SECRET,System.getenv(JsonKey.AZURE_STORAGE_SECRET));
-            //properties.put(JsonKey.AZURE_STORAGE_KEY,System.getenv(JsonKey.AZURE_STORAGE_KEY));
-
-            //StorageParams storageParams = new StorageParams(properties);
-            //storageParams.init();
-            //return storageParams.upload(System.getenv(JsonKey.CONTAINER_NAME), "/", file, false);
-
             File file = FileUtils.getFile(directory + certFileName);
             HashMap<String,String> properties = new HashMap<>();
             properties.put(JsonKey.CONTAINER_NAME,certVar.getCONTAINER_NAME());

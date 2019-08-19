@@ -23,7 +23,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     /**
      * html zip file url
      */
-    private static URL zipUrl;
+    private  URL zipUrl;
 
     public HTMLTempalteZip(URL zipUrl) {
         this.zipUrl = zipUrl;
@@ -70,7 +70,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
      * @param zipFilePath
      * @param destDir
      */
-    private static void unzip(String zipFilePath, String destDir) {
+    private  void unzip(String zipFilePath, String destDir) {
         File dir = new File(destDir);
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs();
@@ -111,7 +111,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
      * @param filePath
      * @throws IOException
      */
-    private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+    private  void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[4096];
         int read = 0;
@@ -121,7 +121,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         bos.close();
     }
 
-    private static void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
+    private  void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
         byte[] buf = new byte[bufferSize];
         int n = input.read(buf);
         while (n >= 0) {
@@ -137,7 +137,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
      *
      * @return zip file name
      */
-    public static String getZipFileName() {
+    public  String getZipFileName() {
         String fileName = null;
         try {
             URI uri = new URI(zipUrl.toString());

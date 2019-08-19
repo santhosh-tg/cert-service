@@ -32,7 +32,7 @@ public class CertificateFactory {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties, String keyID)
+    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties)
             throws InvalidDateFormatException, SignatureException.UnreachableException, IOException, SignatureException.CreationException {
 
         uuid = properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.CONTAINER_NAME).concat("/")
@@ -60,7 +60,7 @@ public class CertificateFactory {
 
         issuerBuilder.setId(properties.get(JsonKey.ISSUER_URL)).setName(certModel.getIssuer().getName())
                 .setUrl(certModel.getIssuer().getUrl()).setPublicKey(certModel.getIssuer().getPublicKey());
-        ;
+
         /**
          * badge class object
          * **/
@@ -80,14 +80,14 @@ public class CertificateFactory {
                 .setIssuedOn(certModel.getIssuedDate()).setExpires(certModel.getExpiry())
                 .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification).setSignatory(certModel.getSignatoryList());
 
-        if (keyID.isEmpty()) {
+        if (properties.get(JsonKey.KEY_ID).isEmpty()) {
             signedVerification.setType(new String[]{JsonKey.HOSTED});
 
         } else {
             signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
 
             /** certificate  signature value **/
-            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, keyID);
+            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, properties.get(JsonKey.KEY_ID));
 
             /**
              * to assign signature value

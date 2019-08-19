@@ -77,7 +77,7 @@ public interface JsonKey {
     String SIGN_CREATOR = "SIGN_CREATOR";
     String SIGN = "sign";
     String VERIFY = "verify";
-    String KEY_ID = "keyID";
+    String KEY_ID = "keyId";
     String JSON_URL = "jsonUrl";
     String PDF_URL = "pdfUrl";
     String UNIQUE_ID = "id";

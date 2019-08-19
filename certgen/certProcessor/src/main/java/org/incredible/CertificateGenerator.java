@@ -7,7 +7,6 @@ import com.google.zxing.WriterException;
 import org.apache.commons.lang.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.CertificateFactory;
-import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
@@ -43,16 +42,14 @@ public class CertificateGenerator {
     private CertificateFactory certificateFactory = new CertificateFactory();
 
 
-    public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider, String signatureConfig)
+    public String createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider, String directory, String zipFileName)
             throws InvalidDateFormatException, WriterException, FontFormatException, NotFoundException, IOException,
             SignatureException.UnreachableException, SignatureException.CreationException {
 
-        CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties, signatureConfig);
-        String directory = "conf/" + properties.get(JsonKey.ROOT_ORG_ID).concat("_") + properties.get(JsonKey.TAG).concat("_")
-                + HTMLTempalteZip.getZipFileName().concat("/");
+        CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties);
         generateCertificateJson(certificateExtension, directory);
         generateQRCodeForCertificate(certificateExtension, directory);
-        if (HTMLTempalteZip.checkZipFileExists(new File(directory + HTMLTempalteZip.getZipFileName().concat(".zip")))) {
+        if (HTMLTempalteZip.checkZipFileExists(new File(directory + zipFileName.concat(".zip")))) {
             HTMLGenerator htmlGenerator = new HTMLGenerator(htmlTemplateProvider.getTemplateContent(directory));
             htmlGenerator.generate(certificateExtension, directory);
             return getUUID(certificateExtension.getId());
