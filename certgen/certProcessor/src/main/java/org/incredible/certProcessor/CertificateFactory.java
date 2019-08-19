@@ -3,6 +3,7 @@ package org.incredible.certProcessor;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.incredible.builders.*;
 import org.incredible.certProcessor.signature.SignatureHelper;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
@@ -80,11 +81,12 @@ public class CertificateFactory {
                 .setIssuedOn(certModel.getIssuedDate()).setExpires(certModel.getExpiry())
                 .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification).setSignatory(certModel.getSignatoryList());
 
-        if (properties.get(JsonKey.KEY_ID).isEmpty()) {
+        if (StringUtils.isEmpty(properties.get(JsonKey.KEY_ID))) {
             signedVerification.setType(new String[]{JsonKey.HOSTED});
-
+            logger.info("CertificateExtension:createCertificate: if keyID is empty then verification type is HOSTED");
         } else {
             signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
+            logger.info("CertificateExtension:createCertificate: if keyID is not empty then verification type is SignedBadge");
 
             /** certificate  signature value **/
             String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, properties.get(JsonKey.KEY_ID));

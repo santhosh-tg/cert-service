@@ -32,7 +32,9 @@ public class CertValidator {
         validateCertData((List<Map<String, Object>>) certReq.get(JsonKey.DATA));
         validateCertIssuer((Map<String, Object>) certReq.get(JsonKey.ISSUER));
         validateCertSignatoryList((List<Map<String, Object>>) certReq.get(JsonKey.SIGNATORY_LIST));
-        validateKeys((Map<String, Object>) certReq.get(JsonKey.KEYS));
+        if (certReq.containsKey(JsonKey.KEYS)) {
+            validateKeys((Map<String, Object>) certReq.get(JsonKey.KEYS));
+        }
     }
 
     private static void validateCertSignatoryList(List<Map<String, Object>> signatoryList) throws BaseException {
