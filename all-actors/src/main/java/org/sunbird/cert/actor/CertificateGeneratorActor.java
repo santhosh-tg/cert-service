@@ -56,16 +56,27 @@ public class CertificateGeneratorActor extends BaseActor {
     }
 
 	private void generateSignUrl(Request request) {
-		String uri = (String) request.getRequest().get(JsonKey.PDF_URL);
-		logger.info("CertificateGeneratorActor:generateSignUrl:generate sign url method called for uri: ".concat(uri));
-		IStorageService storageService = getStorageService();
-		String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
-				Some.apply("r"));
-        logger.info("CertificateGeneratorActor:generateSignUrl:signedUrl got: ".concat(signUrl));
-		Response response = new Response();
-		response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
-		response.put(JsonKey.SIGNED_URL, signUrl);
-		sender().tell(response, self());
+        try {
+            logger.info("CertificateGeneratorActor:generateSignUrl:generate request got : ".concat(request.getRequest()+""));
+            String uri = (String) request.getRequest().get(JsonKey.PDF_URL);
+            logger.info("CertificateGeneratorActor:generateSignUrl:generate sign url method called for uri: ".concat(uri));
+            IStorageService storageService = getStorageService();
+            String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
+                    Some.apply("r"));
+            logger.info("CertificateGeneratorActor:generateSignUrl:signedUrl got: ".concat(signUrl));
+            Response response = new Response();
+            response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
+            response.put(JsonKey.SIGNED_URL, signUrl);
+            sender().tell(response, self());
+        }
+        catch (Exception e){
+            logger.error("CertificateGeneratorActor:generateSignUrl: error in genrerating sign url "+ e);
+            Response response = new Response();
+            response.put(JsonKey.RESPONSE, "failure");
+            response.put(JsonKey.SIGNED_URL, "");
+            sender().tell(response, self());
+        }
+
 	}
 
 
