@@ -53,7 +53,7 @@ public class CertificateGeneratorActor extends BaseActor {
 
 	private void generateSignUrl(Request request) {
 		String uri = (String) request.getRequest().get(JsonKey.PDF_URL);
-		logger.info("generate sign url method called for uri ");
+		logger.info("CertificateGeneratorActor:generateSignUrl:generate sign url method called for uri: ".concat(uri));
 		IStorageService storageService = getStorageService(certVar.getCloudStorageType());
 		String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
 				Some.apply("r"));
@@ -76,8 +76,9 @@ public class CertificateGeneratorActor extends BaseActor {
 		return storageService;
 	}
 
-    private static int getTimeoutInSeconds() {
+    private int getTimeoutInSeconds() {
         String timeoutInSecondsStr = CertsConstant.getExpiryLink(CertsConstant.DOWNLOAD_LINK_EXPIRY_TIMEOUT);
+        logger.info("CertificateGeneratorActor:getTimeoutInSeconds:timeout got: ".concat(timeoutInSecondsStr));
         return Integer.parseInt(timeoutInSecondsStr);
       }
 
@@ -193,5 +194,4 @@ public class CertificateGeneratorActor extends BaseActor {
         logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;
     }
-
  }
