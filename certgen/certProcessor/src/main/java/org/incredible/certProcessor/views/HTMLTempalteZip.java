@@ -1,11 +1,14 @@
 package org.incredible.certProcessor.views;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -20,7 +23,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     /**
      * html zip file url
      */
-    private URL zipUrl;
+    private  URL zipUrl;
 
     public HTMLTempalteZip(URL zipUrl) {
         this.zipUrl = zipUrl;
@@ -38,17 +41,21 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
         }
-        HttpURLConnection connection = (HttpURLConnection) zipUrl.openConnection();
-        connection.setRequestMethod("GET");
-        InputStream in = connection.getInputStream();
-        String zipPath = targetDirectory.getAbsolutePath() + "/arc" + System.nanoTime() + ".zip";
-        FileOutputStream out = new FileOutputStream(zipPath);
-        copy(in, out, 1024);
-        out.close();
-        in.close();
-        logger.info("Downloading Zip file from given url : success");
-        unzip(zipPath, targetDirectory.getAbsolutePath());
-        readIndexHtmlFile(targetDirectory.getAbsolutePath());
+        if (checkZipFileExists(new File(targetDirectory.getAbsolutePath().concat("/") + getZipFileName() + ".zip"))) {
+            readIndexHtmlFile(targetDirectory.getAbsolutePath());
+        } else {
+            HttpURLConnection connection = (HttpURLConnection) zipUrl.openConnection();
+            connection.setRequestMethod("GET");
+            InputStream in = connection.getInputStream();
+            String zipPath = targetDirectory.getAbsolutePath().concat("/") + getZipFileName().concat(".zip");
+            FileOutputStream out = new FileOutputStream(zipPath);
+            copy(in, out, 1024);
+            out.close();
+            in.close();
+            logger.info("Downloading Zip file from given url : success");
+            unzip(zipPath, targetDirectory.getAbsolutePath());
+            readIndexHtmlFile(targetDirectory.getAbsolutePath());
+        }
     }
 
     private void readIndexHtmlFile(String absolutePath) throws IOException {
@@ -57,7 +64,13 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         fis.close();
     }
 
-    private static void unzip(String zipFilePath, String destDir) {
+    /**
+     * unzips zip file
+     *
+     * @param zipFilePath
+     * @param destDir
+     */
+    private  void unzip(String zipFilePath, String destDir) {
         File dir = new File(destDir);
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs();
@@ -91,7 +104,14 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
 
     }
 
-    private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
+    /**
+     * extracts each files in zip file (zip entry)
+     *
+     * @param zipIn
+     * @param filePath
+     * @throws IOException
+     */
+    private  void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[4096];
         int read = 0;
@@ -101,7 +121,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         bos.close();
     }
 
-    public static void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
+    private  void copy(InputStream input, OutputStream output, int bufferSize) throws IOException {
         byte[] buf = new byte[bufferSize];
         int n = input.read(buf);
         while (n >= 0) {
@@ -112,15 +132,36 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     }
 
 
+    /**
+     * used to get file name from the url
+     *
+     * @return zip file name
+     */
+    public  String getZipFileName() {
+        String fileName = null;
+        try {
+            URI uri = new URI(zipUrl.toString());
+            String path = uri.getPath();
+            fileName = path.substring(path.lastIndexOf('/') + 1);
+        } catch (URISyntaxException e) {
+            logger.debug("Exception while getting key id from the sign-creator url : {}", e.getMessage());
+        }
+        return StringUtils.substringBefore(fileName, ".");
+    }
 
     /**
-     * This method is used to check whether the directory exists or not, if not it creates the directory
+     * checks if zip file with this name is exists or not
      *
-     * @param file file to check is exists or not
+     * @param zipFile
      * @return
      */
-    public static boolean isDirectoryExists(File file) {
-        return file.exists() || file.mkdirs();
+    public static boolean checkZipFileExists(File zipFile) {
+        boolean isExits = false;
+        if (zipFile.exists()) {
+            isExits = true;
+            logger.info("zip file  exists : " + isExits);
+        } else isExits = false;
+        return isExits;
     }
 
     /**
@@ -129,10 +170,15 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
      * @return html string
      */
     @Override
-    public String getTemplateContent() {
+    public String getTemplateContent(String filePath) {
         if (content == null) {
             try {
-                getZipFileFromURl(new File("conf/certificate"));
+                File targetDirectory =  new File(filePath);
+                if (checkZipFileExists(new File(targetDirectory.getAbsolutePath().concat("/") + getZipFileName() + ".zip"))) {
+                    readIndexHtmlFile(targetDirectory.getAbsolutePath());
+                } else {
+                    getZipFileFromURl(targetDirectory);
+                }
             } catch (Exception e) {
                 logger.info("Exception while unzip the zip file {}", e.getMessage());
                 e.printStackTrace();

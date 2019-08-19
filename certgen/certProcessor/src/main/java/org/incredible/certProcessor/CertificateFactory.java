@@ -32,7 +32,8 @@ public class CertificateFactory {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties, String keyID) throws InvalidDateFormatException {
+    public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties)
+            throws InvalidDateFormatException, SignatureException.UnreachableException, IOException, SignatureException.CreationException {
 
         uuid = properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.CONTAINER_NAME).concat("/")
                 + properties.get(JsonKey.ROOT_ORG_ID).concat("/") + properties.get(JsonKey.TAG).concat("/") + UUID.randomUUID().toString() + ".json";
@@ -59,7 +60,7 @@ public class CertificateFactory {
 
         issuerBuilder.setId(properties.get(JsonKey.ISSUER_URL)).setName(certModel.getIssuer().getName())
                 .setUrl(certModel.getIssuer().getUrl()).setPublicKey(certModel.getIssuer().getPublicKey());
-        ;
+
         /**
          * badge class object
          * **/
@@ -79,14 +80,14 @@ public class CertificateFactory {
                 .setIssuedOn(certModel.getIssuedDate()).setExpires(certModel.getExpiry())
                 .setValidFrom(certModel.getValidFrom()).setVerification(signedVerification).setSignatory(certModel.getSignatoryList());
 
-        if (keyID.isEmpty()) {
+        if (properties.get(JsonKey.KEY_ID).isEmpty()) {
             signedVerification.setType(new String[]{JsonKey.HOSTED});
 
         } else {
             signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
 
             /** certificate  signature value **/
-            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, keyID);
+            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, properties.get(JsonKey.KEY_ID));
 
             /**
              * to assign signature value
@@ -133,20 +134,16 @@ public class CertificateFactory {
      * @param properties
      * @return
      */
-    private String getSignatureValue(CertificateExtension certificateExtension, Map<String, String> properties, String keyID) {
+    private String getSignatureValue(CertificateExtension certificateExtension, Map<String, String> properties, String keyID) throws IOException, SignatureException.UnreachableException, SignatureException.CreationException {
         SignatureHelper signatureHelper = new SignatureHelper(properties);
         Map<String, Object> signMap;
-        try {
+
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             String request = mapper.writeValueAsString(certificateExtension);
             JsonNode jsonNode = mapper.readTree(request);
             signMap = signatureHelper.generateSignature(jsonNode, keyID);
             return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
-        } catch (IOException | SignatureException.UnreachableException | SignatureException.CreationException e) {
-            logger.debug("Exception while generating signature for certificate : {}", e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
+
     }
 
     /**

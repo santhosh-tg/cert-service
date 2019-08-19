@@ -30,7 +30,7 @@ public class HTMLTemplateFile extends HTMLTemplateProvider {
     }
 
     @Override
-    public String getTemplateContent() {
+    public String getTemplateContent(String filePath) {
         if (content == null) {
             fetchFile();
         }
