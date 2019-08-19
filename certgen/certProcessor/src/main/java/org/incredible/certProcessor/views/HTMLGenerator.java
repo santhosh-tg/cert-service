@@ -60,13 +60,12 @@ public class HTMLGenerator {
                 Method method = htmlVarResolver.getClass().getMethod("get" + capitalize(macro));
                 method.setAccessible(true);
                 context.put(macro, method.invoke(htmlVarResolver));
-                createHTMLFile(context, getUUID(certificateExtension.getId()), directory);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
                 logger.info("exception while generating html for certificate {}", e.getMessage());
             }
         }
-
+        createHTMLFile(context, getUUID(certificateExtension.getId()), directory);
     }
 
     private String getUUID(String id) {
