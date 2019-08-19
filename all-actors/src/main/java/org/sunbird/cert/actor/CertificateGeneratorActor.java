@@ -166,7 +166,11 @@ public class CertificateGeneratorActor extends BaseActor {
     private HashMap<String, String> populatePropertiesMap(Request request) {
         String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
         String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
-        String keyId = (String) ((Map<String, Object>) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS)).get(JsonKey.ID);
+        String keyId = "";
+        if (((Map<String, Object>) (request.getRequest().get(JsonKey.CERTIFICATE))).containsKey(JsonKey.KEYS)) {
+            keyId = (String) ((Map<String, Object>) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS)).get(JsonKey.ID);
+            logger.info("populatePropertiesMap: keys after".concat(keyId));
+        }
         HashMap<String, String> properties = new HashMap<>();
         properties.put(JsonKey.ORG_ID, orgId);
         properties.put(JsonKey.TAG, tag);

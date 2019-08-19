@@ -82,9 +82,10 @@ public class CertificateFactory {
 
         if (properties.get(JsonKey.KEY_ID).isEmpty()) {
             signedVerification.setType(new String[]{JsonKey.HOSTED});
-
+            logger.info("CertificateExtension:createCertificate: if keyID is empty then verification type is HOSTED");
         } else {
             signedVerification.setCreator(properties.get(JsonKey.PUBLIC_KEY_URL));
+            logger.info("CertificateExtension:createCertificate: if keyID is not empty then verification type is SignedBadge");
 
             /** certificate  signature value **/
             String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, properties.get(JsonKey.KEY_ID));
