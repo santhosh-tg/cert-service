@@ -61,7 +61,7 @@ public class CertificateGeneratorActor extends BaseActor {
 		IStorageService storageService = getStorageService();
 		String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
 				Some.apply("r"));
-        logger.info("CertificateGeneratorActor:generateSignUrl:signedurl got: ".concat(signUrl));
+        logger.info("CertificateGeneratorActor:generateSignUrl:signedUrl got: ".concat(signUrl));
 		Response response = new Response();
 		response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
 		response.put(JsonKey.SIGNED_URL, signUrl);
