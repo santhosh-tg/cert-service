@@ -3,6 +3,8 @@ package org.sunbird;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import java.awt.image.Kernel;
+
 /**
  * this constant file is used to get the Constants which is used by entire actors
  */
@@ -12,34 +14,36 @@ public class CertsConstant {
     private static final String BADGE_URL = "Badge.json";
     private static final String ISSUER_URL = "Issuer.json";
     private static final String CONTEXT = "v1/context.json";
-    private static final String PUBLIC_KEY_URL = "v1/PublicKey.json";
+    private static final String PUBLIC_KEY_URL = "_publicKey.json";
     private static final String VERIFICATION_TYPE = "SignedBadge";
     private static final String CLOUD_UPLOAD_RETRY_COUNT = "3";
     private static final String ACCESS_CODE_LENGTH = "6";
     public static final String DOWNLOAD_LINK_EXPIRY_TIMEOUT = "download_link_expiry_timeout";
     private static final String LINK_TIMEOUT = "600";
+    private static final String SIGNATORY_EXTENSION = "v1/extensions/SignatoryExtension";
     private static final String DOMAIN_URL = getDomainUrlFromEnv();
     private static final String CONTAINER_NAME = getContainerNameFromEnv();
     private static final String ENC_SERVICE_URL = getEncServiceUrl();
     private static final String CLOUD_STORAGE_TYPE=getCloudStorageTypeFromEnv();
     private static final String AZURE_STORAGE_SECRET=getStorageSecret();
     private static final String AZURE_STORAGE_KEY=getStorageKey();
+    private static final String SLUG = getSlugFormEnv();
 
     public String getBADGE_URL(String rootOrgId, String batchId) {
-        return String.format("%s/%s/%s/%s/%s", DOMAIN_URL, CONTAINER_NAME, rootOrgId, batchId, BADGE_URL);
+        return String.format("%s/%s/%s/%s/%s", DOMAIN_URL, SLUG, rootOrgId, batchId, BADGE_URL);
     }
 
 
 	public String getISSUER_URL(String rootOrgId) {
-        return String.format("%s/%s/%s/%s", DOMAIN_URL, CONTAINER_NAME, rootOrgId, ISSUER_URL);
+        return String.format("%s/%s/%s/%s", DOMAIN_URL, SLUG, rootOrgId, ISSUER_URL);
     }
 
     public String getCONTEXT() {
-        return String.format("%s/%s/%s", DOMAIN_URL, CONTAINER_NAME, CONTEXT);
+        return String.format("%s/%s/%s", DOMAIN_URL, SLUG, CONTEXT);
     }
 
-    public String getPUBLIC_KEY_URL(String rootOrgId) {
-        return String.format("%s/%s/%s/%s", DOMAIN_URL, CONTAINER_NAME, rootOrgId, PUBLIC_KEY_URL);
+    public String getPUBLIC_KEY_URL(String rootOrgId, String keyId) {
+        return String.format("%s/%s/%s/%s%s", DOMAIN_URL, SLUG, rootOrgId, keyId, PUBLIC_KEY_URL);
     }
 
     public String getVERIFICATION_TYPE() {
@@ -109,14 +113,14 @@ public class CertsConstant {
     }
 
 
-    public String getSignCreator(String keyId) {
-        return String.format("%s/%s/%s", DOMAIN_URL, JsonKey.KEYS, keyId);
+    public String getSignCreator(String orgId, String keyId) {
+        return String.format("%s/%s/%s/%s%s", DOMAIN_URL,SLUG, orgId, keyId,PUBLIC_KEY_URL);
     }
 
     public String getEncryptionServiceUrl() {
         return getEncServiceUrl();
     }
-    
+
     public static String getExpiryLink(String key) {
     	 return getPropertyFromEnv(key) != null ? getPropertyFromEnv(key) :LINK_TIMEOUT ;
 	}
@@ -150,6 +154,22 @@ public class CertsConstant {
 
     public  String getAzureStorageKey() {
         return AZURE_STORAGE_KEY;
+    }
+
+    public String getSignatoryExtensionUrl()  {
+        return String.format("%s/%s/%s/%s", DOMAIN_URL, SLUG, SIGNATORY_EXTENSION, "context.json");
+    }
+
+
+    private static String getSlugFormEnv()    {
+        String slug = getPropertyFromEnv(JsonKey.SLUG);
+        return StringUtils.isNotBlank(slug) ? slug : "certs";
+//        validateEnvProperty(slug);
+//        return slug;
+    }
+
+    public String getSlug() {
+        return SLUG;
     }
 
 }

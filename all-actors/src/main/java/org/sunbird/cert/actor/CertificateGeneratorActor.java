@@ -115,7 +115,7 @@ public class CertificateGeneratorActor extends BaseActor {
         for (CertModel certModel : certModelList) {
             CertificateResponse certificateResponse = null;
             try {
-                certificateResponse = certificateGenerator.createCertificate(certModel, htmlTempalteZip, directory, htmlTempalteZip.getZipFileName());
+                certificateResponse = certificateGenerator.createCertificate(certModel, htmlTempalteZip, directory);
             } catch (Exception ex) {
                 cleanup(directory, certificateResponse.getUuid());
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
@@ -193,7 +193,8 @@ public class CertificateGeneratorActor extends BaseActor {
         if (MapUtils.isNotEmpty(keysObject)){
             String keyId = (String) keysObject.get(JsonKey.ID);
             properties.put(JsonKey.KEY_ID, keyId);
-            properties.put(JsonKey.SIGN_CREATOR, certVar.getSignCreator(keyId));
+            properties.put(JsonKey.SIGN_CREATOR, certVar.getSignCreator(orgId,keyId));
+            properties.put(JsonKey.PUBLIC_KEY_URL, certVar.getPUBLIC_KEY_URL(orgId, keyId));
             logger.info("populatePropertiesMap: keys after".concat(keyId));
         }
         properties.put(JsonKey.ORG_ID, orgId);
@@ -205,10 +206,11 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.CONTEXT, certVar.getCONTEXT());
         properties.put(JsonKey.VERIFICATION_TYPE, certVar.getVERIFICATION_TYPE());
         properties.put(JsonKey.ACCESS_CODE_LENGTH, certVar.getACCESS_CODE_LENGTH());
-        properties.put(JsonKey.PUBLIC_KEY_URL, certVar.getPUBLIC_KEY_URL(orgId));
         properties.put(JsonKey.SIGN_URL, certVar.getEncSignUrl());
         properties.put(JsonKey.SIGN_VERIFY_URL, certVar.getEncSignVerifyUrl());
         properties.put(JsonKey.ENC_SERVICE_URL, certVar.getEncryptionServiceUrl());
+        properties.put(JsonKey.SIGNATORY_EXTENSION, certVar.getSignatoryExtensionUrl());
+        properties.put(JsonKey.SLUG, certVar.getSlug());
 
         logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;

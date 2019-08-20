@@ -28,6 +28,8 @@ public interface JsonKey {
     String AWS="aws";
     String AWS_STORAGE_KEY="AWS_STORAGE_KEY";
     String AWS_STORAGE_SECRET="AWS_STORAGE_SECRET";
+    String SLUG ="sunbird_cert_slug";
+    String ACCESS_CODE_LENGTH = "ACCESS_CODE_LENGTH";
 
 
 }

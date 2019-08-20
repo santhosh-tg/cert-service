@@ -21,7 +21,7 @@ public class CertMapper {
     public List<CertModel> toList(Map<String, Object> request) {
         Map<String, Object> json = (Map<String, Object>) request.get(JsonKey.CERTIFICATE);
         List<Map<String, Object>> dataList = (List<Map<String, Object>>) json.get(JsonKey.DATA);
-        Issuer issuer = getIssuer((Map<String, Object>) json.get(JsonKey.ISSUER));
+        Issuer issuer = getIssuer((Map<String, Object>) json.get(JsonKey.ISSUER), (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID));
         SignatoryExtension[] signatoryArr = getSignatoryArray((List<Map<String, Object>>) json.get(JsonKey.SIGNATORY_LIST));
         List<CertModel> certList = dataList.stream().map(data -> getCertModel(data)).collect(Collectors.toList());
         certList.stream().forEach(cert -> {
@@ -42,7 +42,7 @@ public class CertMapper {
     }
 
     private static SignatoryExtension getSignatory(Map<String, Object> signatory) {
-        SignatoryExtension signatoryExt = new SignatoryExtension(properties.get(JsonKey.CONTEXT));
+        SignatoryExtension signatoryExt = new SignatoryExtension(properties.get(JsonKey.SIGNATORY_EXTENSION));
         signatoryExt.setIdentity((String) signatory.get(JsonKey.ID));
         signatoryExt.setDesignation((String) signatory.get(JsonKey.DESIGNATION));
         signatoryExt.setImage((String) signatory.get(JsonKey.SIGNATORY_IMAGE));
@@ -51,11 +51,11 @@ public class CertMapper {
     }
 
 
-    private static Issuer getIssuer(Map<String, Object> issuerData) {
+    private static Issuer getIssuer(Map<String, Object> issuerData, String rootOrgId) {
         Issuer issuer = new Issuer(properties.get(JsonKey.CONTEXT));
         issuer.setName((String) issuerData.get(JsonKey.NAME));
         issuer.setUrl((String) issuerData.get(JsonKey.URL));
-        List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY));
+        List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY), rootOrgId);
         if (CollectionUtils.isNotEmpty(keyList)) {
             String[] keyArr = keyList.stream().toArray(String[]::new);
             issuer.setPublicKey(keyArr);
@@ -75,11 +75,15 @@ public class CertMapper {
         return certModel;
     }
 
-    private static List<String> validatePublicKeys(List<String> publicKeys) {
+    private static List<String> validatePublicKeys(List<String> publicKeys, String rootOrgId) {
         List<String> validatedPublicKeys = new ArrayList<>();
         publicKeys.forEach((publicKey) -> {
             if (!publicKey.startsWith("http")) {
-                validatedPublicKeys.add(properties.get(JsonKey.ENC_SERVICE_URL) + "/" + JsonKey.KEYS + "/" + publicKey);
+                if (null == rootOrgId || (rootOrgId != null && rootOrgId.isEmpty()))
+                    validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + publicKey.concat("_publicKey.json"));
+                else
+                    validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + rootOrgId.concat("/") + publicKey.concat("_publicKey.json"));
+
             } else {
                 validatedPublicKeys.add(publicKey);
             }

@@ -14,6 +14,7 @@ export AZURE_STORAGE_KEY=sb
 export ACCESS_CODE_LENGTH=6
 export sunbird_cert_enc_service_url=http://localhost:8013
 export download_link_expiry_timeout=10
+export sunbird_cert_slug=certs
 
 
 ################### END -  configuration #############################

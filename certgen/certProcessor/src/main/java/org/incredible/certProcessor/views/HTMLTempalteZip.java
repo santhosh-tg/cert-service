@@ -41,9 +41,6 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
         }
-        if (checkZipFileExists(new File(targetDirectory.getAbsolutePath().concat("/") + getZipFileName() + ".zip"))) {
-            readIndexHtmlFile(targetDirectory.getAbsolutePath());
-        } else {
             HttpURLConnection connection = (HttpURLConnection) zipUrl.openConnection();
             connection.setRequestMethod("GET");
             InputStream in = connection.getInputStream();
@@ -55,7 +52,6 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
             logger.info("Downloading Zip file from given url : success");
             unzip(zipPath, targetDirectory.getAbsolutePath());
             readIndexHtmlFile(targetDirectory.getAbsolutePath());
-        }
     }
 
     private void readIndexHtmlFile(String absolutePath) throws IOException {
@@ -170,20 +166,15 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
      * @return html string
      */
     @Override
-    public String getTemplateContent(String filePath) {
+    public String getTemplateContent(String filePath) throws Exception {
         if (content == null) {
-            try {
                 File targetDirectory =  new File(filePath);
                 if (checkZipFileExists(new File(targetDirectory.getAbsolutePath().concat("/") + getZipFileName() + ".zip"))) {
                     readIndexHtmlFile(targetDirectory.getAbsolutePath());
                 } else {
                     getZipFileFromURl(targetDirectory);
                 }
-            } catch (Exception e) {
-                logger.info("Exception while unzip the zip file {}", e.getMessage());
-                e.printStackTrace();
             }
-        }
         return content;
     }
 

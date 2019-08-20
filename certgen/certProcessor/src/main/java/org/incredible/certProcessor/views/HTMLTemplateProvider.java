@@ -12,7 +12,7 @@ import java.util.HashSet;
 
 public abstract class HTMLTemplateProvider {
 
-    abstract public String getTemplateContent(String filePath);
+    abstract public String getTemplateContent(String filePath) throws Exception;
 
     /**
      * variables present in html template

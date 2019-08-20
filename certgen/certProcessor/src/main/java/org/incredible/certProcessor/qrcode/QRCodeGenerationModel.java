@@ -9,7 +9,7 @@ public class QRCodeGenerationModel {
     private int qrCodeMargin = 4;
     private String text;
     private String textFontName = "Verdana";
-    private int textFontSize = 10;
+    private int textFontSize = 20;
     private double textCharacterSpacing = 1;
     private int imageBorderSize = 0;
     private String colorModel = "black";

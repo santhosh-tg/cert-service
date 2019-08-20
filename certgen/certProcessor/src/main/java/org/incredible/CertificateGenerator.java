@@ -7,15 +7,13 @@ import com.google.zxing.WriterException;
 import org.apache.commons.lang.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.CertificateFactory;
+import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
-import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.certProcessor.views.HTMLGenerator;
-import org.incredible.certProcessor.views.HTMLTempalteZip;
 import org.incredible.certProcessor.views.HTMLTemplateProvider;
 import org.incredible.pojos.CertificateExtension;
 import org.incredible.pojos.CertificateResponse;
-import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.incredible.certProcessor.qrcode.utils.QRCodeImageGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,25 +41,18 @@ public class CertificateGenerator {
     private CertificateFactory certificateFactory = new CertificateFactory();
 
 
-    public CertificateResponse createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider, String directory, String zipFileName)
-            throws InvalidDateFormatException, WriterException, FontFormatException, NotFoundException, IOException,
-            SignatureException.UnreachableException, SignatureException.CreationException {
+    public CertificateResponse createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider, String directory)
+            throws Exception {
         String uuid = null;
         CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties);
-       String jsonData = generateCertificateJson(certificateExtension, directory);
-       String accessCode =  generateQRCodeForCertificate(certificateExtension, directory);
-        if (HTMLTempalteZip.checkZipFileExists(new File(directory + zipFileName.concat(".zip")))) {
-            HTMLGenerator htmlGenerator = new HTMLGenerator(htmlTemplateProvider.getTemplateContent(directory));
+        String jsonData = generateCertificateJson(certificateExtension, directory);
+        String accessCode = generateQRCodeForCertificate(certificateExtension, directory);
+        String htmlContent = htmlTemplateProvider.getTemplateContent(directory);
+        if (htmlTemplateProvider.checkHtmlTemplateIsValid(htmlContent)) {
+            HTMLGenerator htmlGenerator = new HTMLGenerator(htmlContent);
             htmlGenerator.generate(certificateExtension, directory);
-             uuid = getUUID(certificateExtension.getId());
-        } else {
-            String htmlContent = htmlTemplateProvider.getTemplateContent(directory);
-            if (htmlTemplateProvider.checkHtmlTemplateIsValid(htmlContent)) {
-                HTMLGenerator htmlGenerator = new HTMLGenerator(htmlContent);
-                htmlGenerator.generate(certificateExtension, directory);
-                uuid = getUUID(certificateExtension.getId());
-            } else return new CertificateResponse();
-        }
+            uuid = getUUID(certificateExtension.getId());
+        } else return new CertificateResponse();
         return new CertificateResponse(uuid, accessCode, jsonData);
     }
 
@@ -89,7 +80,7 @@ public class CertificateGenerator {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return  jsonData;
+        return jsonData;
     }
 
     private void checkDirectoryExists(String directory) {
@@ -101,12 +92,13 @@ public class CertificateGenerator {
 
     private String generateQRCodeForCertificate(CertificateExtension certificateExtension, String directory) throws WriterException,
             FontFormatException, NotFoundException, IOException {
-        AccessCodeGenerator accessCodeGenerator = new AccessCodeGenerator(Double.valueOf(properties.get("ACCESS_CODE_LENGTH")));
+        AccessCodeGenerator accessCodeGenerator = new AccessCodeGenerator(Double.valueOf(properties.get(JsonKey.ACCESS_CODE_LENGTH)));
         String accessCode = accessCodeGenerator.generate();
         QRCodeGenerationModel qrCodeGenerationModel = new QRCodeGenerationModel();
         qrCodeGenerationModel.setText(accessCode);
         qrCodeGenerationModel.setFileName(directory + getUUID(certificateExtension.getId()));
-        qrCodeGenerationModel.setData(certificateExtension.getId());
+        qrCodeGenerationModel.setData(properties.get(JsonKey.DOMAIN_URL).concat("/") +
+                properties.get(JsonKey.SLUG).concat("/") + getUUID(certificateExtension.getId()));
         QRCodeImageGenerator qrCodeImageGenerator = new QRCodeImageGenerator();
         File Qrcode = qrCodeImageGenerator.createQRImages(qrCodeGenerationModel);
         logger.info("Qrcode is created for the certificate");

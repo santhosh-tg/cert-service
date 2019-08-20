@@ -48,7 +48,7 @@ public interface JsonKey {
     String TEMPLATE_URL = "TEMPLATE_URL";
     String CONTEXT = "CONTEXT";
     String VERIFICATION_TYPE = "VERIFICATION_TYPE";
-
+    String SIGNATORY_EXTENSION = "SIGNATORY_EXTENSION";
     String RECIPIENT_EMAIl = "recipientEmail";
     String RECIPIENT_PHONE = "recipientPhone";
     String RECIPIENT_ID = "recipientId";
@@ -88,4 +88,5 @@ public interface JsonKey {
 
     String ACCESS_CODE = "accessCode";
     String JSON_DATA = "jsonData";
+    String SLUG = "sunbird_cert_slug";
 }
