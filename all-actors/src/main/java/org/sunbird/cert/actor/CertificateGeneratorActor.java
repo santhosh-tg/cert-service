@@ -20,7 +20,6 @@ import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
-
 import scala.Some;
 
 import java.io.File;
@@ -119,7 +118,7 @@ public class CertificateGeneratorActor extends BaseActor {
             } catch (Exception ex) {
                 cleanup(directory, certificateResponse.getUuid());
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
-                throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.INTERNAL_ERROR, ResponseCode.SERVER_ERROR.getCode());
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
             }
             certUrlList.add(uploadCertificate(certificateResponse, certModel.getIdentifier(), orgId, tag, directory));
 

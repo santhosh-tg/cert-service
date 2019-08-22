@@ -58,7 +58,7 @@ public interface JsonKey {
     String PUBLIC_KEY = "publicKey";
     String DESCRIPTION = "description";
     String LOGO = "logo";
-    String ISSUED_DATE = "issuedDate";
+    String ISSUE_DATE = "issueDate";
     String USER = "user";
     String CERTIFICATE_NAME = "name";
 

@@ -1,10 +1,14 @@
 package org.sunbird;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.pojos.SignatoryExtension;
 import org.incredible.pojos.ob.Issuer;
+import org.sunbird.request.Request;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +34,21 @@ public class CertMapper {
             cert.setCourseName((String) json.get(JsonKey.COURSE_NAME));
             cert.setCertificateDescription((String) json.get(JsonKey.DESCRIPTION));
             cert.setCertificateLogo((String) json.get(JsonKey.LOGO));
-            cert.setIssuedDate((String) json.get(JsonKey.ISSUED_DATE));
+            String issuedDate = (String) json.get(JsonKey.ISSUE_DATE);
+            if(StringUtils.isBlank(issuedDate)){
+                cert.setIssuedDate(getCurrentDate());
+            } else {
+                cert.setIssuedDate((String) json.get(JsonKey.ISSUE_DATE));
+            }
             cert.setCertificateName((String) json.get(JsonKey.CERTIFICATE_NAME));
         });
         return certList;
+    }
+
+    private String getCurrentDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        LocalDateTime now = LocalDateTime.now();
+        return dtf.format(now);
     }
 
     private static SignatoryExtension[] getSignatoryArray(List<Map<String, Object>> signatoryList) {
