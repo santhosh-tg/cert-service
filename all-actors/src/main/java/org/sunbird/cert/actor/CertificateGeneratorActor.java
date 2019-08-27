@@ -24,7 +24,6 @@ import scala.Some;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -94,14 +93,15 @@ public class CertificateGeneratorActor extends BaseActor {
 
 	private void generateCertificate(Request request) throws BaseException {
         logger.info("Request received==" + request.getRequest());
-        CertMapper certMapper = new CertMapper(populatePropertiesMap(request));
+        HashMap<String, String> properties = populatePropertiesMap(request);
+        CertMapper certMapper = new CertMapper(properties);
         List<CertModel> certModelList = certMapper.toList(request.getRequest());
-        CertificateGenerator certificateGenerator = new CertificateGenerator(populatePropertiesMap(request));
+        CertificateGenerator certificateGenerator = new CertificateGenerator(properties);
         HTMLTempalteZip htmlTempalteZip = null;
         String directory;
         String url = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
         try {
-            htmlTempalteZip = new HTMLTempalteZip(new URL(url));
+            htmlTempalteZip = new HTMLTempalteZip(url, properties);
             logger.info("CertificateGeneratorActor:generateCertificate:html zip generated");
         } catch (Exception ex) {
             logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while creating HtmlTemplate provider.", ex);
@@ -210,6 +210,10 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.ENC_SERVICE_URL, certVar.getEncryptionServiceUrl());
         properties.put(JsonKey.SIGNATORY_EXTENSION, certVar.getSignatoryExtensionUrl());
         properties.put(JsonKey.SLUG, certVar.getSlug());
+        properties.put(JsonKey.CLOUD_STORAGE_TYPE,certVar.getCloudStorageType());
+        properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,certVar.getCLOUD_UPLOAD_RETRY_COUNT());
+        properties.put(JsonKey.AZURE_STORAGE_SECRET,certVar.getAzureStorageSecret());
+        properties.put(JsonKey.AZURE_STORAGE_KEY,certVar.getAzureStorageKey());
 
         logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;

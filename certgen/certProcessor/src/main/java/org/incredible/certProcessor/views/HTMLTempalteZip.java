@@ -2,6 +2,7 @@ package org.incredible.certProcessor.views;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.incredible.certProcessor.store.StorageParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,9 +11,13 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ *  Downloads zip file and unzips from given cloud(container) based relative url or from the public http url
+ */
 public class HTMLTempalteZip extends HTMLTemplateProvider {
 
 
@@ -21,12 +26,17 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     private static Logger logger = LoggerFactory.getLogger(HTMLTempalteZip.class);
 
     /**
-     * html zip file url
+     * html zip file url (relative path (uri) of container based url or pubic http url)
      */
-    private  URL zipUrl;
+    private String zipUrl;
 
-    public HTMLTempalteZip(URL zipUrl) {
+    private Map<String, String> properties;
+
+
+    public HTMLTempalteZip(String zipUrl, Map<String, String> properties) {
+        this.properties = properties;
         this.zipUrl = zipUrl;
+
     }
 
     private static final int bufferSize = 4096;
@@ -41,17 +51,32 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
         }
-            HttpURLConnection connection = (HttpURLConnection) zipUrl.openConnection();
+        String zipFileName = getZipFileName().concat(".zip");
+        /**
+         * path to download zip file
+         */
+        String zipFilePath = targetDirectory.getAbsolutePath().concat("/");
+        if(zipUrl.startsWith("http")) {
+            logger.info("getZipFileFromURl:"+ zipUrl + " is public url");
+            logger.info("getZipFileFromURl: downloading zip file " + zipFileName  + " to the path "+ zipFilePath +"started ");
+            HttpURLConnection connection = (HttpURLConnection) new URL(zipUrl).openConnection();
             connection.setRequestMethod("GET");
             InputStream in = connection.getInputStream();
-            String zipPath = targetDirectory.getAbsolutePath().concat("/") + getZipFileName().concat(".zip");
-            FileOutputStream out = new FileOutputStream(zipPath);
+            FileOutputStream out = new FileOutputStream(zipFilePath.concat(zipFileName));
             copy(in, out, 1024);
             out.close();
             in.close();
-            logger.info("Downloading Zip file from given url : success");
-            unzip(zipPath, targetDirectory.getAbsolutePath());
-            readIndexHtmlFile(targetDirectory.getAbsolutePath());
+            logger.info("Downloading Zip file " + zipFileName + " from given url : success");
+        }   else {
+            logger.info("getZipFileFromURl: "+ zipUrl + " is container based  uri");
+            logger.info("getZipFileFromURl: downloading zip file " + zipFileName + " started ");
+            StorageParams storageParams = new StorageParams(properties);
+            storageParams.init();
+            storageParams.download(zipUrl, zipFilePath, false);
+            logger.info("Downloading Zip file " + zipFileName + " from given url : success");
+        }
+        unzip(zipFilePath.concat(zipFileName) , zipFilePath);
+        readIndexHtmlFile(targetDirectory.getAbsolutePath());
     }
 
     private void readIndexHtmlFile(String absolutePath) throws IOException {
@@ -63,10 +88,10 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     /**
      * unzips zip file
      *
-     * @param zipFilePath
+     * @param zipFile
      * @param destDir
      */
-    private  void unzip(String zipFilePath, String destDir) {
+    private  void unzip(String zipFile, String destDir) {
         File dir = new File(destDir);
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs();
@@ -74,7 +99,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
         try {
-            fis = new FileInputStream(zipFilePath);
+            fis = new FileInputStream(zipFile);
             ZipInputStream zipIn = new ZipInputStream(fis);
             ZipEntry entry = zipIn.getNextEntry();
             // iterates over entries in the zip file
@@ -136,7 +161,7 @@ public class HTMLTempalteZip extends HTMLTemplateProvider {
     public  String getZipFileName() {
         String fileName = null;
         try {
-            URI uri = new URI(zipUrl.toString());
+            URI uri = new URI(zipUrl);
             String path = uri.getPath();
             fileName = path.substring(path.lastIndexOf('/') + 1);
         } catch (URISyntaxException e) {
