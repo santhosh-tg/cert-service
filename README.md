@@ -1,34 +1,40 @@
-## cert-play-service
-Play, Akka seed project without router implementation.
+#Certificate utilities
+This is a utility to create badge, issuer and public key jsons.
 
-cert service will run by default on port 9000.
+### Setup
+> npm install
 
+### Procedure
+The outTemplate folder has some static jsons files in an expected hierarchy. These refer to the domain name that needs to be replaced. 
 
-### Build
+### Steps
+1.Update the environment variables (take a copy of setVars.sh.sample)
+> source ./setVars.sh <br>
 
-1. Execute clean install `mvn clean install`
+After setting the environment variables, replace the domain name in the json files. This will create an 'out' directory.
+> ./createStaticJson.sh
 
+2. Run individually other scripts, as needed
 
-### Run 
-1. For debug mode, <br> 
-   `cd play-service` <br>
-   `mvn play2:dist`  <br>
-   `mvn play2:run`
+> node createBadge.js
 
-2. For run mode, 
-   `cd play-service` <br>
-   `mvn play2:dist`  <br>
-   `mvn play2:start`
+> node createIssuer.js
 
-### Verify running status
+> node createPublicKey.js
 
-Hit the following Health check curl command 
+1. Finally copy contents of the 'out' directory to container.
 
-`curl -X GET \
-   http://localhost:9000/health \
-   -H 'Postman-Token: 6a5e0eb0-910a-42d1-9077-c46f6f85397d' \
-   -H 'cache-control: no-cache'`
-
-And, a successful response must be like this:
-
-`{"id":"api.200ok","ver":"v1","ts":"2019-01-17 16:53:26:286+0530","params":{"resmsgid":null,"msgid":"8e27cbf5-e299-43b0-bca7-8347f7ejk5abcf","err":null,"status":"success","errmsg":null},"responseCode":"OK","result":{"response":{"response":"SUCCESS","errors":[]}}}`
+The structure must look like this <br>
+container_name <br>
+- v1 <br>
+   - context.json
+   - extensions
+        - AssessedEvidence
+            - ...other files...
+- <ROOT_ORG_ID>
+    - <BATCH_ID>
+        - Badge.json
+        - ...all certificate files go here...
+    - Issuer.json
+    - 1_publicKey.json
+    - 2_publicKey.json
