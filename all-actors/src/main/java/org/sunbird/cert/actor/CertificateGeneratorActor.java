@@ -1,138 +1,221 @@
 package org.sunbird.cert.actor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.incredible.CertificateGenerator;
 import org.incredible.certProcessor.CertModel;
+import org.incredible.certProcessor.store.StorageParams;
 import org.incredible.certProcessor.views.HTMLTempalteZip;
-import org.sunbird.BaseActor;
-import org.sunbird.BaseException;
-import org.sunbird.CertMapper;
-import org.sunbird.JsonKey;
+import org.incredible.pojos.CertificateResponse;
+import org.sunbird.*;
 import org.sunbird.actor.core.ActorConfig;
-import org.sunbird.azure.AzureFileUtility;
+import org.sunbird.cert.actor.operation.CertActorOperation;
+import org.sunbird.cloud.storage.IStorageService;
+import org.sunbird.cloud.storage.factory.StorageConfig;
+import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
+import scala.Some;
 
 import java.io.File;
-import java.net.URL;
+import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This actor is responsible for certificate generation.
- * @author manzarul
  *
+ * @author manzarul
  */
 @ActorConfig(
-        tasks = {"generateCert"},
+        tasks = {JsonKey.GENERATE_CERT, JsonKey.GET_SIGN_URL},
         asyncTasks = {}
 )
 public class CertificateGeneratorActor extends BaseActor {
-	private Logger logger = Logger.getLogger(CertificateGeneratorActor.class);
+    private Logger logger = Logger.getLogger(CertificateGeneratorActor.class);
+    private static CertsConstant certVar = new CertsConstant();
+    private ObjectMapper mapper = new ObjectMapper();
 
-	@Override
-	public void onReceive(Request request) throws Throwable {
-		String operation = request.getOperation();
-		logger.info("onReceive method call start for operation " + operation);
-		if("generateCert".equalsIgnoreCase(operation)){
-			generateCertificate(request);
-		}
-		logger.info("onReceive method call End");
+    @Override
+    public void onReceive(Request request) throws Throwable {
+        String operation = request.getOperation();
+        logger.info("onReceive method call start for operation " + operation);
+        if (JsonKey.GENERATE_CERT.equalsIgnoreCase(operation)) {
+            generateCertificate(request);
+        }else if (CertActorOperation.GET_SIGN_URL.getOperation().equalsIgnoreCase(operation)) {
+        	generateSignUrl (request) ;
+        }
+        logger.info("onReceive method call End");
+    }
+
+	private void generateSignUrl(Request request) {
+        try {
+            logger.info("CertificateGeneratorActor:generateSignUrl:generate request got : ".concat(request.getRequest()+""));
+            String uri = (String) request.getRequest().get(JsonKey.PDF_URL);
+            logger.info("CertificateGeneratorActor:generateSignUrl:generate sign url method called for uri: ".concat(uri));
+            IStorageService storageService = getStorageService();
+            String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
+                    Some.apply("r"));
+            logger.info("CertificateGeneratorActor:generateSignUrl:signedUrl got: ".concat(signUrl));
+            Response response = new Response();
+            response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
+            response.put(JsonKey.SIGNED_URL, signUrl);
+            sender().tell(response, self());
+        }
+        catch (Exception e){
+            logger.error("CertificateGeneratorActor:generateSignUrl: error in genrerating sign url "+ e);
+            Response response = new Response();
+            response.put(JsonKey.RESPONSE, "failure");
+            response.put(JsonKey.SIGNED_URL, "");
+            sender().tell(response, self());
+        }
+
 	}
+
+
+    private IStorageService getStorageService() {
+		StorageConfig storageConfig = new StorageConfig(certVar.getCloudStorageType(), certVar.getAzureStorageKey(), certVar.getAzureStorageSecret());
+		logger.info("CertificateGeneratorActor:getStorageService:storage object formed:".concat(storageConfig.toString()));
+		IStorageService storageService = StorageServiceFactory.getStorageService(storageConfig);
+		return storageService;
+	}
+
+    private int getTimeoutInSeconds() {
+        String timeoutInSecondsStr = CertsConstant.getExpiryLink(CertsConstant.DOWNLOAD_LINK_EXPIRY_TIMEOUT);
+        logger.info("CertificateGeneratorActor:getTimeoutInSeconds:timeout got: ".concat(timeoutInSecondsStr));
+        return Integer.parseInt(timeoutInSecondsStr);
+      }
 
 	private void generateCertificate(Request request) throws BaseException {
-		logger.info("Request received==" + request.getRequest());
-		List<CertModel> certModelList = CertMapper.toList(request.getRequest());
-		CertificateGenerator certificateGenerator = new CertificateGenerator(getProperties());
-		HTMLTempalteZip htmlTempalteZip = null;
-		String url = (String)((Map<String,Object>)request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
-		try {
-			htmlTempalteZip = new HTMLTempalteZip(new URL(url));
-		} catch (Exception ex) {
-			logger.info("CertificateGeneratorActor : generateCertificate :Exception Occurred while creating HtmlTemplate provider.",ex);
-			throw new  BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,url,JsonKey.HTML_TEMPLATE), ResponseCode.CLIENT_ERROR.getCode());
-		}
-		List<Map<String,String>> certUrlList = new ArrayList<>();
-		for(CertModel certModel : certModelList){
-			String certUUID = "";
-			try {
-				certUUID = certificateGenerator.createCertificate(certModel,htmlTempalteZip);
-			} catch (Exception ex) {
-				cleanup();
-				logger.info("CertificateGeneratorActor : generateCertificate :Exception Occurred while generating certificate.",ex);
-				throw new  BaseException("INVALID_REQUESTED_DATA", IResponseMessage.INVALID_REQUESTED_DATA, ResponseCode.CLIENT_ERROR.getCode());
-			}
-			certUrlList.add(uploadCertificate(certUUID));
-		}
-		Response response = new Response();
-		response.getResult().put("response", certUrlList);
-		sender().tell(response, getSelf());
-		cleanup();
-		logger.info("onReceive method call End");
-	}
+        logger.info("Request received==" + request.getRequest());
+        HashMap<String, String> properties = populatePropertiesMap(request);
+        CertMapper certMapper = new CertMapper(properties);
+        List<CertModel> certModelList = certMapper.toList(request.getRequest());
+        CertificateGenerator certificateGenerator = new CertificateGenerator(properties);
+        HTMLTempalteZip htmlTempalteZip = null;
+        String directory;
+        String url = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
+        try {
+            htmlTempalteZip = new HTMLTempalteZip(url, properties);
+            logger.info("CertificateGeneratorActor:generateCertificate:html zip generated");
+        } catch (Exception ex) {
+            logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while creating HtmlTemplate provider.", ex);
+            throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE, url, JsonKey.HTML_TEMPLATE), ResponseCode.CLIENT_ERROR.getCode());
+        }
+        String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
+        String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
+        directory = "conf/" + orgId.concat("_") + tag.concat("_") + htmlTempalteZip.getZipFileName().concat("/");
+        List<Map<String, Object>> certUrlList = new ArrayList<>();
+        for (CertModel certModel : certModelList) {
+            CertificateResponse certificateResponse = null;
+            try {
+                certificateResponse = certificateGenerator.createCertificate(certModel, htmlTempalteZip, directory);
+            } catch (Exception ex) {
+                cleanup(directory, certificateResponse.getUuid());
+                logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
+                throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
+            }
+            certUrlList.add(uploadCertificate(certificateResponse, certModel.getIdentifier(), orgId, tag, directory));
 
-	private void cleanup() {
-		try {
-			File file = new File("conf/certificate");
-			FileUtils.deleteDirectory(file);
-		} catch (Exception ex) {
-			logger.info(ex.getMessage(),ex);
-		}
-	}
+            cleanup(directory, certificateResponse.getUuid());
+        }
+        Response response = new Response();
+        response.getResult().put("response", certUrlList);
+        sender().tell(response, getSelf());
+        logger.info("onReceive method call End");
+    }
 
-	private Map<String,String> uploadCertificate(String certUUID) {
-		Map<String,String> resMap = new HashMap<>();
-		String certFileName = certUUID+".html";
-		resMap.put(certFileName,upload(certFileName));
-		certFileName = certUUID+".pdf";
-		resMap.put(certFileName,upload(certFileName));
-		certFileName = certUUID+".json";
-		resMap.put(certFileName,upload(certFileName));
-		return resMap;
-	}
+    private void cleanup(String path, String fileName) {
+        try {
+            File directory = new File(path);
+            File[] files = directory.listFiles();
+            for (File file : files) {
+                if (file.getName().startsWith(fileName)) file.delete();
+            }
+            logger.info("CertificateGeneratorActor: cleanUp completed");
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+    }
 
-	private String upload(String certFileName) {
-		try {
-			//TODO  Un comment this to use cloud storage jar to upload file to azure as of now
-			// not using because of jar conflict issue
+    private Map<String, Object> uploadCertificate(CertificateResponse certificateResponse
+            , String recipientID, String orgId, String batchId, String directory) throws BaseException {
+        Map<String, Object> resMap = new HashMap<>();
+        String certFileName = certificateResponse.getUuid() + ".pdf";
+        resMap.put(JsonKey.PDF_URL, upload(certFileName, orgId, batchId, directory));
+        certFileName = certificateResponse.getUuid() + ".json";
+        resMap.put(JsonKey.JSON_URL, upload(certFileName, orgId, batchId, directory));
+        resMap.put(JsonKey.UNIQUE_ID, certificateResponse.getUuid());
+        resMap.put(JsonKey.RECIPIENT_ID, recipientID);
+        resMap.put(JsonKey.ACCESS_CODE, certificateResponse.getAccessCode());
+        try {
+            resMap.put(JsonKey.JSON_DATA, mapper.readValue(certificateResponse.getJsonData(),Map.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(StringUtils.isBlank((String) resMap.get(JsonKey.PDF_URL)) || StringUtils.isBlank((String) resMap.get(JsonKey.JSON_URL))) {
+            logger.error("CertificateGeneratorActor:uploadCertificate:Exception Occurred while uploading certificate pdfUrl and jsonUrl is null");
+            throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.ERROR_UPLOADING_CERTIFICATE, ResponseCode.SERVER_ERROR.getCode());
+        }
+        return resMap;
+    }
 
-			//HashMap<String,String> properties = new HashMap<>();
-			//properties.put(JsonKey.CONTAINER_NAME,System.getenv(JsonKey.CONTAINER_NAME));
-			//properties.put(JsonKey.CLOUD_STORAGE_TYPE,System.getenv(JsonKey.CLOUD_STORAGE_TYPE));
-			//properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,System.getenv(JsonKey.CLOUD_UPLOAD_RETRY_COUNT));
-			//properties.put(JsonKey.AZURE_STORAGE_SECRET,System.getenv(JsonKey.AZURE_STORAGE_SECRET));
-			//properties.put(JsonKey.AZURE_STORAGE_KEY,System.getenv(JsonKey.AZURE_STORAGE_KEY));
+    private String upload(String certFileName, String orgId, String batchId, String directory) {
+        try {
+            File file = FileUtils.getFile(directory + certFileName);
+            HashMap<String,String> properties = new HashMap<>();
+            properties.put(JsonKey.CONTAINER_NAME,certVar.getCONTAINER_NAME());
+            properties.put(JsonKey.CLOUD_STORAGE_TYPE,certVar.getCloudStorageType());
+            properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,certVar.getCLOUD_UPLOAD_RETRY_COUNT());
+            properties.put(JsonKey.AZURE_STORAGE_SECRET,certVar.getAzureStorageSecret());
+            properties.put(JsonKey.AZURE_STORAGE_KEY,certVar.getAzureStorageKey());
+            StorageParams storageParams = new StorageParams(properties);
+            storageParams.init();
+            return storageParams.upload(orgId + "/" + batchId+"/", file, false);
+        } catch (Exception ex) {
+            logger.info("CertificateGeneratorActor:upload: Exception occurred while uploading certificate.", ex);
+        }
+        return StringUtils.EMPTY;
+    }
 
-			//StorageParams storageParams = new StorageParams(properties);
-			//storageParams.init();
-			//return storageParams.upload(System.getenv(JsonKey.CONTAINER_NAME), "/", file, false);
+    private HashMap<String, String> populatePropertiesMap(Request request) {
+        HashMap<String, String> properties = new HashMap<>();
 
-			File file = FileUtils.getFile("conf/certificate/"+certFileName);
-			return AzureFileUtility.uploadFile(System.getenv(JsonKey.CONTAINER_NAME),file);
-		}catch (Exception ex) {
-			logger.info("CertificateGeneratorActor:upload: Exception occurred while uploading certificate.",ex);
-		}
-		return "";
-	}
+        String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
+        String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
+        Map <String, Object> keysObject = (Map<String, Object>)((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS);
+        if (MapUtils.isNotEmpty(keysObject)){
+            String keyId = (String) keysObject.get(JsonKey.ID);
+            properties.put(JsonKey.KEY_ID, keyId);
+            properties.put(JsonKey.SIGN_CREATOR, certVar.getSignCreator(orgId,keyId));
+            properties.put(JsonKey.PUBLIC_KEY_URL, certVar.getPUBLIC_KEY_URL(orgId, keyId));
+            logger.info("populatePropertiesMap: keys after".concat(keyId));
+        }
+        properties.put(JsonKey.ORG_ID, orgId);
+        properties.put(JsonKey.TAG, tag);
+        properties.put(JsonKey.CONTAINER_NAME, certVar.getCONTAINER_NAME());
+        properties.put(JsonKey.DOMAIN_URL, certVar.getDOMAIN_URL());
+        properties.put(JsonKey.BADGE_URL, certVar.getBADGE_URL(orgId, tag));
+        properties.put(JsonKey.ISSUER_URL, certVar.getISSUER_URL(orgId));
+        properties.put(JsonKey.CONTEXT, certVar.getCONTEXT());
+        properties.put(JsonKey.VERIFICATION_TYPE, certVar.getVERIFICATION_TYPE());
+        properties.put(JsonKey.ACCESS_CODE_LENGTH, certVar.getACCESS_CODE_LENGTH());
+        properties.put(JsonKey.SIGN_URL, certVar.getEncSignUrl());
+        properties.put(JsonKey.SIGN_VERIFY_URL, certVar.getEncSignVerifyUrl());
+        properties.put(JsonKey.ENC_SERVICE_URL, certVar.getEncryptionServiceUrl());
+        properties.put(JsonKey.SIGNATORY_EXTENSION, certVar.getSignatoryExtensionUrl());
+        properties.put(JsonKey.SLUG, certVar.getSlug());
+        properties.put(JsonKey.CLOUD_STORAGE_TYPE,certVar.getCloudStorageType());
+        properties.put(JsonKey.CLOUD_UPLOAD_RETRY_COUNT,certVar.getCLOUD_UPLOAD_RETRY_COUNT());
+        properties.put(JsonKey.AZURE_STORAGE_SECRET,certVar.getAzureStorageSecret());
+        properties.put(JsonKey.AZURE_STORAGE_KEY,certVar.getAzureStorageKey());
 
-	private HashMap<String,String> getProperties(){
-		// properties need to populate from env
-		HashMap<String,String> properties = new HashMap<>();
-		properties.put(JsonKey.DOMAIN_PATH,System.getenv(JsonKey.DOMAIN_PATH));
-		properties.put(JsonKey.ASSESSED_DOMAIN,System.getenv(JsonKey.ASSESSED_DOMAIN));
-		properties.put(JsonKey.BADGE_URL,System.getenv(JsonKey.BADGE_URL));
-		properties.put(JsonKey.ISSUER_URL,System.getenv(JsonKey.ISSUER_URL));
-		properties.put(JsonKey.TEMPLATE_URL,System.getenv(JsonKey.TEMPLATE_URL));
-		properties.put(JsonKey.CONTEXT,System.getenv(JsonKey.CONTEXT));
-		properties.put(JsonKey.VERIFICATION_TYPE,System.getenv(JsonKey.VERIFICATION_TYPE));
-		properties.put(JsonKey.ACCESS_CODE_LENGTH,System.getenv(JsonKey.ACCESS_CODE_LENGTH));
-		return properties;
-	}
-
-}
+        logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
+        return properties;
+    }
+ }

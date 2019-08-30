@@ -189,7 +189,19 @@
             </plugin>
         </plugins>
     </build>
-    <!--<repositories>-->
+    <repositories>
+        <repository>
+            <id>oss-sonatype</id>
+            <name>oss-sonatype</name>
+            <url>https://oss.sonatype.org/content/repositories/orgsunbird-1033</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>    <!--<repositories>-->
         <!--<repository>-->
             <!--<id>scalaz-bintray</id>-->
             <!--<name>Scalaz Bintray - releases</name>-->

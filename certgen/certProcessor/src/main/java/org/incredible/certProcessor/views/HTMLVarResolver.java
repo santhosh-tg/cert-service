@@ -1,6 +1,7 @@
 package org.incredible.certProcessor.views;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.incredible.pojos.CertificateExtension;
 
 import java.net.URI;
@@ -36,7 +37,7 @@ public class HTMLVarResolver {
             URI uri = new URI(certificateExtension.getId());
             String path = uri.getPath();
             String idStr = path.substring(path.lastIndexOf('/') + 1);
-            return idStr + ".png";
+            return StringUtils.substringBefore(idStr, ".") + ".png";
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return null;

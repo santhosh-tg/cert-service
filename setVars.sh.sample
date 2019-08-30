@@ -1,24 +1,32 @@
 #Sets up all environment vars.
 
-################### CERT_SERVICE configuration ###################################
-export keyA=valA
-export DOMAIN_PATH=http://localhost:8080/_schemas/Certificate/
-export ASSESSED_DOMAIN=http://localhost:8080/_schemas/extensions/AssessedEvidence/context.json
-export BADGE_URL=http://localhost:8080/_schemas/Badge.json
-export ISSUER_URL=http://localhost:8080/_schemas/Issuer.json
-export TEMPLATE_URL=http://localhost:8080/_schemas/template.html
-export CONTEXT=http://localhost:8080/_schemas/context.json
-export VERIFICATION_TYPE=SignedBadge
-export PUBLIC_KEY_URL=http://localhost:8080/_schemas/publicKey.json
+################### CERT_UTILS configuration ##################################
+
+# The environment where this is being used.
+export PROTO=https://
+export DOMAIN=dev.sunbirded.org
+
+# Badge related
+export BADGE_NAME="Course Completion Certificate"
+export BADGE_DESCRIPTION="Successfully completed course on Sunbird"
+export BADGE_IMAGE=""
+export CRITERIA_NARRATIVE="Course completion certificate"
+
+# Public key
+export ROOT_ORG_ID=1234
+export KEY_ID=1
+export PUBLIC_KEY_PEM=""
+
+# Issuer
+export ISSUER_NAME="Project Sunbird"
+export ISSUER_URL="https://github.com/project-sunbird"
+
+export BATCH_ID=batch_xyz
 
 export CONTAINER_NAME=certs
 export CLOUD_STORAGE_TYPE=azure
 export CLOUD_UPLOAD_RETRY_COUNT=3
 export AZURE_STORAGE_SECRET=someKey
-export CONTAINER_NAME=certs
 export AZURE_STORAGE_KEY=sb
-
-
-export ACCESS_CODE_LENGTH=6
 
 ################### END -  configuration #############################
