@@ -1,0 +1,78 @@
+{
+    "type": "signatory",
+    "action": "signatory",
+    "data": {
+        "templateName": "defaultTemplate",
+        "action": "create",
+        "fields": [
+            {
+                "code": "name",
+                "dataType": "text",
+                "name": "signatoryName",
+                "label": "Signatory Name",
+                "description": "Signatory Name",
+                "editable": true,
+                "placeholder": "Signatory Name",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "three"
+                },
+                "index": 1
+            },
+            {
+                "code": "designation",
+                "dataType": "text",
+                "name": "signatoryDesignation",
+                "label": "Signatory Designation",
+                "description": "Signatory Designation",
+                "editable": true,
+                "placeholder": "Signatory Designation",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "three"
+                },
+                "index": 2
+            },
+            {
+                "code": "id",
+                "dataType": "text",
+                "name": "signatoryId",
+                "label": "Signatory ID",
+                "description": "Signatory ID",
+                "editable": true,
+                "placeholder": "Signatory ID",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "two"
+                },
+                "index": 3
+            },
+            {
+                "code": "image",
+                "dataType": "text",
+                "name": "signatoryImage",
+                "label": "Signatory Image",
+                "description": "Signatory Image",
+                "editable": true,
+                "placeholder": "Signatory Image",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "four"
+                },
+                "index": 4
+            }
+        ]
+    }
+}
