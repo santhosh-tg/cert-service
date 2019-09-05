@@ -70,11 +70,13 @@ public class CertMapper {
         Issuer issuer = new Issuer(properties.get(JsonKey.CONTEXT));
         issuer.setName((String) issuerData.get(JsonKey.NAME));
         issuer.setUrl((String) issuerData.get(JsonKey.URL));
-        List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY), rootOrgId);
-        if (CollectionUtils.isNotEmpty(keyList)) {
-            String[] keyArr = keyList.stream().toArray(String[]::new);
-            issuer.setPublicKey(keyArr);
-        }
+       if(issuerData.containsKey(JsonKey.PUBLIC_KEY)) {
+           List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY), rootOrgId);
+           if (CollectionUtils.isNotEmpty(keyList)) {
+               String[] keyArr = keyList.stream().toArray(String[]::new);
+               issuer.setPublicKey(keyArr);
+           }
+       }
         return issuer;
     }
 

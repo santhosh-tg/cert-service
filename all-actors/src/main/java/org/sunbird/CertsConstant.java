@@ -24,18 +24,25 @@ public class CertsConstant {
     private static final String DOMAIN_URL = getDomainUrlFromEnv();
     private static final String CONTAINER_NAME = getContainerNameFromEnv();
     private static final String ENC_SERVICE_URL = getEncServiceUrl();
-    private static final String CLOUD_STORAGE_TYPE=getCloudStorageTypeFromEnv();
-    private static final String AZURE_STORAGE_SECRET=getStorageSecret();
-    private static final String AZURE_STORAGE_KEY=getStorageKey();
+    private static final String CLOUD_STORAGE_TYPE = getCloudStorageTypeFromEnv();
+    private static final String AZURE_STORAGE_SECRET = getStorageSecret();
+    private static final String AZURE_STORAGE_KEY = getStorageKey();
     private static final String SLUG = getSlugFormEnv();
+    private static final String DOMAIN_SLUG = DOMAIN_URL + "/" + SLUG;
 
     public String getBADGE_URL(String rootOrgId, String batchId) {
-        return String.format("%s/%s/%s/%s/%s", DOMAIN_URL, SLUG, rootOrgId, batchId, BADGE_URL);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(DOMAIN_URL + "/" + SLUG);
+        if (StringUtils.isNotEmpty(rootOrgId))
+            stringBuilder.append("/" + rootOrgId);
+        if (StringUtils.isNotEmpty(batchId))
+            stringBuilder.append("/" + batchId);
+        return stringBuilder.append("/" + BADGE_URL).toString();
     }
 
 
-	public String getISSUER_URL(String rootOrgId) {
-        return String.format("%s/%s/%s/%s", DOMAIN_URL, SLUG, rootOrgId, ISSUER_URL);
+    public String getISSUER_URL(String rootOrgId) {
+        return appendOrgIdIfExists(DOMAIN_SLUG, rootOrgId) + "/" + ISSUER_URL;
     }
 
     public String getCONTEXT() {
@@ -43,7 +50,7 @@ public class CertsConstant {
     }
 
     public String getPUBLIC_KEY_URL(String rootOrgId, String keyId) {
-        return String.format("%s/%s/%s/%s%s", DOMAIN_URL, SLUG, rootOrgId, keyId, PUBLIC_KEY_URL);
+        return appendOrgIdIfExists(DOMAIN_SLUG, rootOrgId) + "/" + keyId + PUBLIC_KEY_URL;
     }
 
     public String getVERIFICATION_TYPE() {
@@ -52,7 +59,7 @@ public class CertsConstant {
 
     public String getCLOUD_UPLOAD_RETRY_COUNT() {
         String retryCount = getPropertyFromEnv(JsonKey.CLOUD_UPLOAD_RETRY_COUNT);
-        return StringUtils.isNotBlank(retryCount)?retryCount:CLOUD_UPLOAD_RETRY_COUNT;
+        return StringUtils.isNotBlank(retryCount) ? retryCount : CLOUD_UPLOAD_RETRY_COUNT;
     }
 
     public String getACCESS_CODE_LENGTH() {
@@ -114,7 +121,7 @@ public class CertsConstant {
 
 
     public String getSignCreator(String orgId, String keyId) {
-        return String.format("%s/%s/%s/%s%s", DOMAIN_URL,SLUG, orgId, keyId,PUBLIC_KEY_URL);
+        return appendOrgIdIfExists(DOMAIN_SLUG, orgId) + "/" + keyId + PUBLIC_KEY_URL;
     }
 
     public String getEncryptionServiceUrl() {
@@ -122,8 +129,8 @@ public class CertsConstant {
     }
 
     public static String getExpiryLink(String key) {
-    	 return getPropertyFromEnv(key) != null ? getPropertyFromEnv(key) :LINK_TIMEOUT ;
-	}
+        return getPropertyFromEnv(key) != null ? getPropertyFromEnv(key) : LINK_TIMEOUT;
+    }
 
 
     private static String getCloudStorageTypeFromEnv() {
@@ -144,24 +151,24 @@ public class CertsConstant {
         return storageSecret;
     }
 
-    public  String getCloudStorageType() {
+    public String getCloudStorageType() {
         return CLOUD_STORAGE_TYPE;
     }
 
-    public  String getAzureStorageSecret() {
+    public String getAzureStorageSecret() {
         return AZURE_STORAGE_SECRET;
     }
 
-    public  String getAzureStorageKey() {
+    public String getAzureStorageKey() {
         return AZURE_STORAGE_KEY;
     }
 
-    public String getSignatoryExtensionUrl()  {
+    public String getSignatoryExtensionUrl() {
         return String.format("%s/%s/%s/%s", DOMAIN_URL, SLUG, SIGNATORY_EXTENSION, "context.json");
     }
 
 
-    private static String getSlugFormEnv()    {
+    private static String getSlugFormEnv() {
         String slug = getPropertyFromEnv(JsonKey.SLUG);
         return StringUtils.isNotBlank(slug) ? slug : "certs";
 //        validateEnvProperty(slug);
@@ -170,6 +177,19 @@ public class CertsConstant {
 
     public String getSlug() {
         return SLUG;
+    }
+
+    /**
+     * appends orgId to the domain_slug if exists
+     *
+     * @param uri
+     * @param orgId
+     * @return
+     */
+    private String appendOrgIdIfExists(String uri, String orgId) {
+        if (StringUtils.isNotEmpty(orgId))
+            return uri + "/" + orgId;
+        else return uri;
     }
 
 }
