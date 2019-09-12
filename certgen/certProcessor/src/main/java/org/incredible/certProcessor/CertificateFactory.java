@@ -36,9 +36,15 @@ public class CertificateFactory {
     public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties)
             throws InvalidDateFormatException, SignatureException.UnreachableException, IOException, SignatureException.CreationException {
 
-        uuid = properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/")
-                + properties.get(JsonKey.ROOT_ORG_ID).concat("/") + properties.get(JsonKey.TAG).concat("/") + UUID.randomUUID().toString() + ".json";
-
+        StringBuilder sb = new StringBuilder();
+        sb.append(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG));
+        if (StringUtils.isNotEmpty(properties.get(JsonKey.ROOT_ORG_ID))) {
+            sb.append("/" + properties.get(JsonKey.ROOT_ORG_ID));
+        }
+        if (StringUtils.isNotEmpty(properties.get(JsonKey.TAG))) {
+            sb.append("/" + properties.get(JsonKey.TAG));
+        }
+        uuid = sb.toString().concat("/" + UUID.randomUUID().toString() + ".json");
         CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(properties.get(JsonKey.CONTEXT));
         CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(properties.get(JsonKey.CONTEXT));
         BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(properties.get(JsonKey.CONTEXT));
@@ -47,8 +53,7 @@ public class CertificateFactory {
         SignatureBuilder signatureBuilder = new SignatureBuilder();
 
         Criteria criteria = new Criteria();
-        criteria.setId(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + properties.get(JsonKey.ROOT_ORG_ID).concat("/")
-                + properties.get(JsonKey.TAG));
+        criteria.setId(sb.toString());
         criteria.setNarrative(certModel.getCertificateDescription());
 
         /**
@@ -140,12 +145,12 @@ public class CertificateFactory {
         SignatureHelper signatureHelper = new SignatureHelper(properties);
         Map<String, Object> signMap;
 
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            String request = mapper.writeValueAsString(certificateExtension);
-            JsonNode jsonNode = mapper.readTree(request);
-            logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
-            signMap = signatureHelper.generateSignature(jsonNode, keyID);
-            return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        String request = mapper.writeValueAsString(certificateExtension);
+        JsonNode jsonNode = mapper.readTree(request);
+        logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
+        signMap = signatureHelper.generateSignature(jsonNode, keyID);
+        return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
 
     }
 

@@ -1,0 +1,164 @@
+{
+    "type": "certificate",
+    "action": "certificate",
+    "data": {
+        "templateName": "defaultTemplate",
+        "action": "create",
+        "fields": [
+            {
+                "code": "recipientName",
+                "dataType": "text",
+                "name": "recipientName",
+                "label": "Recipient Name",
+                "description": "Recipient Name",
+                "editable": true,
+                "placeholder": "Recipient Name",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "four"
+                },
+                "index": 1
+            },
+            {
+                "code": "recipientPhone",
+                "dataType": "text",
+                "name": "recipientPhone",
+                "label": "Recipient Phone",
+                "description": "Recipient Phone",
+                "editable": true,
+                "placeholder": "Recipient Phone",
+                "inputType": "text",
+                "required": false,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "three"
+                },
+                "index": 2
+            },
+            {
+                "code": "recipientEmail",
+                "dataType": "text",
+                "name": "recipientEmail",
+                "label": "Recipient Email",
+                "description": "Recipient Email",
+                "editable": true,
+                "placeholder": "Recipient Email",
+                "inputType": "text",
+                "required": false,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "five"
+                },
+                "index": 3
+            },
+
+            {
+                "code": "courseName",
+                "dataType": "text",
+                "name": "courseName",
+                "label": "Course Name",
+                "description": "Course Name",
+                "editable": true,
+                "placeholder": "Course Name",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "four"
+                },
+                "index": 4
+            },
+            {
+                "code": "certificateName",
+                "dataType": "text",
+                "name": "certificateName",
+                "label": "Certificate Name",
+                "description": "Certificate Name",
+                "editable": true,
+                "placeholder": "Certificate Name",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "four"
+                },
+                "index": 5
+            },
+            {
+                "code": "certificateDescription",
+                "dataType": "text",
+                "name": "certificateDescription",
+                "label": "Certificate Description",
+                "description": "Certificate Description",
+                "editable": true,
+                "placeholder": "Certificate Description",
+                "inputType": "text",
+                "required": false,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "four"
+                },
+                "index": 6
+            },
+            {
+                "code": "name",
+                "dataType": "text",
+                "name": "issuerName",
+                "label": "Issuer Name",
+                "description": "Issuer Name",
+                "editable": true,
+                "placeholder": "Issuer Name",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "six"
+                },
+                "index": 7
+            },
+            {
+                "code": "url",
+                "dataType": "text",
+                "name": "issuerURL",
+                "label": "Issuer URL",
+                "description": "Issuer URL",
+                "editable": true,
+                "placeholder": "Issuer URL",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "six"
+                },
+                "index": 8
+            },
+            {
+                "code": "htmlTemplateUrl",
+                "dataType": "text",
+                "name": "htmlTemplateUrl",
+                "label": "HTML Template URL",
+                "description": "HTML Template URL",
+                "editable": true,
+                "placeholder": "HTML Template URL",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "twelve"
+                },
+                "index": 9
+            }
+        ]
+    }
+}
