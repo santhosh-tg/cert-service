@@ -32,6 +32,9 @@ public class CertValidator {
         validateCertData((List<Map<String, Object>>) certReq.get(JsonKey.DATA));
         validateCertIssuer((Map<String, Object>) certReq.get(JsonKey.ISSUER));
         validateCertSignatoryList((List<Map<String, Object>>) certReq.get(JsonKey.SIGNATORY_LIST));
+        if(certReq.containsKey(JsonKey.STORE)) {
+            validateStore((Map<String, Object>) certReq.get(JsonKey.STORE));
+        }
         if (certReq.containsKey(JsonKey.KEYS)) {
             validateKeys((Map<String, Object>) certReq.get(JsonKey.KEYS));
         }
@@ -80,7 +83,7 @@ public class CertValidator {
     private static void checkChildrenMapMandatoryParams(Map<String, Object> data, List<String> keys, String parentKey) throws BaseException {
 
         for (String key : keys) {
-            if (StringUtils.isEmpty((String) data.get(key))) {
+            if (StringUtils.isBlank((String) data.get(key))) {
                 throw new BaseException("MANDATORY_PARAMETER_MISSING",
                         MessageFormat.format(IResponseMessage.MANDATORY_PARAMETER_MISSING, parentKey + "." + key),
                         ResponseCode.CLIENT_ERROR.getCode());
@@ -88,6 +91,20 @@ public class CertValidator {
         }
     }
 
+    private static void validateStore(Map<String, Object> store)  throws   BaseException{
+        checkMandatoryParamsPresent(store, JsonKey.CERTIFICATE + "." + JsonKey.STORE, Arrays.asList(JsonKey.TYPE));
+        validateStorageType(store, JsonKey.CERTIFICATE + "." + JsonKey.STORE);
+        checkMandatoryParamsPresent((Map<String, Object>)store.get(store.get(JsonKey.TYPE)), JsonKey.CERTIFICATE + "." + JsonKey.STORE + "."
+                + store.get(JsonKey.TYPE), Arrays.asList(JsonKey.containerName, JsonKey.ACCOUNT, JsonKey.key));
+    }
+
+    private static void validateStorageType(Map<String, Object> data, String parentKey) throws BaseException {
+        if(!StorageType.get().contains(data.get(JsonKey.TYPE)))  {
+            throw new BaseException("INVALID_PARAM_VALUE",
+                    MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE, data.get(JsonKey.TYPE), parentKey + "." + JsonKey.TYPE),
+                    ResponseCode.CLIENT_ERROR.getCode());
+        }
+    }
 
 }
 

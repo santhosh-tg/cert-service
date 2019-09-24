@@ -5,8 +5,11 @@ import org.incredible.pojos.TrainingEvidence;
 
 public class TrainingEvidenceBuilder implements IBuilder<TrainingEvidence> {
 
-    private TrainingEvidence trainingEvidence;
+    private TrainingEvidence trainingEvidence ;
 
+    public TrainingEvidenceBuilder(String context) {
+        trainingEvidence = new TrainingEvidence(context);
+    }
 
     public TrainingEvidenceBuilder setSubject(String subject) {
         trainingEvidence.setSubject(subject);

@@ -30,6 +30,15 @@ public interface JsonKey {
     String AWS_STORAGE_SECRET="AWS_STORAGE_SECRET";
     String SLUG ="sunbird_cert_slug";
     String ACCESS_CODE_LENGTH = "ACCESS_CODE_LENGTH";
+    String PATH = "path";
+    String PREVIEW="preview";
+    String ASSETS = "assets";
+    String TYPE = "type";
+    String BUCKET_NAME = "BUCKET_NAME";
+    String KEY="key";
+    String ACCOUNT = "account";
+    String containerName = "containerName";
+
 
 
 }

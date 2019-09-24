@@ -1,6 +1,5 @@
 package org.incredible.certProcessor.views;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.incredible.pojos.CertificateExtension;
 
@@ -10,6 +9,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class HTMLVarResolver {
 
@@ -19,8 +19,6 @@ public class HTMLVarResolver {
     public HTMLVarResolver(CertificateExtension certificateExtension) {
         this.certificateExtension = certificateExtension;
     }
-
-    private ObjectMapper mapper = new ObjectMapper();
 
     public String getRecipientName() {
         return certificateExtension.getRecipient().getName();
@@ -39,7 +37,6 @@ public class HTMLVarResolver {
             String idStr = path.substring(path.lastIndexOf('/') + 1);
             return StringUtils.substringBefore(idStr, ".") + ".png";
         } catch (URISyntaxException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -60,12 +57,11 @@ public class HTMLVarResolver {
         String dateInFormat;
         try {
             Date parsedIssuedDate = simpleDateFormat.parse(certificateExtension.getIssuedOn());
-            DateFormat format = new SimpleDateFormat("dd MMMM yyy");
+            DateFormat format = new SimpleDateFormat("dd MMMM yyy", Locale.getDefault());
             format.format(parsedIssuedDate);
             dateInFormat = format.format(parsedIssuedDate);
             return dateInFormat;
         } catch (ParseException e) {
-            e.printStackTrace();
             return null;
         }
     }

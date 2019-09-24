@@ -89,4 +89,18 @@ public interface JsonKey {
     String ACCESS_CODE = "accessCode";
     String JSON_DATA = "jsonData";
     String SLUG = "sunbird_cert_slug";
+
+    String STORE = "store";
+    String PATH = "path";
+    String containerName = "containerName";
+    String TYPE = "type";
+    String ACCOUNT = "account";
+    String key = "key";
+    String ASSETS = "assets";
+    String PREVIEW="preview";
+    String AWS_STORAGE_KEY="AWS_STORAGE_KEY";
+    String AWS_STORAGE_SECRET="AWS_STORAGE_SECRET";
+    String VERIFY_CERT = "verifyCert";
+    String AZURE = "azure";
+    String AWS = "aws";
 }

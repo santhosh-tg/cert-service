@@ -7,8 +7,6 @@ public class BadgeClass extends OBBase {
      */
     private String id;
 
-    public BadgeClass() {
-    }
 
     /**
      * In most cases, this will simply be the string BadgeClass. An array including BadgeClass and other string
@@ -44,6 +42,9 @@ public class BadgeClass extends OBBase {
     private Issuer issuer;
 
     private AlignmentObject alignment;
+
+    public BadgeClass() {
+    }
 
     public BadgeClass(String ctx) {
         setContext(ctx);

@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class HTMLTemplateFile extends HTMLTemplateProvider {
 
-    private String HTML_TEMPLATE_NAME;
+    private String htmlTemplateName;
 
     private String content = null;
 
@@ -17,15 +17,16 @@ public class HTMLTemplateFile extends HTMLTemplateProvider {
 
 
     public HTMLTemplateFile(String fileName) {
-        HTML_TEMPLATE_NAME = fileName;
+        htmlTemplateName = fileName;
     }
 
     private void fetchFile() {
-        File htmlTemplateFile = new File(getPath(HTML_TEMPLATE_NAME));
+        File htmlTemplateFile = new File(getPath(htmlTemplateName));
         try {
             content = FileUtils.readFileToString(htmlTemplateFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Exception while fetching  file {}", e.getMessage());
+
         }
     }
 

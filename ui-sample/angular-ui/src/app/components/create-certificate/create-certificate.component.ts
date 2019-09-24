@@ -60,9 +60,14 @@ export class CreateCertificateComponent implements OnInit {
     }
     console.log("form data", requestData)
     this.dataService.post(requestData).subscribe(res => {
-      this.pdfUrl = res.result.response[0].pdfUrl;
       console.log('certificate generated successfully', res)
-      this.dowloadPdf();
+      if(res.result.response[0].preview)  {
+        window.open(res.result.response[0].pdfUrl, '_blank');
+      } else  {
+        this.pdfUrl = res.result.response[0].pdfUrl;
+        this.dowloadPdf();
+
+      }
     });
   }
   generateData(request: any) {
@@ -120,6 +125,7 @@ export class CreateCertificateComponent implements OnInit {
   removeSignatory() {
     if (this.signatoryCount > 1) {
       this.signatory.pop()
+      this.signatoryCount --;
     }
   }
 

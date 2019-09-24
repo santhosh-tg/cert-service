@@ -9,13 +9,8 @@ import java.util.*;
 
 public class IssuedDateValuator implements IEvaluator {
 
-    private static List<SimpleDateFormat>
-            dateFormats = new ArrayList<SimpleDateFormat>() {
-        {
-            add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
-            add(new SimpleDateFormat("yyyy-MM-dd"));
-        }
-    };
+    private static List<SimpleDateFormat> dateFormats = Arrays.asList(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            , new SimpleDateFormat("yyyy-MM-dd"));
 
     @Override
     public String evaluates(Object inputVal) throws InvalidDateFormatException {
@@ -39,13 +34,16 @@ public class IssuedDateValuator implements IEvaluator {
                 date = format.parse(input);
             } catch (ParseException e) {
             }
-            if (date != null)
+            if (date != null) {
                 break;
+            }
         }
         if (date == null) {
             throw new InvalidDateFormatException("issued date is not in valid format");
 
-        } else return date;
+        } else {
+            return date;
+        }
     }
 
 }

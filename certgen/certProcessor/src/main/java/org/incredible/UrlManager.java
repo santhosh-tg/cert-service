@@ -10,9 +10,10 @@ public class UrlManager {
     private static Logger logger = Logger.getLogger(UrlManager.class);
 
     public static String getSharableUrl(String url,String containerName) {
-        url = removeQueryParams(url);
-        url=fetchFileFromUrl(url);
-        return removeContainerName(url,containerName);
+        String uri;
+        uri = removeQueryParams(url);
+        uri=fetchFileFromUrl(uri);
+        return removeContainerName(uri,containerName);
     }
 
     private static String removeQueryParams(String url) {

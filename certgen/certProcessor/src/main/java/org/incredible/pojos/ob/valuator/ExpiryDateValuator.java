@@ -45,25 +45,25 @@ public class ExpiryDateValuator implements IEvaluator {
                     Date parsedIssuedDate = simpleDateFormat.parse(issuedDate);
                     cal.setTime(parsedIssuedDate);
 
-                    for (int index = 0; index < splitExpiry.length; index++) {
-                        String string = checkValid(splitExpiry[index]);
-
+                    for (String expiry : splitExpiry) {
+                        String string = checkValid(expiry);
                         switch (string.toLowerCase()) {
                             case "d":
-                                cal.add(Calendar.DATE, getDigits(splitExpiry[index]));
+                                cal.add(Calendar.DATE, getDigits(expiry));
                                 break;
                             case "m":
-                                cal.add(Calendar.MONTH, getDigits(splitExpiry[index]));
+                                cal.add(Calendar.MONTH, getDigits(expiry));
                                 break;
                             case "y":
-                                cal.add(Calendar.YEAR, getDigits(splitExpiry[index]));
+                                cal.add(Calendar.YEAR, getDigits(expiry));
+                                break;
+                            default:
                                 break;
                         }
                     }
                     return simpleDateFormat.format(cal.getTime());
                 }
             } catch (ParseException e) {
-                e.printStackTrace();
                 return null;
             }
         }

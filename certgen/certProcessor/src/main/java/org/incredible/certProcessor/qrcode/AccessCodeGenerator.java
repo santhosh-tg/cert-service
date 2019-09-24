@@ -15,8 +15,7 @@ public class AccessCodeGenerator {
     private String regex = "[A-Z][0-9][A-Z][0-9][A-Z][0-9]";
     private Pattern pattern = Pattern.compile(regex);
 
-
-    private static final String[] alphabet = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C",
+    private static final String[] ALPHABET = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C",
             "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y",
             "Z"};
 
@@ -26,7 +25,7 @@ public class AccessCodeGenerator {
 
     public String generate() {
         double count = 1;
-        int totalChars = alphabet.length;
+        int totalChars = ALPHABET.length;
         BigDecimal exponent = BigDecimal.valueOf(totalChars);
         exponent = exponent.pow(length.intValue());
         double codesCount = 0;
@@ -51,7 +50,7 @@ public class AccessCodeGenerator {
         }
         double div = Math.floor(num.doubleValue() / base);
         String val = baseN(new BigDecimal(div), base);
-        return StringUtils.stripStart(val, stripChars) + alphabet[num.remainder(new BigDecimal(base)).intValue()];
+        return StringUtils.stripStart(val, stripChars) + ALPHABET[num.remainder(new BigDecimal(base)).intValue()];
     }
 
 
