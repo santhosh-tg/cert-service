@@ -10,7 +10,7 @@ export interface CertReq {
 
 export interface Data {
     recipientName?: String,
-    recipientEmail? : String,
+    recipientEmail?: String,
     recipientPhone?: String
 }
 export interface SignatoryList {
@@ -22,4 +22,17 @@ export interface SignatoryList {
 export interface Issuer {
     name: String,
     url: String
+}
+
+export interface Store {
+    type: String,
+    account: String,
+    key: String,
+    path?: String,
+    containerName: String
+}
+
+export interface Templates {
+    id: String,
+    name: String
 }

@@ -11,7 +11,7 @@ import { AvatarModule } from 'ngx-avatar';
 import { HttpClientModule } from '@angular/common/http';
 import {HttpModule} from '@angular/http'
 import { SuiSelectModule, SuiModalModule, SuiAccordionModule, SuiPopupModule, SuiDropdownModule, SuiProgressModule,
-  SuiRatingModule, SuiCollapseModule , SuiCheckboxModule} from 'ng2-semantic-ui';
+  SuiRatingModule, SuiCollapseModule , SuiCheckboxModule, SuiTabsModule} from 'ng2-semantic-ui';
   import { RouterModule } from '@angular/router';
 import { DefaultTemplateComponent } from './components/default-template/default-template.component';
 import { FormsModule, ReactiveFormsModule, } from '@angular/forms';
@@ -36,8 +36,7 @@ import { CreateCertificateComponent } from './components/create-certificate/crea
     LoginComponent,
     CreateComponent,
     UpdateComponent,
-    CreateCertificateComponent
-  ],
+    CreateCertificateComponent  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -45,7 +44,7 @@ import { CreateCertificateComponent } from './components/create-certificate/crea
     HttpClientModule,
     HttpModule,
     SuiSelectModule, SuiModalModule, SuiAccordionModule, SuiPopupModule, SuiDropdownModule, SuiProgressModule,
-    SuiRatingModule, SuiCollapseModule, SuiCheckboxModule,
+    SuiRatingModule, SuiCollapseModule, SuiCheckboxModule, SuiTabsModule,
     RouterModule,
     FormsModule,
     ReactiveFormsModule

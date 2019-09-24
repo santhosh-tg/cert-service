@@ -23,7 +23,7 @@
         </label>
         <input name="{{field.code}}" type="{{field.inputType}}" [(ngModel)]="formInputData[field.code]">
       </div>
-      <div *ngIf="field.inputType==='select'" class="field" [ngClass]="{ 'disabled':!field.editable}">
+      <div *ngIf="field.inputType==='select'" class="field" [ngClass]="{ 'disabled':!field.editable, 'required':field.required}">
         <label>{{field.label}}</label>
         <div class="field">
           <sui-select id={{field.code}} name={{field.code}} class="selection" [(ngModel)]="formInputData[field.code]">

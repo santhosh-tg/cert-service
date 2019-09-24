@@ -1,0 +1,105 @@
+{
+    "type": "store",
+    "action": "store",
+    "data": {
+        "templateName": "defaultTemplate",
+        "action": "create",
+        "fields": [
+            {
+                "code": "type",
+                "dataType": "",
+                "name": "type",
+                "label": "Cloud Storage Type",
+                "description": "Cloud Storage Type",
+                "editable": true,
+                "placeholder": "Cloud Storage Type",
+                "inputType": "select",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "four"
+                },
+                "range": [
+                    {
+                        "id": "cloudStorageType1",
+                        "name": "azure"
+                    },
+                    {
+                        "id": "cloudStorageType2",
+                        "name": "aws"
+                    }
+                ],
+                "index": 1
+            },
+            {
+                "code": "containerName",
+                "dataType": "text",
+                "name": "containerName",
+                "label": "Container Name",
+                "description": "Container Name",
+                "editable": true,
+                "placeholder": "Container Name",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "four"
+                },
+                "index": 2
+            },
+            {
+                "code": "account",
+                "dataType": "text",
+                "name": "account",
+                "label": "Account Name",
+                "description": "Account Name",
+                "editable": true,
+                "placeholder": "Account Name",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "four"
+                },
+                "index": 3
+            },
+            {
+                "code": "key",
+                "dataType": "text",
+                "name": "key",
+                "label": "Account key",
+                "description": "Account key",
+                "editable": true,
+                "placeholder": "Account key",
+                "inputType": "text",
+                "required": true,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "eight"
+                },
+                "index": 4
+            },
+            {
+                "code": "path",
+                "dataType": "text",
+                "name": "path",
+                "label": "Path",
+                "description": "Path",
+                "editable": true,
+                "placeholder": "Path",
+                "inputType": "text",
+                "required": false,
+                "displayProperty": "Editable",
+                "visible": true,
+                "renderingHints": {
+                    "semanticColumnWidth": "four"
+                },
+                "index": 4
+            }
+        ]
+    }
+}
