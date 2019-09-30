@@ -119,7 +119,8 @@
                 "inputType": "text",
                 "required": true,
                 "displayProperty": "Editable",
-                "visible": true,
+                "visible": true,        
+                "value":"Ekstep",
                 "renderingHints": {
                     "semanticColumnWidth": "six"
                 },
@@ -137,6 +138,7 @@
                 "required": true,
                 "displayProperty": "Editable",
                 "visible": true,
+                "value":"http://diksha.gov.in",
                 "renderingHints": {
                     "semanticColumnWidth": "six"
                 },
