@@ -1,6 +1,6 @@
 package org.sunbird;
 
-public class ActorServiceException {
+public class ActorServiceException extends Exception{
 
     public static class InvalidOperationName extends BaseException
     {

@@ -9,30 +9,28 @@ import org.incredible.pojos.CertificateExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashSet;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import java.util.Set;
 
 
 public class HTMLGenerator {
 
     private static Logger logger = LoggerFactory.getLogger(HTMLGenerator.class);
 
-    private String HtmlString;
+    private String htmlString;
 
-    private HashSet<String> htmlReferenceVariable;
+    private Set<String> htmlReferenceVariable;
 
 
     public HTMLGenerator(String htmlString) {
-        HtmlString = htmlString;
-        htmlReferenceVariable = HTMLTemplateProvider.storeAllHTMLTemplateVariables(HtmlString);
+        this.htmlString = htmlString;
+        htmlReferenceVariable = HTMLTemplateProvider.storeAllHTMLTemplateVariables(this.htmlString);
     }
 
 
@@ -52,7 +50,7 @@ public class HTMLGenerator {
         initVelocity();
         VelocityContext context = new VelocityContext();
         HTMLVarResolver htmlVarResolver = new HTMLVarResolver(certificateExtension);
-        htmlReferenceVariable = HTMLTemplateProvider.storeAllHTMLTemplateVariables(HtmlString);
+        htmlReferenceVariable = HTMLTemplateProvider.storeAllHTMLTemplateVariables(htmlString);
         Iterator<String> iterator = htmlReferenceVariable.iterator();
         while (iterator.hasNext()) {
             String macro = iterator.next().substring(1);
@@ -61,34 +59,32 @@ public class HTMLGenerator {
                 method.setAccessible(true);
                 context.put(macro, method.invoke(htmlVarResolver));
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
                 logger.info("exception while generating html for certificate {}", e.getMessage());
             }
         }
         createHTMLFile(context, getUUID(certificateExtension.getId()), directory);
     }
 
-    private String getUUID(String id) {
+    private String getUUID(String certId) {
         try {
-            URI uri = new URI(id);
+            URI uri = new URI(certId);
             String path = uri.getPath();
             String idStr = path.substring(path.lastIndexOf('/') + 1);
             return StringUtils.substringBefore(idStr, ".");
         } catch (URISyntaxException e) {
-            e.printStackTrace();
             return null;
         }
     }
 
-    private void createHTMLFile(VelocityContext context, String id, String directory) {
+    private void createHTMLFile(VelocityContext context, String certUuid, String directory) {
         try {
-            File file = new File(directory, id + ".html");
-            Writer writer = new FileWriter(file);
-            Velocity.evaluate(context, writer, "velocity", HtmlString);
+            File file = new File(directory, certUuid + ".html");
+            Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
+            Velocity.evaluate(context, writer, "velocity", htmlString);
             writer.flush();
             writer.close();
             logger.info("html file is created {}", file.getName());
-            PdfConverter.convertor(file, id, directory);
+            PdfConverter.convertor(file, certUuid, directory);
         } catch (IOException e) {
             logger.error("IO exception while creating html file :{}", e.getMessage());
         }

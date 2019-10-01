@@ -49,10 +49,12 @@ public class Issuer extends OBBase {
         this.type = type;
     }
 
+    @Override
     public String getContext() {
         return context;
     }
 
+    @Override
     public void setContext(String context) {
         this.context = context;
     }

@@ -16,8 +16,8 @@ public class ZipEditorUtil {
         ZipOutputStream zos = new ZipOutputStream(fos);
         for (File file : files) {
             String filePath = file.getAbsolutePath();
-            ZipEntry ze = new ZipEntry(file.getName());
-            zos.putNextEntry(ze);
+            ZipEntry zipEntry = new ZipEntry(file.getName());
+            zos.putNextEntry(zipEntry);
             FileInputStream fis = new FileInputStream(filePath);
             byte[] buffer = new byte[1024];
             int len;

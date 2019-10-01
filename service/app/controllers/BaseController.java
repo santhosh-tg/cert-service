@@ -40,7 +40,7 @@ public class BaseController extends Controller {
 	 */
 	@Inject
 	private HttpExecutionContext httpExecutionContext;
-	protected static Localizer localizerObject = Localizer.getInstance();
+	protected final static Localizer localizerObject = Localizer.getInstance();
 	public static final String RESPONSE = "Response";
 	public static final String SUCCESS = "Success";
 
@@ -144,16 +144,6 @@ public class BaseController extends Controller {
 	public CompletionStage<Result> handleLogRequest() {
 		startTrace("handleLogRequest");
 		Response response = new Response();
-		Request request = null;
-		try {
-			request = (Request) RequestMapper.mapRequest(request(), Request.class);
-		} catch (Exception ex) {
-			// ProjectLogger.log(String.format("%s:%s:exception occurred in mapping
-			// request", this.getClass().getSimpleName(), "handleLogRequest"),
-			// LoggerEnum.ERROR.name());
-			return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
-		}
-
 		/*
 		 * if (LogValidator.isLogParamsPresent(request)) { if
 		 * (LogValidator.isValidLogLevelPresent((String)

@@ -25,7 +25,7 @@ public class HTMLTemplateProviderTest {
 
         HTMLTemplateFile htmlTemplateFile = new HTMLTemplateFile("ValidTemplate.html");
         Boolean valid = HTMLTemplateProvider.checkHtmlTemplateIsValid(htmlTemplateFile.getTemplateContent(filePath));
-        assertEquals(true, valid);
+        assertTrue("valid template",valid);
 
     }
 
@@ -34,7 +34,7 @@ public class HTMLTemplateProviderTest {
 
         HTMLTemplateFile htmlTemplateFile = new HTMLTemplateFile("InvalidTemplate.html");
         Boolean valid = HTMLTemplateProvider.checkHtmlTemplateIsValid(htmlTemplateFile.getTemplateContent(filePath));
-        assertEquals(false, valid);
+        assertFalse("invalid template",valid);
 
     }
 }

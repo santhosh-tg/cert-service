@@ -6,28 +6,52 @@ import org.apache.velocity.runtime.parser.node.ASTReference;
 import org.apache.velocity.runtime.parser.node.ParserVisitor;
 import org.apache.velocity.runtime.parser.node.SimpleNode;
 import org.apache.velocity.runtime.visitor.BaseVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.Set;
 
 public abstract class HTMLTemplateProvider {
 
-    abstract public String getTemplateContent(String filePath) throws Exception;
+    private static Logger logger = LoggerFactory.getLogger(HTMLTemplateProvider.class);
 
     /**
      * variables present in html template
      */
-    private static HashSet<String> htmlReferenceVariable = new HashSet<>();
+    private static Set<String> htmlReferenceVariable = new HashSet<>();
+
+
+    abstract public String getTemplateContent(String filePath) throws IOException;
 
 
     public static Boolean checkHtmlTemplateIsValid(String htmlString) {
-        if (htmlString == null) return false;
-        else {
+        if (htmlString == null) {
+            return false;
+        } else {
             HTMLTemplateValidator htmlTemplateValidator = new HTMLTemplateValidator(storeAllHTMLTemplateVariables(htmlString));
             return htmlTemplateValidator.validate();
         }
     }
 
+    /**
+     * to check file is  exists or not
+     *
+     * @param file
+     * @return
+     */
+    public static Boolean isFileExists(File file) {
+        boolean isExits = false;
+        if (file.exists()) {
+            isExits = true;
+        } else {
+            isExits = false;
+        }
+        return isExits;
+    }
 
     /**
      * to get all the reference variables present in htmlString
@@ -35,13 +59,13 @@ public abstract class HTMLTemplateProvider {
      * @param htmlString html file read in the form of string
      * @return set of reference variables
      */
-    public static HashSet<String> storeAllHTMLTemplateVariables(String htmlString) {
+    public static Set<String> storeAllHTMLTemplateVariables(String htmlString) {
         RuntimeInstance runtimeInstance = new RuntimeInstance();
         SimpleNode node = null;
         try {
             node = runtimeInstance.parse(htmlString, null);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.debug("exception while storing template variables");
         }
         visitor.visit(node, null);
         return htmlReferenceVariable;

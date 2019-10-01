@@ -60,7 +60,7 @@ public class Assertion extends OBBase {
      */
     private String revocationReason;
 
-    protected Assertion() {
+    public Assertion() {
     }
 
     public Assertion(String ctx) {
@@ -92,8 +92,9 @@ public class Assertion extends OBBase {
         IssuedDateValuator issuedDateValuator = new IssuedDateValuator();
         if (issuedDateValuator.evaluates(issuedOn) == null) {
             throw new InvalidDateFormatException("Issued date is not in a given format");
-        } else
+        } else {
             this.issuedOn = issuedDateValuator.evaluates(issuedOn);
+        }
 
     }
 
@@ -134,12 +135,13 @@ public class Assertion extends OBBase {
     }
 
     public void setExpires(String expires) throws InvalidDateFormatException {
-        if(StringUtils.isNotBlank(expires)) {
+        if (StringUtils.isNotBlank(expires)) {
             ExpiryDateValuator valuator = new ExpiryDateValuator(this.getIssuedOn());
             if (valuator.evaluates(expires) == null) {
                 throw new InvalidDateFormatException("Expiry date is in wrong format");
-            } else
+            } else {
                 this.expires = valuator.evaluates(expires);
+            }
         }
 
     }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.incredible.pojos.SignatoryExtension;
 import org.incredible.pojos.ob.Issuer;
-import org.incredible.pojos.ob.Profile;
 
 
 public class CertModel {
@@ -174,7 +173,6 @@ public class CertModel {
         try {
             stringRep = mapper.writeValueAsString(this);
         } catch (JsonProcessingException jpe) {
-            jpe.printStackTrace();
         }
         return stringRep;
     }

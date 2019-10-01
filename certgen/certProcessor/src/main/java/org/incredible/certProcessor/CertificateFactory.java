@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public class CertificateFactory {
 
-    private static String uuid;
+    private String uuid;
 
     private static Logger logger = LoggerFactory.getLogger(CertificateFactory.class);
 
@@ -36,9 +36,8 @@ public class CertificateFactory {
     public CertificateExtension createCertificate(CertModel certModel, Map<String, String> properties)
             throws InvalidDateFormatException, SignatureException.UnreachableException, IOException, SignatureException.CreationException {
 
-        uuid = properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/")
-                + properties.get(JsonKey.ROOT_ORG_ID).concat("/") + properties.get(JsonKey.TAG).concat("/") + UUID.randomUUID().toString() + ".json";
-
+        String domainUrl = getDomainUrl(properties);
+        uuid = domainUrl + "/" + UUID.randomUUID().toString() + ".json";
         CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(properties.get(JsonKey.CONTEXT));
         CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(properties.get(JsonKey.CONTEXT));
         BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(properties.get(JsonKey.CONTEXT));
@@ -47,8 +46,7 @@ public class CertificateFactory {
         SignatureBuilder signatureBuilder = new SignatureBuilder();
 
         Criteria criteria = new Criteria();
-        criteria.setId(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + properties.get(JsonKey.ROOT_ORG_ID).concat("/")
-                + properties.get(JsonKey.TAG));
+        criteria.setId(domainUrl);
         criteria.setNarrative(certModel.getCertificateDescription());
 
         /**
@@ -140,12 +138,12 @@ public class CertificateFactory {
         SignatureHelper signatureHelper = new SignatureHelper(properties);
         Map<String, Object> signMap;
 
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            String request = mapper.writeValueAsString(certificateExtension);
-            JsonNode jsonNode = mapper.readTree(request);
-            logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
-            signMap = signatureHelper.generateSignature(jsonNode, keyID);
-            return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        String request = mapper.writeValueAsString(certificateExtension);
+        JsonNode jsonNode = mapper.readTree(request);
+        logger.info("CertificateFactory:getSignatureValue:Json node of certificate".concat(jsonNode.toString()));
+        signMap = signatureHelper.generateSignature(jsonNode, keyID);
+        return (String) signMap.get(JsonKey.SIGNATURE_VALUE);
 
     }
 
@@ -165,6 +163,25 @@ public class CertificateFactory {
             logger.debug("Exception while getting key id from the sign-creator url : {}", e.getMessage());
         }
         return Integer.parseInt(idStr);
+    }
+
+
+    /**
+     * appends slug , org id, batch id to the domain url
+     *
+     * @param properties
+     * @return
+     */
+    private String getDomainUrl(Map<String, String> properties) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(properties.get(JsonKey.DOMAIN_URL)).append("/").append(properties.get(JsonKey.SLUG));
+        if (StringUtils.isNotEmpty(properties.get(JsonKey.ROOT_ORG_ID))) {
+            stringBuilder.append("/" + properties.get(JsonKey.ROOT_ORG_ID));
+        }
+        if (StringUtils.isNotEmpty(properties.get(JsonKey.TAG))) {
+            stringBuilder.append("/" + properties.get(JsonKey.TAG));
+        }
+        return stringBuilder.toString();
     }
 
 }

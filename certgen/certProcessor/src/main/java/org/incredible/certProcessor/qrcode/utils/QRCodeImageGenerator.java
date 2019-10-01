@@ -9,7 +9,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,6 @@ public class QRCodeImageGenerator {
 
     public File createQRImages(QRCodeGenerationModel qrGenRequest) throws WriterException, IOException, NotFoundException, FontFormatException {
 
-        List<File> fileList = new ArrayList<File>();
 
         String data = qrGenRequest.getData();
         String text = qrGenRequest.getText();
@@ -56,7 +55,7 @@ public class QRCodeImageGenerator {
 
         BufferedImage qrImage = generateBaseImage(data, errorCorrectionLevel, pixelsPerBlock, qrMargin, colorModel);
 
-        if (null != text || "" != text) {
+        if (StringUtils.isNotBlank(text)) {
             BufferedImage textImage = getTextImage(text, fontName, fontSize, tracking, colorModel);
             qrImage = addTextToBaseImage(qrImage, textImage, colorModel, qrMargin, pixelsPerBlock, qrMarginBottom, imageMargin);
         }
@@ -67,7 +66,6 @@ public class QRCodeImageGenerator {
 
         File finalImageFile = new File(fileName + "." + imageFormat);
         ImageIO.write(qrImage, imageFormat, finalImageFile);
-        fileList.add(finalImageFile);
         logger.info("qr code is created for the certificate");
         return finalImageFile;
 
@@ -202,6 +200,9 @@ public class QRCodeImageGenerator {
             case "L":
                 hintsMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
                 break;
+            default:
+                logger.error("Unknown error correction");
+                break;
         }
         hintsMap.put(EncodeHintType.MARGIN, qrMargin);
         return hintsMap;
@@ -216,12 +217,12 @@ public class QRCodeImageGenerator {
         Font basicFont = null;
         ClassLoader classLoader = this.getClass().getClassLoader();
         try {
-        inputStream = classLoader.getResourceAsStream(fontFile);
-        logger.info ("input stream value is not null for fontfile " + fontFile + " " + inputStream);    
-        basicFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            inputStream = classLoader.getResourceAsStream(fontFile);
+            logger.info("input stream value is not null for fontfile " + fontFile + " " + inputStream);
+            basicFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
         } catch (Exception e) {
-        logger.info ("Exception occurred during font creation " + e);
-        }  
+            logger.debug("Exception occurred during font creation " + e);
+        }
         Map<TextAttribute, Object> attributes = new HashMap<TextAttribute, Object>();
         attributes.put(TextAttribute.TRACKING, tracking);
         attributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
@@ -255,7 +256,7 @@ public class QRCodeImageGenerator {
     }
 
     private static int getImageType(String colorModel) {
-        if (colorModel.equalsIgnoreCase("RGB")) {
+        if (("RGB").equalsIgnoreCase(colorModel)) {
             return BufferedImage.TYPE_INT_RGB;
         } else {
             return BufferedImage.TYPE_BYTE_GRAY;

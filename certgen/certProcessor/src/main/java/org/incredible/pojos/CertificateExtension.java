@@ -1,7 +1,6 @@
 package org.incredible.pojos;
 
 import org.incredible.pojos.ob.Assertion;
-import org.incredible.pojos.ob.Issuer;
 
 
 /**

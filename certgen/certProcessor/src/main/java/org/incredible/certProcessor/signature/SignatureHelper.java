@@ -26,13 +26,11 @@ public class SignatureHelper {
 
     private Map<String, String> properties;
 
+    private ObjectMapper mapper = new ObjectMapper();
 
     public SignatureHelper(Map<String, String> properties) {
         this.properties = properties;
     }
-
-    private ObjectMapper mapper = new ObjectMapper();
-
 
     private static Logger logger = LoggerFactory.getLogger(SignatureHelper.class);
 
@@ -51,7 +49,7 @@ public class SignatureHelper {
         signReq.put(JsonKey.ENTITY, rootNode);
         CloseableHttpClient client = HttpClients.createDefault();
         logger.info("SignatureHelper:generateSignature:keyID:".concat(keyId));
-        String encServiceUrl=properties.get(JsonKey.SIGN_URL).concat("/").concat(keyId);
+        String encServiceUrl = properties.get(JsonKey.SIGN_URL).concat("/").concat(keyId);
         logger.info("SignatureHelper:generateSignature:enc service url formed:".concat(encServiceUrl));
         HttpPost httpPost = new HttpPost(encServiceUrl);
         try {
