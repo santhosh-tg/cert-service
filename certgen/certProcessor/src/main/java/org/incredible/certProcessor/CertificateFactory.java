@@ -175,9 +175,6 @@ public class CertificateFactory {
     private String getDomainUrl(Map<String, String> properties) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(properties.get(JsonKey.DOMAIN_URL)).append("/").append(properties.get(JsonKey.SLUG));
-        if (StringUtils.isNotEmpty(properties.get(JsonKey.ROOT_ORG_ID))) {
-            stringBuilder.append("/" + properties.get(JsonKey.ROOT_ORG_ID));
-        }
         if (StringUtils.isNotEmpty(properties.get(JsonKey.TAG))) {
             stringBuilder.append("/" + properties.get(JsonKey.TAG));
         }

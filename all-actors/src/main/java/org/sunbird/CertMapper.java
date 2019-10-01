@@ -1,12 +1,10 @@
 package org.sunbird;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.pojos.SignatoryExtension;
 import org.incredible.pojos.ob.Issuer;
-import org.sunbird.request.Request;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,7 +24,7 @@ public class CertMapper {
     public List<CertModel> toList(Map<String, Object> request) {
         Map<String, Object> json = (Map<String, Object>) request.get(JsonKey.CERTIFICATE);
         List<Map<String, Object>> dataList = (List<Map<String, Object>>) json.get(JsonKey.DATA);
-        Issuer issuer = getIssuer((Map<String, Object>) json.get(JsonKey.ISSUER), (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID));
+        Issuer issuer = getIssuer((Map<String, Object>) json.get(JsonKey.ISSUER));
         SignatoryExtension[] signatoryArr = getSignatoryArray((List<Map<String, Object>>) json.get(JsonKey.SIGNATORY_LIST));
         List<CertModel> certList = dataList.stream().map(data -> getCertModel(data)).collect(Collectors.toList());
         certList.stream().forEach(cert -> {
@@ -67,12 +65,12 @@ public class CertMapper {
     }
 
 
-    private Issuer getIssuer(Map<String, Object> issuerData, String rootOrgId) {
+    private Issuer getIssuer(Map<String, Object> issuerData) {
         Issuer issuer = new Issuer(properties.get(JsonKey.CONTEXT));
         issuer.setName((String) issuerData.get(JsonKey.NAME));
         issuer.setUrl((String) issuerData.get(JsonKey.URL));
         if (issuerData.containsKey(JsonKey.PUBLIC_KEY)) {
-            List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY), rootOrgId);
+            List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY));
             if (CollectionUtils.isNotEmpty(keyList)) {
                 String[] keyArr = keyList.stream().toArray(String[]::new);
                 issuer.setPublicKey(keyArr);
@@ -93,15 +91,12 @@ public class CertMapper {
         return certModel;
     }
 
-    private List<String> validatePublicKeys(List<String> publicKeys, String rootOrgId) {
+    private List<String> validatePublicKeys(List<String> publicKeys) {
         List<String> validatedPublicKeys = new ArrayList<>();
         publicKeys.forEach((publicKey) -> {
             if (!publicKey.startsWith("http")) {
-                if (StringUtils.isBlank(rootOrgId))
-                    validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + publicKey.concat("_publicKey.json"));
-                else
-                    validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + rootOrgId.concat("/") + publicKey.concat("_publicKey.json"));
-
+                validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG)
+                        .concat("/") + JsonKey.KEYS.concat("/") + publicKey.concat("_publicKey.json"));
             } else {
                 validatedPublicKeys.add(publicKey);
             }

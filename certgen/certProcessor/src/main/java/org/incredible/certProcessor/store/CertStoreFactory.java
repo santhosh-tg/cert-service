@@ -107,9 +107,6 @@ public class CertStoreFactory {
     public String getDirectoryName(String zipFileName) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("conf/");
-        if (StringUtils.isNotEmpty(properties.get(JsonKey.ROOT_ORG_ID))) {
-            stringBuilder.append(properties.get(JsonKey.ROOT_ORG_ID) + "_");
-        }
         if (StringUtils.isNotEmpty(properties.get(JsonKey.TAG))) {
             stringBuilder.append(properties.get(JsonKey.TAG) + "_");
         }
@@ -134,6 +131,7 @@ public class CertStoreFactory {
 
     /**
      * set the path for file to store cloud or path to store in local
+     *
      * @param storeConfig
      * @return
      */
@@ -142,13 +140,9 @@ public class CertStoreFactory {
         if (BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW))) {
             stringBuilder.append("public/").toString();
         } else if (storeConfig.isCloudStore()) {
-            String orgId = properties.get(org.incredible.certProcessor.JsonKey.ROOT_ORG_ID);
-            String batchId = properties.get(org.incredible.certProcessor.JsonKey.TAG);
-            if (org.apache.commons.lang3.StringUtils.isNotEmpty(orgId)) {
-                stringBuilder.append(orgId).append("/");
-            }
-            if (org.apache.commons.lang3.StringUtils.isNotEmpty(batchId)) {
-                stringBuilder.append(batchId).append("/");
+            String tagId = properties.get(org.incredible.certProcessor.JsonKey.TAG);
+            if (StringUtils.isNotEmpty(tagId)) {
+                stringBuilder.append(tagId).append("/");
             }
         } else {
             stringBuilder.append("public/").toString();

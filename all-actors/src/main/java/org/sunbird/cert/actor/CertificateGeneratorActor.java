@@ -169,25 +169,23 @@ public class CertificateGeneratorActor extends BaseActor {
         return resMap;
     }
 
-    private HashMap<String, String> populatePropertiesMap(Request request) {
+    private HashMap<String, String> populatePropertiesMap(Request request) throws BaseException {
         HashMap<String, String> properties = new HashMap<>();
-        String orgId = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID);
         String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
         String preview = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.PREVIEW);
         Map<String, Object> keysObject = (Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS);
         if (MapUtils.isNotEmpty(keysObject)) {
             String keyId = (String) keysObject.get(JsonKey.ID);
             properties.put(JsonKey.KEY_ID, keyId);
-            properties.put(JsonKey.SIGN_CREATOR, certVar.getSignCreator(orgId, keyId));
-            properties.put(JsonKey.PUBLIC_KEY_URL, certVar.getPUBLIC_KEY_URL(orgId, keyId));
+            properties.put(JsonKey.SIGN_CREATOR, certVar.getSignCreator(keyId));
+            properties.put(JsonKey.PUBLIC_KEY_URL, certVar.getPUBLIC_KEY_URL(keyId));
             logger.info("populatePropertiesMap: keys after".concat(keyId));
         }
-        properties.put(JsonKey.ORG_ID, orgId);
         properties.put(JsonKey.TAG, tag);
         properties.put(JsonKey.CONTAINER_NAME, certVar.getCONTAINER_NAME());
         properties.put(JsonKey.DOMAIN_URL, certVar.getDOMAIN_URL());
-        properties.put(JsonKey.BADGE_URL, certVar.getBADGE_URL(orgId, tag));
-        properties.put(JsonKey.ISSUER_URL, certVar.getISSUER_URL(orgId));
+        properties.put(JsonKey.BADGE_URL, certVar.getBADGE_URL(tag));
+        properties.put(JsonKey.ISSUER_URL, certVar.getISSUER_URL());
         properties.put(JsonKey.CONTEXT, certVar.getCONTEXT());
         properties.put(JsonKey.VERIFICATION_TYPE, certVar.getVERIFICATION_TYPE());
         properties.put(JsonKey.ACCESS_CODE_LENGTH, certVar.getACCESS_CODE_LENGTH());
