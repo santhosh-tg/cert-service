@@ -58,7 +58,7 @@ public interface JsonKey {
     String PUBLIC_KEY = "publicKey";
     String DESCRIPTION = "description";
     String LOGO = "logo";
-    String ISSUE_DATE = "issueDate";
+    String ISSUE_DATE = "issuedDate";
     String USER = "user";
     String CERTIFICATE_NAME = "name";
 
@@ -103,4 +103,12 @@ public interface JsonKey {
     String VERIFY_CERT = "verifyCert";
     String AZURE = "azure";
     String AWS = "aws";
+    String UUID = "uuid";
+    String SIGNATURE = "signature";
+    String SIGNATURE_VALUE = "signatureValue";
+    String VERIFICATION = "verification";
+    String CREATOR = "creator";
+    String HOSTED = "hosted";
+    String SIGNED_BADGE = "SignedBadge";
+    String EXPIRES = "expires";
 }

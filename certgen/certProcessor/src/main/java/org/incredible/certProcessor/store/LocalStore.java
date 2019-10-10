@@ -43,6 +43,10 @@ public class LocalStore implements ICertStore {
     }
 
     @Override
+    public void get(String fileName) {
+    }
+
+    @Override
     public void init() {
 
     }

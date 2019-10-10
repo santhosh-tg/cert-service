@@ -19,6 +19,7 @@ import org.incredible.certProcessor.qrcode.utils.QRCodeImageGenerator;
 import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sunbird.cloud.storage.exception.StorageServiceException;
 
 import java.awt.FontFormatException;
 import java.io.File;
@@ -51,7 +52,7 @@ public class CertificateGenerator {
 
     public CertificateResponse createCertificate(CertModel certModel, HTMLTemplateProvider htmlTemplateProvider) throws
             SignatureException.UnreachableException, InvalidDateFormatException, SignatureException.CreationException,
-            IOException, FontFormatException, NotFoundException, WriterException {
+            IOException, FontFormatException, NotFoundException, WriterException, StorageServiceException {
         String uuid;
         CertificateExtension certificateExtension = certificateFactory.createCertificate(certModel, properties);
         String jsonData = generateCertificateJson(certificateExtension);

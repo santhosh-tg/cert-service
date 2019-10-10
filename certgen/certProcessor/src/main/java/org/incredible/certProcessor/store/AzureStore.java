@@ -4,6 +4,7 @@ package org.incredible.certProcessor.store;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.sunbird.cloud.storage.BaseStorageService;
+import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
@@ -37,7 +38,7 @@ public class AzureStore extends CloudStore {
     }
 
     @Override
-    public void download(String fileName, String localPath) {
+    public void download(String fileName, String localPath) throws StorageServiceException {
         CloudStorage cloudStorage = new CloudStorage(storageService);
         cloudStorage.downloadFile(azureStoreConfig.getAzureStoreConfig().getContainerName(), fileName, localPath, false);
     }

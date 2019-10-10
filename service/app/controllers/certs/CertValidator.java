@@ -9,7 +9,10 @@ import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.JsonKey;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +21,8 @@ import java.util.Map;
  * This class contains method to validate certificate api request
  */
 public class CertValidator {
+
+    private static List<String> publicKeys;
 
     /**
      * This method will validate generate certificate request
@@ -46,6 +51,7 @@ public class CertValidator {
 
     private static void validateCertIssuer(Map<String, Object> issuer) throws BaseException {
         checkMandatoryParamsPresent(issuer, JsonKey.CERTIFICATE + "." + JsonKey.ISSUER, Arrays.asList(JsonKey.NAME, JsonKey.URL));
+        publicKeys = (List<String>) issuer.get(JsonKey.PUBLIC_KEY);
     }
 
     private static void validateCertData(List<Map<String, Object>> data) throws BaseException {
@@ -54,7 +60,51 @@ public class CertValidator {
 
     private static void validateKeys(Map<String, Object> keys) throws BaseException {
         checkMandatoryParamsPresent(keys, JsonKey.CERTIFICATE + "." + JsonKey.KEYS, Arrays.asList(JsonKey.ID));
+        validateIssuerPublicKeys(keys);
+    }
 
+    /**
+     * this method used to validate public keys of Issuer object ,if  public key list is present, list  must contain keys.id value of
+     * certificate request
+     *
+     * @param keys
+     * @throws BaseException
+     */
+    private static void validateIssuerPublicKeys(Map<String, Object> keys) throws BaseException {
+        List<String> keyIds = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(publicKeys)) {
+            publicKeys.forEach((publicKey) -> {
+                if (publicKey.startsWith("http")) {
+                    keyIds.add(getKeyFromPublicKeyUrl(publicKey));
+                } else {
+                    keyIds.add(publicKey);
+                }
+            });
+        }
+        if (!keyIds.contains(keys.get(JsonKey.ID))) {
+            throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,
+                    publicKeys, JsonKey.CERTIFICATE + "." + JsonKey.ISSUER + "." + JsonKey.PUBLIC_KEY)
+                    + " ,public key array must contain keys.id value",
+                    ResponseCode.CLIENT_ERROR.getCode());
+        }
+    }
+
+    /**
+     * to get keyId from the publicKey url
+     *
+     * @param publicKey
+     * @return
+     */
+    private static String getKeyFromPublicKeyUrl(String publicKey) {
+        String idStr = null;
+        try {
+            URI uri = new URI(publicKey);
+            String path = uri.getPath();
+            idStr = path.substring(path.lastIndexOf('/') + 1);
+            idStr = idStr.substring(0, 1);
+        } catch (URISyntaxException e) {
+        }
+        return idStr;
     }
 
     private static void checkMandatoryParamsPresent(

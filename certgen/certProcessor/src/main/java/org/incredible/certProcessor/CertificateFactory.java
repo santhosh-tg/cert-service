@@ -87,7 +87,7 @@ public class CertificateFactory {
             logger.info("CertificateExtension:createCertificate: if keyID is not empty then verification type is SignedBadge");
 
             /** certificate  signature value **/
-            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties, properties.get(JsonKey.KEY_ID));
+            String signatureValue = getSignatureValue(certificateExtensionBuilder.build(), properties.get(JsonKey.ENC_SERVICE_URL), properties.get(JsonKey.KEY_ID));
 
             /**
              * to assign signature value
@@ -108,22 +108,18 @@ public class CertificateFactory {
      *
      * @param certificate
      * @param signatureValue
-     * @param properties
+     * @param encServiceUrl
      * @return
      */
-    public boolean verifySignature(CertificateExtension certificate, String signatureValue, Map<String, String> properties) {
+    public boolean verifySignature(JsonNode certificate, String signatureValue, String encServiceUrl, String creator) throws SignatureException.UnreachableException, SignatureException.VerificationException {
         boolean isValid = false;
-        SignatureHelper signatureHelper = new SignatureHelper(properties);
-        try {
-            Map signReq = new HashMap<String, Object>();
+        SignatureHelper signatureHelper = new SignatureHelper(encServiceUrl);
+            Map<String, Object> signReq = new HashMap<>();
             signReq.put(JsonKey.CLAIM, certificate);
             signReq.put(JsonKey.SIGNATURE_VALUE, signatureValue);
-            signReq.put(JsonKey.KEY_ID, getKeyId(properties.get(JsonKey.SIGN_CREATOR)));
+            signReq.put(JsonKey.KEY_ID, getKeyId(creator));
             JsonNode jsonNode = mapper.valueToTree(signReq);
             isValid = signatureHelper.verifySignature(jsonNode);
-        } catch (SignatureException.UnreachableException | SignatureException.VerificationException e) {
-            logger.error("exception while verifying Signature : {}", e.getMessage());
-        }
         return isValid;
     }
 
@@ -131,13 +127,12 @@ public class CertificateFactory {
      * to get signature value of certificate
      *
      * @param certificateExtension
-     * @param properties
+     * @param encServiceUrl
      * @return
      */
-    private String getSignatureValue(CertificateExtension certificateExtension, Map<String, String> properties, String keyID) throws IOException, SignatureException.UnreachableException, SignatureException.CreationException {
-        SignatureHelper signatureHelper = new SignatureHelper(properties);
+    private String getSignatureValue(CertificateExtension certificateExtension, String encServiceUrl, String keyID) throws IOException, SignatureException.UnreachableException, SignatureException.CreationException {
+        SignatureHelper signatureHelper = new SignatureHelper(encServiceUrl);
         Map<String, Object> signMap;
-
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         String request = mapper.writeValueAsString(certificateExtension);
         JsonNode jsonNode = mapper.readTree(request);
@@ -159,6 +154,7 @@ public class CertificateFactory {
             URI uri = new URI(creator);
             String path = uri.getPath();
             idStr = path.substring(path.lastIndexOf('/') + 1);
+            idStr = idStr.substring(0, 1);
         } catch (URISyntaxException e) {
             logger.debug("Exception while getting key id from the sign-creator url : {}", e.getMessage());
         }

@@ -62,9 +62,9 @@ public class CertStoreFactory {
      * @param preview
      * @return
      */
-    public ICertStore getCertStore(StoreConfig storeConfig, String preview) {
+    public ICertStore getCertStore(StoreConfig storeConfig, Boolean preview) {
         ICertStore store = null;
-        if (BooleanUtils.toBoolean(preview)) {
+        if (preview) {
             store = new LocalStore(properties.get(JsonKey.DOMAIN_URL));
         } else if (storeConfig.isCloudStore()) {
             store = getCloudStore(storeConfig);
@@ -119,11 +119,11 @@ public class CertStoreFactory {
      * @param storeConfig
      * @return instance of azureStore or awsStore
      */
-    private CloudStore getCloudStore(StoreConfig storeConfig) {
+    public CloudStore getCloudStore(StoreConfig storeConfig) {
         CloudStore cloudStore = null;
-        if (storeConfig.getType().equals(JsonKey.AZURE)) {
+        if (JsonKey.AZURE.equals(storeConfig.getType())) {
             cloudStore = new AzureStore(storeConfig);
-        } else if (storeConfig.getType().equals(JsonKey.AWS)) {
+        } else if (JsonKey.AWS.equals(storeConfig.getType())) {
             cloudStore = new AwsStore(storeConfig);
         }
         return cloudStore;

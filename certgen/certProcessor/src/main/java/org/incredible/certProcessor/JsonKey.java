@@ -38,6 +38,9 @@ public interface JsonKey {
     String KEY="key";
     String ACCOUNT = "account";
     String containerName = "containerName";
+    String ENC_SERVICE_URL = "sunbird_cert_enc_service_url";
+    String SIGN = "sign";
+    String VERIFY = "verify";
 
 
 

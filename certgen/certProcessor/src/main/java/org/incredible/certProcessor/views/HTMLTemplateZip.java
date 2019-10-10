@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.incredible.certProcessor.store.ICertStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sunbird.cloud.storage.exception.StorageServiceException;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -129,7 +130,7 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
 
     }
 
-    private void downloadAndUnzip(String zipFileName, String targetDirectory) throws IOException {
+    private void downloadAndUnzip(String zipFileName, String targetDirectory) throws IOException, StorageServiceException {
         htmlTemplateStore.init();
         htmlTemplateStore.get(zipUrl, zipFileName, zipFilePath);
         unzip(zipFilePath + zipFileName, targetDirectory);
@@ -141,7 +142,7 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
      * @return html string
      */
     @Override
-    public String getTemplateContent(String filePath) throws IOException {
+    public String getTemplateContent(String filePath) throws IOException, StorageServiceException {
         String zipFileName = getZipFileName();
         if (content == null) {
             File targetDirectory = new File(filePath);

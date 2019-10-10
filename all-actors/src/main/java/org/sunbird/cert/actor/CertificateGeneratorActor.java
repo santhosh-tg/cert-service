@@ -3,6 +3,7 @@ package org.sunbird.cert.actor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.incredible.CertificateGenerator;
@@ -107,7 +108,7 @@ public class CertificateGeneratorActor extends BaseActor {
         String templateUrl = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
         StoreConfig storeParams = new StoreConfig(getStorageParamsFromRequestOrEnv((Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.STORE)));
         ICertStore htmlTemplateStore = certStoreFactory.getHtmlTemplateStore(templateUrl, storeParams);
-        ICertStore certStore = certStoreFactory.getCertStore(storeParams, properties.get(JsonKey.PREVIEW));
+        ICertStore certStore = certStoreFactory.getCertStore(storeParams, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
         CertMapper certMapper = new CertMapper(properties);
         List<CertModel> certModelList = certMapper.toList(request.getRequest());
         HTMLTemplateZip htmlTemplateZip;

@@ -8,6 +8,7 @@ import org.apache.velocity.runtime.parser.node.SimpleNode;
 import org.apache.velocity.runtime.visitor.BaseVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sunbird.cloud.storage.exception.StorageServiceException;
 
 
 import java.io.File;
@@ -25,7 +26,7 @@ public abstract class HTMLTemplateProvider {
     private static Set<String> htmlReferenceVariable = new HashSet<>();
 
 
-    abstract public String getTemplateContent(String filePath) throws IOException;
+    abstract public String getTemplateContent(String filePath) throws IOException, StorageServiceException;
 
 
     public static Boolean checkHtmlTemplateIsValid(String htmlString) {
