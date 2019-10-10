@@ -1,6 +1,10 @@
 #Certificate utilities
 This is a utility to create badge, issuer and public key jsons.
 
+### Refer CertUtilScripts
+Please refer the certUtilScripts in the following repository 
+        https://github.com/project-sunbird/sunbird-utils/tree/master/certUtilScripts
+
 ### Setup
 > npm install
 
