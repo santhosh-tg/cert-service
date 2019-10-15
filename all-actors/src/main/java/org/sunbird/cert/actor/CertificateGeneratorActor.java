@@ -175,6 +175,8 @@ public class CertificateGeneratorActor extends BaseActor {
         String tag = (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.TAG);
         String preview = (String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE)).get(JsonKey.PREVIEW);
         Map<String, Object> keysObject = (Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.KEYS);
+        certVar.setBasePath((String) ((Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE))
+                .get(JsonKey.BASE_PATH));
         if (MapUtils.isNotEmpty(keysObject)) {
             String keyId = (String) keysObject.get(JsonKey.ID);
             properties.put(JsonKey.KEY_ID, keyId);
@@ -184,7 +186,6 @@ public class CertificateGeneratorActor extends BaseActor {
         }
         properties.put(JsonKey.TAG, tag);
         properties.put(JsonKey.CONTAINER_NAME, certVar.getCONTAINER_NAME());
-        properties.put(JsonKey.DOMAIN_URL, certVar.getDOMAIN_URL());
         properties.put(JsonKey.BADGE_URL, certVar.getBADGE_URL(tag));
         properties.put(JsonKey.ISSUER_URL, certVar.getISSUER_URL());
         properties.put(JsonKey.CONTEXT, certVar.getCONTEXT());
@@ -196,6 +197,7 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.SIGNATORY_EXTENSION, certVar.getSignatoryExtensionUrl());
         properties.put(JsonKey.SLUG, certVar.getSlug());
         properties.put(JsonKey.PREVIEW, certVar.getPreview(preview));
+        properties.put(JsonKey.BASE_PATH, certVar.getBasePath());
 
         logger.info("CertificateGeneratorActor:getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;

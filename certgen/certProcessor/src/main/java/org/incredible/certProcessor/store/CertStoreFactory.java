@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.incredible.certProcessor.JsonKey;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -64,12 +66,17 @@ public class CertStoreFactory {
      */
     public ICertStore getCertStore(StoreConfig storeConfig, Boolean preview) {
         ICertStore store = null;
-        if (preview) {
-            store = new LocalStore(properties.get(JsonKey.DOMAIN_URL));
-        } else if (storeConfig.isCloudStore()) {
-            store = getCloudStore(storeConfig);
-        } else {
-            store = new LocalStore(properties.get(JsonKey.DOMAIN_URL));
+        try {
+            String domainUrl = StringUtils.remove(properties.get(JsonKey.BASE_PATH), new URL(properties.get(JsonKey.BASE_PATH)).getPath());
+            if (preview) {
+                store = new LocalStore(domainUrl);
+            } else if (storeConfig.isCloudStore()) {
+                store = getCloudStore(storeConfig);
+            } else {
+                store = new LocalStore(domainUrl);
+            }
+        } catch (MalformedURLException e) {
+
         }
         return store;
     }

@@ -3,6 +3,7 @@ package controllers.certs;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.UrlValidator;
 import org.sunbird.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
@@ -37,7 +38,11 @@ public class CertValidator {
         validateCertData((List<Map<String, Object>>) certReq.get(JsonKey.DATA));
         validateCertIssuer((Map<String, Object>) certReq.get(JsonKey.ISSUER));
         validateCertSignatoryList((List<Map<String, Object>>) certReq.get(JsonKey.SIGNATORY_LIST));
-        if(certReq.containsKey(JsonKey.STORE)) {
+        String basePath = (String) certReq.get(JsonKey.BASE_PATH);
+        if(StringUtils.isNotBlank(basePath))    {
+            validateBasePath(basePath);
+        }
+        if (certReq.containsKey(JsonKey.STORE)) {
             validateStore((Map<String, Object>) certReq.get(JsonKey.STORE));
         }
         if (certReq.containsKey(JsonKey.KEYS)) {
@@ -152,6 +157,17 @@ public class CertValidator {
         if(!StorageType.get().contains(data.get(JsonKey.TYPE)))  {
             throw new BaseException("INVALID_PARAM_VALUE",
                     MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE, data.get(JsonKey.TYPE), parentKey + "." + JsonKey.TYPE),
+                    ResponseCode.CLIENT_ERROR.getCode());
+        }
+    }
+
+    private static void validateBasePath(String basePath) throws BaseException {
+        UrlValidator urlValidator = new UrlValidator();
+        boolean isValid = urlValidator.isValid(basePath);
+        if (!isValid) {
+            throw new BaseException("INVALID_PARAM_VALUE",
+                    MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE, basePath, JsonKey.CERTIFICATE
+                            + "." + JsonKey.BASE_PATH),
                     ResponseCode.CLIENT_ERROR.getCode());
         }
     }

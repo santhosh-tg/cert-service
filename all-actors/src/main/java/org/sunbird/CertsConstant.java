@@ -26,28 +26,40 @@ public class CertsConstant {
     private String CONTAINER_NAME;
     private static final String ENC_SERVICE_URL = getEncServiceUrl();
     private String CLOUD_STORAGE_TYPE;
+    private static String BASE_PATH;
     private static final String SLUG = getSlugFormEnv();
     private static final String DOMAIN_SLUG = DOMAIN_URL + "/" + SLUG;
 
     public String getBADGE_URL(String tag) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(DOMAIN_URL + "/" + SLUG);
+        stringBuilder.append(BASE_PATH);
         if (StringUtils.isNotEmpty(tag))
             stringBuilder.append("/" + tag);
         return stringBuilder.append("/" + BADGE_URL).toString();
     }
 
+    public void setBasePath(String basePath) {
+        if (StringUtils.isNotBlank(basePath)) {
+            BASE_PATH = basePath;
+        } else {
+            BASE_PATH = DOMAIN_URL + "/" + SLUG;
+        }
+    }
+
+    public String getBasePath() {
+        return BASE_PATH;
+    }
 
     public String getISSUER_URL() {
-        return DOMAIN_SLUG + "/" + ISSUER_URL;
+        return BASE_PATH + "/" + ISSUER_URL;
     }
 
     public String getCONTEXT() {
-        return String.format("%s/%s/%s", DOMAIN_URL, SLUG, CONTEXT);
+        return String.format("%s/%s", BASE_PATH, CONTEXT);
     }
 
     public String getPUBLIC_KEY_URL(String keyId) {
-        return DOMAIN_SLUG + "/" + JsonKey.KEYS + "/" + keyId + PUBLIC_KEY_URL;
+        return BASE_PATH + "/" + JsonKey.KEYS + "/" + keyId + PUBLIC_KEY_URL;
     }
 
     public String getVERIFICATION_TYPE() {
@@ -117,7 +129,7 @@ public class CertsConstant {
 
 
     public String getSignCreator(String keyId) {
-        return DOMAIN_SLUG + "/" + keyId + PUBLIC_KEY_URL;
+        return BASE_PATH + "/" + keyId + PUBLIC_KEY_URL;
     }
 
     public String getEncryptionServiceUrl() {
@@ -156,7 +168,7 @@ public class CertsConstant {
     }
 
     public String getSignatoryExtensionUrl() {
-        return String.format("%s/%s/%s/%s", DOMAIN_URL, SLUG, SIGNATORY_EXTENSION, "context.json");
+        return String.format("%s/%s/%s", BASE_PATH, SIGNATORY_EXTENSION, "context.json");
     }
 
 

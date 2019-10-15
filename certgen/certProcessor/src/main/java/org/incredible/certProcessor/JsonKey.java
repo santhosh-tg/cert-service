@@ -41,7 +41,7 @@ public interface JsonKey {
     String ENC_SERVICE_URL = "sunbird_cert_enc_service_url";
     String SIGN = "sign";
     String VERIFY = "verify";
-
+    String BASE_PATH = "basePath";
 
 
 }
