@@ -24,8 +24,12 @@ public class HTMLVarResolver {
         return certificateExtension.getRecipient().getName();
     }
 
+    public String getRecipientId() {
+        return certificateExtension.getRecipient().getIdentity();
+    }
 
     public String getCourseName() {
+        //todo need to resolve
         return certificateExtension.getBadge().getName();
     }
 
@@ -40,17 +44,6 @@ public class HTMLVarResolver {
             return null;
         }
     }
-
-
-    public String getTitle() {
-        return "certificate";
-    }
-
-
-    public String getDated() {
-        return certificateExtension.getIssuedOn();
-    }
-
 
     public String getIssuedDate() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -74,9 +67,24 @@ public class HTMLVarResolver {
         return certificateExtension.getSignatory()[0].getDesignation();
     }
 
+    public String getSignatory1Image() {
+        return certificateExtension.getSignatory()[1].getImage();
+    }
+
+    public String getSignatory1Designation() {
+        return certificateExtension.getSignatory()[1].getDesignation();
+    }
+
     public String getCertificateName() {
         return certificateExtension.getBadge().getName();
     }
 
+    public String getcertificateDescription() {
+        return certificateExtension.getBadge().getDescription();
+    }
+
+    public String getExpiryDate() {
+        return certificateExtension.getExpires();
+    }
 
 }
