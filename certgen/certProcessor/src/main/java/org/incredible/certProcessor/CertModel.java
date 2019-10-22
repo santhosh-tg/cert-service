@@ -3,6 +3,7 @@ package org.incredible.certProcessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.incredible.pojos.SignatoryExtension;
+import org.incredible.pojos.ob.Criteria;
 import org.incredible.pojos.ob.Issuer;
 
 
@@ -37,6 +38,10 @@ public class CertModel {
     private SignatoryExtension[] signatoryList;
     private String assessedOn;
     private String identifier;
+    /**
+     * Mandatory
+     */
+    private Criteria criteria;
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -165,6 +170,14 @@ public class CertModel {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public Criteria getCriteria() {
+        return criteria;
+    }
+
+    public void setCriteria(Criteria criteria) {
+        this.criteria = criteria;
     }
 
     @Override

@@ -38,6 +38,7 @@ public class CertValidator {
         validateCertData((List<Map<String, Object>>) certReq.get(JsonKey.DATA));
         validateCertIssuer((Map<String, Object>) certReq.get(JsonKey.ISSUER));
         validateCertSignatoryList((List<Map<String, Object>>) certReq.get(JsonKey.SIGNATORY_LIST));
+        validateCriteria((Map<String, Object>) certReq.get(JsonKey.CRITERIA));
         String basePath = (String) certReq.get(JsonKey.BASE_PATH);
         if(StringUtils.isNotBlank(basePath))    {
             validateBasePath(basePath);
@@ -57,6 +58,10 @@ public class CertValidator {
     private static void validateCertIssuer(Map<String, Object> issuer) throws BaseException {
         checkMandatoryParamsPresent(issuer, JsonKey.CERTIFICATE + "." + JsonKey.ISSUER, Arrays.asList(JsonKey.NAME, JsonKey.URL));
         publicKeys = (List<String>) issuer.get(JsonKey.PUBLIC_KEY);
+    }
+
+    private static void validateCriteria(Map<String, Object> criteria) throws BaseException {
+        checkMandatoryParamsPresent(criteria, JsonKey.CERTIFICATE + "." + JsonKey.CRITERIA, Arrays.asList(JsonKey.NARRATIVE));
     }
 
     private static void validateCertData(List<Map<String, Object>> data) throws BaseException {

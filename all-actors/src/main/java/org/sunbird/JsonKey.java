@@ -111,5 +111,7 @@ public interface JsonKey {
     String HOSTED = "hosted";
     String SIGNED_BADGE = "SignedBadge";
     String EXPIRES = "expires";
+    String CRITERIA = "criteria";
+    String NARRATIVE = "narrative";
     String BASE_PATH = "basePath";
 }

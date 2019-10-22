@@ -8,7 +8,6 @@ import org.incredible.builders.*;
 import org.incredible.certProcessor.signature.SignatureHelper;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.pojos.CertificateExtension;
-import org.incredible.pojos.ob.Criteria;
 
 import java.io.IOException;
 import java.net.URI;
@@ -45,9 +44,6 @@ public class CertificateFactory {
         SignedVerification signedVerification = new SignedVerification();
         SignatureBuilder signatureBuilder = new SignatureBuilder();
 
-        Criteria criteria = new Criteria();
-        criteria.setId(basePath);
-        criteria.setNarrative(certModel.getCertificateDescription());
 
         /**
          *  recipient object
@@ -65,7 +61,7 @@ public class CertificateFactory {
          * **/
 
         badgeClassBuilder.setName(certModel.getCourseName()).setDescription(certModel.getCertificateDescription())
-                .setId(properties.get(JsonKey.BADGE_URL)).setCriteria(criteria)
+                .setId(properties.get(JsonKey.BADGE_URL)).setCriteria(certModel.getCriteria())
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
 
