@@ -3,6 +3,7 @@ package org.sunbird;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.pojos.SignatoryExtension;
@@ -27,7 +28,11 @@ public class CertMapper {
     public List<CertModel> toList(Map<String, Object> request) {
         Map<String, Object> json = (Map<String, Object>) request.get(JsonKey.CERTIFICATE);
         List<Map<String, Object>> dataList = (List<Map<String, Object>>) json.get(JsonKey.DATA);
-        Issuer issuer = getIssuer((Map<String, Object>) json.get(JsonKey.ISSUER));
+        Map<String, Object> issuerData = (Map<String, Object>) json.get(JsonKey.ISSUER);
+        Issuer issuer = getIssuer(issuerData);
+        List<String> publicKeys = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY),
+                (Map<String, Object>) json.get(JsonKey.KEYS));
+        issuer.setPublicKey(publicKeys.toArray(new String[0]));
         SignatoryExtension[] signatoryArr = getSignatoryArray((List<Map<String, Object>>) json.get(JsonKey.SIGNATORY_LIST));
         Criteria criteria = getCriteria((Map<String, Object>) json.get(JsonKey.CRITERIA));
         List<CertModel> certList = dataList.stream().map(data -> getCertModel(data)).collect(Collectors.toList());
@@ -74,13 +79,6 @@ public class CertMapper {
         Issuer issuer = new Issuer(properties.get(JsonKey.CONTEXT));
         issuer.setName((String) issuerData.get(JsonKey.NAME));
         issuer.setUrl((String) issuerData.get(JsonKey.URL));
-        if (issuerData.containsKey(JsonKey.PUBLIC_KEY)) {
-            List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY));
-            if (CollectionUtils.isNotEmpty(keyList)) {
-                String[] keyArr = keyList.stream().toArray(String[]::new);
-                issuer.setPublicKey(keyArr);
-            }
-        }
         return issuer;
     }
 
@@ -99,17 +97,22 @@ public class CertMapper {
         return certModel;
     }
 
-    private List<String> validatePublicKeys(List<String> publicKeys) {
+    private List<String> validatePublicKeys(List<String> publicKeys, Map<String, Object> keys) {
+        if (CollectionUtils.isEmpty(publicKeys) && MapUtils.isNotEmpty(keys)) {
+            publicKeys = new ArrayList<>();
+            publicKeys.add((String) keys.get(JsonKey.ID));
+        }
         List<String> validatedPublicKeys = new ArrayList<>();
-        publicKeys.forEach((publicKey) -> {
-            if (!publicKey.startsWith("http")) {
-                validatedPublicKeys.add(properties.get(JsonKey.BASE_PATH)
-                        .concat("/") + JsonKey.KEYS.concat("/") + publicKey.concat("_publicKey.json"));
-            } else {
-                validatedPublicKeys.add(publicKey);
-            }
-        });
-
+        if (CollectionUtils.isNotEmpty(publicKeys)) {
+            publicKeys.forEach((publicKey) -> {
+                if (!publicKey.startsWith("http")) {
+                    validatedPublicKeys.add(properties.get(JsonKey.BASE_PATH)
+                            .concat("/") + JsonKey.KEYS.concat("/") + publicKey.concat("_publicKey.json"));
+                } else {
+                    validatedPublicKeys.add(publicKey);
+                }
+            });
+        }
         return validatedPublicKeys;
     }
 }

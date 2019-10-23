@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class CertValidator {
 
-    private static List<String> publicKeys;
+    private List<String> publicKeys;
 
     /**
      * This method will validate generate certificate request
@@ -31,7 +31,7 @@ public class CertValidator {
      * @param request
      * @throws BaseException
      */
-    public static void validateGenerateCertRequest(Request request) throws BaseException {
+    public void validateGenerateCertRequest(Request request) throws BaseException {
 
         Map<String, Object> certReq = (Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE);
         checkMandatoryParamsPresent(certReq, JsonKey.CERTIFICATE, Arrays.asList(JsonKey.COURSE_NAME, JsonKey.NAME, JsonKey.HTML_TEMPLATE));
@@ -40,7 +40,7 @@ public class CertValidator {
         validateCertSignatoryList((List<Map<String, Object>>) certReq.get(JsonKey.SIGNATORY_LIST));
         validateCriteria((Map<String, Object>) certReq.get(JsonKey.CRITERIA));
         String basePath = (String) certReq.get(JsonKey.BASE_PATH);
-        if(StringUtils.isNotBlank(basePath))    {
+        if (StringUtils.isNotBlank(basePath)) {
             validateBasePath(basePath);
         }
         if (certReq.containsKey(JsonKey.STORE)) {
@@ -51,26 +51,28 @@ public class CertValidator {
         }
     }
 
-    private static void validateCertSignatoryList(List<Map<String, Object>> signatoryList) throws BaseException {
+    private void validateCertSignatoryList(List<Map<String, Object>> signatoryList) throws BaseException {
         checkMandatoryParamsPresent(signatoryList, JsonKey.CERTIFICATE + "." + JsonKey.SIGNATORY_LIST, Arrays.asList(JsonKey.NAME, JsonKey.ID, JsonKey.DESIGNATION, JsonKey.SIGNATORY_IMAGE));
     }
 
-    private static void validateCertIssuer(Map<String, Object> issuer) throws BaseException {
+    private void validateCertIssuer(Map<String, Object> issuer) throws BaseException {
         checkMandatoryParamsPresent(issuer, JsonKey.CERTIFICATE + "." + JsonKey.ISSUER, Arrays.asList(JsonKey.NAME, JsonKey.URL));
         publicKeys = (List<String>) issuer.get(JsonKey.PUBLIC_KEY);
     }
 
-    private static void validateCriteria(Map<String, Object> criteria) throws BaseException {
+    private void validateCriteria(Map<String, Object> criteria) throws BaseException {
         checkMandatoryParamsPresent(criteria, JsonKey.CERTIFICATE + "." + JsonKey.CRITERIA, Arrays.asList(JsonKey.NARRATIVE));
     }
 
-    private static void validateCertData(List<Map<String, Object>> data) throws BaseException {
+    private void validateCertData(List<Map<String, Object>> data) throws BaseException {
         checkMandatoryParamsPresent(data, JsonKey.CERTIFICATE + "." + JsonKey.DATA, Arrays.asList(JsonKey.RECIPIENT_NAME));
     }
 
-    private static void validateKeys(Map<String, Object> keys) throws BaseException {
+    private void validateKeys(Map<String, Object> keys) throws BaseException {
         checkMandatoryParamsPresent(keys, JsonKey.CERTIFICATE + "." + JsonKey.KEYS, Arrays.asList(JsonKey.ID));
-        validateIssuerPublicKeys(keys);
+        if (CollectionUtils.isNotEmpty(publicKeys)) {
+            validateIssuerPublicKeys(keys);
+        }
     }
 
     /**
@@ -80,17 +82,15 @@ public class CertValidator {
      * @param keys
      * @throws BaseException
      */
-    private static void validateIssuerPublicKeys(Map<String, Object> keys) throws BaseException {
+    private void validateIssuerPublicKeys(Map<String, Object> keys) throws BaseException {
         List<String> keyIds = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(publicKeys)) {
-            publicKeys.forEach((publicKey) -> {
-                if (publicKey.startsWith("http")) {
-                    keyIds.add(getKeyFromPublicKeyUrl(publicKey));
-                } else {
-                    keyIds.add(publicKey);
-                }
-            });
-        }
+        publicKeys.forEach((publicKey) -> {
+            if (publicKey.startsWith("http")) {
+                keyIds.add(getKeyFromPublicKeyUrl(publicKey));
+            } else {
+                keyIds.add(publicKey);
+            }
+        });
         if (!keyIds.contains(keys.get(JsonKey.ID))) {
             throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,
                     publicKeys, JsonKey.CERTIFICATE + "." + JsonKey.ISSUER + "." + JsonKey.PUBLIC_KEY)
@@ -105,7 +105,7 @@ public class CertValidator {
      * @param publicKey
      * @return
      */
-    private static String getKeyFromPublicKeyUrl(String publicKey) {
+    private String getKeyFromPublicKeyUrl(String publicKey) {
         String idStr = null;
         try {
             URI uri = new URI(publicKey);
@@ -117,7 +117,7 @@ public class CertValidator {
         return idStr;
     }
 
-    private static void checkMandatoryParamsPresent(
+    private void checkMandatoryParamsPresent(
             List<Map<String, Object>> data, String parentKey, List<String> keys) throws BaseException {
         if (CollectionUtils.isEmpty(data)) {
             throw new BaseException("MANDATORY_PARAMETER_MISSING",
@@ -130,7 +130,7 @@ public class CertValidator {
 
     }
 
-    private static void checkMandatoryParamsPresent(
+    private void checkMandatoryParamsPresent(
             Map<String, Object> data, String parentKey, List<String> keys) throws BaseException {
         if (MapUtils.isEmpty(data)) {
             throw new BaseException("MANDATORY_PARAMETER_MISSING",
@@ -140,7 +140,7 @@ public class CertValidator {
         checkChildrenMapMandatoryParams(data, keys, parentKey);
     }
 
-    private static void checkChildrenMapMandatoryParams(Map<String, Object> data, List<String> keys, String parentKey) throws BaseException {
+    private void checkChildrenMapMandatoryParams(Map<String, Object> data, List<String> keys, String parentKey) throws BaseException {
 
         for (String key : keys) {
             if (StringUtils.isBlank((String) data.get(key))) {
@@ -151,22 +151,22 @@ public class CertValidator {
         }
     }
 
-    private static void validateStore(Map<String, Object> store)  throws   BaseException{
+    private void validateStore(Map<String, Object> store) throws BaseException {
         checkMandatoryParamsPresent(store, JsonKey.CERTIFICATE + "." + JsonKey.STORE, Arrays.asList(JsonKey.TYPE));
         validateStorageType(store, JsonKey.CERTIFICATE + "." + JsonKey.STORE);
-        checkMandatoryParamsPresent((Map<String, Object>)store.get(store.get(JsonKey.TYPE)), JsonKey.CERTIFICATE + "." + JsonKey.STORE + "."
+        checkMandatoryParamsPresent((Map<String, Object>) store.get(store.get(JsonKey.TYPE)), JsonKey.CERTIFICATE + "." + JsonKey.STORE + "."
                 + store.get(JsonKey.TYPE), Arrays.asList(JsonKey.containerName, JsonKey.ACCOUNT, JsonKey.key));
     }
 
-    private static void validateStorageType(Map<String, Object> data, String parentKey) throws BaseException {
-        if(!StorageType.get().contains(data.get(JsonKey.TYPE)))  {
+    private void validateStorageType(Map<String, Object> data, String parentKey) throws BaseException {
+        if (!StorageType.get().contains(data.get(JsonKey.TYPE))) {
             throw new BaseException("INVALID_PARAM_VALUE",
                     MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE, data.get(JsonKey.TYPE), parentKey + "." + JsonKey.TYPE),
                     ResponseCode.CLIENT_ERROR.getCode());
         }
     }
 
-    private static void validateBasePath(String basePath) throws BaseException {
+    private void validateBasePath(String basePath) throws BaseException {
         UrlValidator urlValidator = new UrlValidator();
         boolean isValid = urlValidator.isValid(basePath);
         if (!isValid) {
