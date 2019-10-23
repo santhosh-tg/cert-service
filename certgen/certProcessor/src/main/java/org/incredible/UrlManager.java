@@ -30,7 +30,7 @@ public class UrlManager {
         }
     }
     private static String removeContainerName(String url,String containerName){
-        String containerNameStr="/".concat(containerName).concat("/");
+        String containerNameStr="/".concat(containerName);
         logger.info("UrlManager:removeContainerName:container string formed:".concat(containerNameStr));
         return url.replace(containerNameStr,"");
     }

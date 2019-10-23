@@ -36,7 +36,7 @@ public class CertificateFactory {
             throws InvalidDateFormatException, SignatureException.UnreachableException, IOException, SignatureException.CreationException {
 
         String basePath = getDomainUrl(properties);
-        uuid = basePath + "/" + UUID.randomUUID().toString() + ".json";
+        uuid = basePath + "/" + UUID.randomUUID().toString();
         CertificateExtensionBuilder certificateExtensionBuilder = new CertificateExtensionBuilder(properties.get(JsonKey.CONTEXT));
         CompositeIdentityObjectBuilder compositeIdentityObjectBuilder = new CompositeIdentityObjectBuilder(properties.get(JsonKey.CONTEXT));
         BadgeClassBuilder badgeClassBuilder = new BadgeClassBuilder(properties.get(JsonKey.CONTEXT));

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * This class contains method to validate certificate api request
@@ -24,6 +25,8 @@ import java.util.Map;
 public class CertValidator {
 
     private List<String> publicKeys;
+
+    private static final String TAG_REGX = "[!@#$%^&*()+=,.?\":;'{}|<>\\s-]";
 
     /**
      * This method will validate generate certificate request
@@ -39,6 +42,7 @@ public class CertValidator {
         validateCertIssuer((Map<String, Object>) certReq.get(JsonKey.ISSUER));
         validateCertSignatoryList((List<Map<String, Object>>) certReq.get(JsonKey.SIGNATORY_LIST));
         validateCriteria((Map<String, Object>) certReq.get(JsonKey.CRITERIA));
+        validateTagId((String) certReq.get(JsonKey.TAG));
         String basePath = (String) certReq.get(JsonKey.BASE_PATH);
         if (StringUtils.isNotBlank(basePath)) {
             validateBasePath(basePath);
@@ -174,6 +178,16 @@ public class CertValidator {
                     MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE, basePath, JsonKey.CERTIFICATE
                             + "." + JsonKey.BASE_PATH),
                     ResponseCode.CLIENT_ERROR.getCode());
+        }
+    }
+
+    private static void validateTagId(String tag) throws BaseException {
+        if(StringUtils.isNotBlank(tag)) {
+            Pattern pattern = Pattern.compile(TAG_REGX);
+            if (pattern.matcher(tag).find()) {
+                throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE
+                        , tag, JsonKey.TAG), ResponseCode.CLIENT_ERROR.getCode());
+            }
         }
     }
 
