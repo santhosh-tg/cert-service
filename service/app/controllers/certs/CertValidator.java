@@ -26,7 +26,7 @@ public class CertValidator {
 
     private List<String> publicKeys;
 
-    private static final String TAG_REGX = "[!@#$%^&*()+=,.?\":;'{}|<>\\s-]";
+    private static final String TAG_REGX = "[!@#$%^&*()+=,.?/\":;'{}|<>\\s-]";
 
     /**
      * This method will validate generate certificate request
@@ -181,7 +181,12 @@ public class CertValidator {
         }
     }
 
-    private static void validateTagId(String tag) throws BaseException {
+    /**
+     * validates tagId , if tagId contains any special character except '_' then tagId is invalid
+     * @param tag
+     * @throws BaseException
+     */
+    private void validateTagId(String tag) throws BaseException {
         if(StringUtils.isNotBlank(tag)) {
             Pattern pattern = Pattern.compile(TAG_REGX);
             if (pattern.matcher(tag).find()) {

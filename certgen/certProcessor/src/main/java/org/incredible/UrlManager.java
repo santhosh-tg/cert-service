@@ -3,6 +3,7 @@ package org.incredible;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class UrlManager {
@@ -33,5 +34,22 @@ public class UrlManager {
         String containerNameStr="/".concat(containerName);
         logger.info("UrlManager:removeContainerName:container string formed:".concat(containerNameStr));
         return url.replace(containerNameStr,"");
+    }
+
+    /**
+     * getting substring from url after domainUrl/slug
+     * for example for the url  domainUrl/slug/tagId/uuid.pdf then return tagId/uuid.pdf
+     * @param url
+     * @return
+     * @throws MalformedURLException
+     */
+    public static String getContainerRelativePath(String url) throws MalformedURLException {
+        if (url.startsWith("http")) {
+            String uri = StringUtils.substringAfter(new URL(url).getPath(), "/");
+            String[] path = uri.split("/");
+            return StringUtils.join(path, "/", path.length - 2, path.length);
+        } else {
+            return url;
+        }
     }
 }
