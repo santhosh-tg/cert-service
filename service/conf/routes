@@ -12,3 +12,9 @@ POST /v1/certs/verify                      @controllers.certs.CertsGenerationCon
 GET  /assets/*file        controllers.Assets.at(path="/public", file)
 # Logs Management APIs
 # POST    /v1.3/system/log/update            @controllers.logsmanager.LogController.setLogLevel()
+
+# Certificate Template APIs
+
+POST /v1/cert/template/create @controllers.certs.CertTemplateController.create()
+PATCH /v1/cert/template/update/:identifier @controllers.certs.CertTemplateController.update(identifier: String)
+GET /v1/cert/template/read/:identifier @controllers.certs.CertTemplateController.read(identifier: String)
