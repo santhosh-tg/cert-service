@@ -193,7 +193,7 @@
         <repository>
             <id>oss-sonatype</id>
             <name>oss-sonatype</name>
-            <url>https://oss.sonatype.org/content/repositories/orgsunbird-1033</url>
+            <url>https://oss.sonatype.org/content/repositories/orgsunbird-1069</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
