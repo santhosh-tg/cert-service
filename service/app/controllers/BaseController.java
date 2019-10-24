@@ -39,7 +39,7 @@ public class BaseController extends Controller {
 	 * We injected HttpExecutionContext to decrease the response time of APIs.
 	 */
 	@Inject
-	private HttpExecutionContext httpExecutionContext;
+	protected HttpExecutionContext httpExecutionContext;
 	protected final static Localizer localizerObject = Localizer.getInstance();
 	public static final String RESPONSE = "Response";
 	public static final String SUCCESS = "Success";
