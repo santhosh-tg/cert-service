@@ -29,7 +29,7 @@ public class ApplicationStart {
 	  public ApplicationStart(ApplicationLifecycle lifecycle, Environment environment) {
 	  	//instantiate actor system and initialize all the actors
 		  Application.getInstance().init();
-		  ElasticSearchUtil.initialiseESClient("cert-templates", Platform.config.getString("search.es_conn_info"));
+		  ElasticSearchUtil.initialiseESClient("cert-templates", Platform.config.getString("es_conn_info"));
 	    // Shut-down hook
 	    lifecycle.addStopHook(
 	        () -> {
