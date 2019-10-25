@@ -150,7 +150,8 @@ public class CertificateFactory {
             URI uri = new URI(creator);
             String path = uri.getPath();
             idStr = path.substring(path.lastIndexOf('/') + 1);
-            idStr = idStr.substring(0, 1);
+            idStr = idStr.split("_")[0];
+            logger.info("CertificateFactory:getKeyId " + idStr);
         } catch (URISyntaxException e) {
             logger.debug("Exception while getting key id from the sign-creator url : {}", e.getMessage());
         }

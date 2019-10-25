@@ -94,11 +94,11 @@ public class SignatureHelper {
                     });
 
         } catch (ClientProtocolException ex) {
-            logger.error("ClientProtocolException when verifying: ", ex);
+            logger.error("ClientProtocolException when verifying: {}", ex.getMessage());
             throw new SignatureException().new UnreachableException(ex.getMessage());
         } catch (Exception e) {
-            logger.error("Exception occurred  while verifying signature: ", e);
-            throw new SignatureException().new VerificationException(e.getMessage());
+            logger.error("Exception occurred  while verifying signature:{} ", e.getMessage());
+            throw new SignatureException().new VerificationException("");
         }
         logger.debug("verify method ends with value {}", result);
         return result;
