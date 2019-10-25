@@ -7,6 +7,8 @@ import javax.inject.Singleton;
 
 import org.sunbird.Application;
 
+import org.sunbird.common.Platform;
+import org.sunbird.es.ElasticSearchUtil;
 import play.api.Environment;
 import play.api.inject.ApplicationLifecycle;
 
@@ -27,6 +29,7 @@ public class ApplicationStart {
 	  public ApplicationStart(ApplicationLifecycle lifecycle, Environment environment) {
 	  	//instantiate actor system and initialize all the actors
 		  Application.getInstance().init();
+		  ElasticSearchUtil.initialiseESClient("cert-templates", Platform.config.getString("search.es_conn_info"));
 	    // Shut-down hook
 	    lifecycle.addStopHook(
 	        () -> {
