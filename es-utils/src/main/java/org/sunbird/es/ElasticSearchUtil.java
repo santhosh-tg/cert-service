@@ -110,7 +110,7 @@ public class ElasticSearchUtil {
 
 	}
 
-	private void actionListener() {
+	private static CompletableFuture<Map<String, Object>> actionListener() {
 		CompletableFuture<Map<String, Object>> future = new CompletableFuture<>();
 		new ActionListener<IndexResponse>() {
 			@Override
@@ -126,18 +126,34 @@ public class ElasticSearchUtil {
 				future.completeExceptionally(e);
 			}
 		};
+		return future;
 	}
 
-	public static void addDocument(String indexName, String documentType, Map<String, Object> doc, String documentId) {
+	public static CompletableFuture<Map<String, Object>> addDocument(String indexName, String documentType, Map<String, Object> doc, String documentId) {
+		CompletableFuture<Map<String, Object>> future = new CompletableFuture<>();
 		try {
 			IndexRequest indexRequest = (StringUtils.isNotBlank(documentId)) ?
 					new IndexRequest(indexName, documentType, documentId) : new IndexRequest(indexName, documentType);
 			IndexResponse response = getClient(indexName).index(indexRequest.source(doc));
-			System.out.println("Added " + response.getId() + " to index " + response.getIndex() + " response: " + response.status().getStatus());
+			getClient(indexName).indexAsync(indexRequest.source(doc), new ActionListener<IndexResponse>() {
+				@Override
+				public void onResponse(IndexResponse indexResponse) {
+					System.out.println("Added " + response.getId() + " to index " + response.getIndex() + " response: " + response.status().getStatus());
+					future.complete(new HashMap<String, Object>(){{
+						put("identifier", response.getId());
+					}});
+				}
+				@Override
+				public void onFailure(Exception e) {
+					future.completeExceptionally(e);
+				}
+			});
 		} catch (IOException e) {
 			e.printStackTrace();
+			future.completeExceptionally(e);
 			System.out.println("Error while adding document to index :" + indexName);
 		}
+		return future;
 	}
 
 	public static void updateDocument(String indexName, String documentType, String document, String documentId) {
@@ -162,10 +178,19 @@ public class ElasticSearchUtil {
 		System.out.println("Deleted " + response.getId() + " to index " + response.getIndex());
 	}
 
-	public static Map<String, Object> getDocument(String indexName, String documentType, String documentId)
-			throws IOException {
-		GetResponse response = getClient(indexName).get(new GetRequest(indexName, documentType, documentId));
-		return response.getSource();
+	public static CompletableFuture<Map<String, Object>> getDocument(String indexName, String documentType, String documentId) {
+		CompletableFuture<Map<String, Object>> future = new CompletableFuture<>();
+		getClient(indexName).getAsync(new GetRequest(indexName, documentType, documentId), new ActionListener<GetResponse>() {
+			@Override
+			public void onResponse(GetResponse documentFields) {
+				future.complete(documentFields.getSource());
+			}
+			@Override
+			public void onFailure(Exception e) {
+				future.completeExceptionally(e);
+			}
+		});
+		return future;
 	}
 
 	@SuppressWarnings("rawtypes")

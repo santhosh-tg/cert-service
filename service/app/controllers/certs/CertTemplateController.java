@@ -6,7 +6,9 @@ import controllers.RequestHandler;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.sunbird.BaseException;
+import org.sunbird.JsonKey;
 import org.sunbird.es.ElasticSearchUtil;
+import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
@@ -34,10 +36,32 @@ public class CertTemplateController extends BaseController {
             String identifier = (String) template.get("identifier");
             if (StringUtils.isBlank(identifier))
                 identifier = UUID.randomUUID() + "";
-            ElasticSearchUtil.addDocument(indexName, docType, template, identifier);
-            Map<String, Object> result = new HashMap<>();
-            result.put("identifier", identifier);
-            return returnResponse(result);
+            CompletableFuture<Map<String, Object>> future = ElasticSearchUtil.addDocument(indexName, docType, template, identifier);
+            return future.handleAsync((map, exception) -> {
+                Response response = new Response();
+                if (null != exception) {
+                    if (exception instanceof BaseException) {
+                        BaseException ex = (BaseException) exception;
+                        response.setResponseCode(ResponseCode.BAD_REQUEST);
+                        response.put(JsonKey.MESSAGE, ex.getMessage());
+                    } else {
+                        response.setResponseCode(ResponseCode.SERVER_ERROR);
+                        response.put(JsonKey.MESSAGE,localizerObject.getMessage(IResponseMessage.INTERNAL_ERROR,null));
+                    }
+                } else {
+                    response.putAll(map);
+                }
+                return response;
+            }).thenApplyAsync(response -> {
+                JsonNode jsonNode = Json.toJson(response);
+                if(StringUtils.equalsIgnoreCase(response.getResponseCode().name(), ResponseCode.BAD_REQUEST.name())) {
+                    return Results.badRequest(jsonNode);
+                } else if (StringUtils.equalsIgnoreCase(response.getResponseCode().name(), ResponseCode.SERVER_ERROR.name())) {
+                    return Results.internalServerError(jsonNode);
+                }
+                return Results.ok(jsonNode);
+            });
+
         } catch (Exception ex) {
             ex.printStackTrace();
             return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
@@ -51,19 +75,40 @@ public class CertTemplateController extends BaseController {
     }
 
     public CompletionStage<Result> read(String identifier) {
-        CompletableFuture<JsonNode> future = new CompletableFuture<>();
-        Response response = new Response();
-        try {
-            Map<String, Object> template = ElasticSearchUtil.getDocument(indexName, docType, identifier);
-            response.put("certificate", new HashMap<String, Object>() {{
-                put("template", template);
-            }});
-            future.complete(Json.toJson(response));
-            return future.thenApplyAsync(Results::ok, httpExecutionContext.current());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
-        }
+        return ElasticSearchUtil.getDocument(indexName, docType, identifier)
+                .handleAsync((template, exception) -> {
+                    Response response = new Response();
+                    if (null != exception) {
+                        if (exception instanceof BaseException) {
+                            BaseException ex = (BaseException) exception;
+                            response.setResponseCode(ResponseCode.BAD_REQUEST);
+                            response.put(JsonKey.MESSAGE, ex.getMessage());
+                        } else {
+                            response.setResponseCode(ResponseCode.SERVER_ERROR);
+                            response.put(JsonKey.MESSAGE,localizerObject.getMessage(IResponseMessage.INTERNAL_ERROR,null));
+                        }
+                    } else {
+                        if(MapUtils.isNotEmpty(template)) {
+                            response.put("certificate", new HashMap<String, Object>() {{
+                                put("template", template);
+                            }});
+                        } else {
+                            response.setResponseCode(ResponseCode.RESOURCE_NOT_FOUND);
+                            response.put(JsonKey.MESSAGE, "Cert template not found for the given identifier: " + identifier);
+                        }
+                    }
+                    return response;
+                }).thenApplyAsync(response -> {
+                    JsonNode jsonNode = Json.toJson(response);
+                    if(StringUtils.equalsIgnoreCase(response.getResponseCode().name(), ResponseCode.BAD_REQUEST.name())) {
+                        return Results.badRequest(jsonNode);
+                    } else if (StringUtils.equalsIgnoreCase(response.getResponseCode().name(), ResponseCode.RESOURCE_NOT_FOUND.name())) {
+                        return Results.notFound(jsonNode);
+                    } else if (StringUtils.equalsIgnoreCase(response.getResponseCode().name(), ResponseCode.SERVER_ERROR.name())) {
+                        return Results.internalServerError(jsonNode);
+                    }
+                    return Results.ok(jsonNode);
+                });
     }
 
     private Request getRequest(play.mvc.Http.Request req) throws Exception {
