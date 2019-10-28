@@ -76,6 +76,11 @@
             <version>${play2.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.sunbird</groupId>
+            <artifactId>es-utils</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
             <version>${powermock.version}</version>
