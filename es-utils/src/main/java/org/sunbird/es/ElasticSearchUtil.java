@@ -43,7 +43,6 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -110,66 +109,43 @@ public class ElasticSearchUtil {
 
 	}
 
-	private static CompletableFuture<Map<String, Object>> actionListener() {
+	public static CompletableFuture<Map<String, Object>> addDocument(String indexName, String documentType, Map<String, Object> doc, String documentId) {
 		CompletableFuture<Map<String, Object>> future = new CompletableFuture<>();
-		new ActionListener<IndexResponse>() {
+		IndexRequest indexRequest = (StringUtils.isNotBlank(documentId)) ?
+				new IndexRequest(indexName, documentType, documentId) : new IndexRequest(indexName, documentType);
+		getClient(indexName).indexAsync(indexRequest.source(doc), new ActionListener<IndexResponse>() {
 			@Override
 			public void onResponse(IndexResponse indexResponse) {
-				indexResponse.status().getStatus();
 				future.complete(new HashMap<String, Object>(){{
-					put("status", indexResponse.status().getStatus());
+					put("identifier", indexResponse.getId());
 				}});
 			}
-
 			@Override
 			public void onFailure(Exception e) {
 				future.completeExceptionally(e);
 			}
-		};
+		});
 		return future;
 	}
 
-	public static CompletableFuture<Map<String, Object>> addDocument(String indexName, String documentType, Map<String, Object> doc, String documentId) {
+	public static CompletableFuture<Map<String, Object>> updateDocument(String indexName, String documentType, Map<String, Object> doc, String documentId) {
+		IndexRequest indexRequest = new IndexRequest(indexName, documentType, documentId).source(doc);
+		UpdateRequest request = new UpdateRequest().index(indexName).type(documentType).id(documentId).doc(doc)
+				.upsert(indexRequest);
 		CompletableFuture<Map<String, Object>> future = new CompletableFuture<>();
-		try {
-			IndexRequest indexRequest = (StringUtils.isNotBlank(documentId)) ?
-					new IndexRequest(indexName, documentType, documentId) : new IndexRequest(indexName, documentType);
-			IndexResponse response = getClient(indexName).index(indexRequest.source(doc));
-			getClient(indexName).indexAsync(indexRequest.source(doc), new ActionListener<IndexResponse>() {
-				@Override
-				public void onResponse(IndexResponse indexResponse) {
-					System.out.println("Added " + response.getId() + " to index " + response.getIndex() + " response: " + response.status().getStatus());
-					future.complete(new HashMap<String, Object>(){{
-						put("identifier", response.getId());
-					}});
-				}
-				@Override
-				public void onFailure(Exception e) {
-					future.completeExceptionally(e);
-				}
-			});
-		} catch (IOException e) {
-			e.printStackTrace();
-			future.completeExceptionally(e);
-			System.out.println("Error while adding document to index :" + indexName);
-		}
+		getClient(indexName).updateAsync(request, new ActionListener<UpdateResponse>() {
+			@Override
+			public void onResponse(UpdateResponse updateResponse) {
+				future.complete(new HashMap<String, Object>(){{
+					put("identifier", updateResponse.getId());
+				}});
+			}
+			@Override
+			public void onFailure(Exception e) {
+				future.completeExceptionally(e);
+			}
+		});
 		return future;
-	}
-
-	public static void updateDocument(String indexName, String documentType, String document, String documentId) {
-		try {
-			Map<String, Object> doc = mapper.readValue(document, new TypeReference<Map<String, Object>>() {
-			});
-			IndexRequest indexRequest = new IndexRequest(indexName, documentType, documentId).source(doc);
-			UpdateRequest request = new UpdateRequest().index(indexName).type(documentType).id(documentId).doc(doc)
-					.upsert(indexRequest);
-			UpdateResponse response = getClient(indexName).update(request);
-			System.out.println("Updated " + response.getId() + " to index " + response.getIndex());
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("Error while updating document to index :" + indexName);
-		}
-
 	}
 
 	public static void deleteDocument(String indexName, String documentType, String documentId)
