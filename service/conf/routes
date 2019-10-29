@@ -15,6 +15,6 @@ GET  /assets/*file        controllers.Assets.at(path="/public", file)
 
 # Certificate Template APIs
 
-POST /cert/template/v1/create @controllers.certs.CertTemplateController.create()
-PATCH /cert/template/v1/update/:identifier @controllers.certs.CertTemplateController.update(identifier: String)
-GET /cert/template/v1/read/:identifier @controllers.certs.CertTemplateController.read(identifier: String)
+POST /cert/v1/template/create @controllers.certs.CertTemplateController.create()
+PATCH /cert/v1/template/update/:identifier @controllers.certs.CertTemplateController.update(identifier: String)
+GET /cert/v1/template/read/:identifier @controllers.certs.CertTemplateController.read(identifier: String)
