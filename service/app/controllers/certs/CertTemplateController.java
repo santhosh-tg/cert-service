@@ -69,9 +69,39 @@ public class CertTemplateController extends BaseController {
     }
 
     public CompletionStage<Result> update(String identifier) {
-        Map<String, Object> result = new HashMap<>();
-        result.put("identifier", identifier);
-        return returnResponse(result);
+        try {
+            Map<String, Object> template = getTemplate(getRequest(request()));
+            template.put("identifier", identifier);
+            CompletableFuture<Map<String, Object>> future = ElasticSearchUtil.addDocument(indexName, docType, template, identifier);
+            return future.handleAsync((map, exception) -> {
+                Response response = new Response();
+                if (null != exception) {
+                    if (exception instanceof BaseException) {
+                        BaseException ex = (BaseException) exception;
+                        response.setResponseCode(ResponseCode.BAD_REQUEST);
+                        response.put(JsonKey.MESSAGE, ex.getMessage());
+                    } else {
+                        response.setResponseCode(ResponseCode.SERVER_ERROR);
+                        response.put(JsonKey.MESSAGE,localizerObject.getMessage(IResponseMessage.INTERNAL_ERROR,null));
+                    }
+                } else {
+                    response.putAll(map);
+                }
+                return response;
+            }).thenApplyAsync(response -> {
+                JsonNode jsonNode = Json.toJson(response);
+                if(StringUtils.equalsIgnoreCase(response.getResponseCode().name(), ResponseCode.BAD_REQUEST.name())) {
+                    return Results.badRequest(jsonNode);
+                } else if (StringUtils.equalsIgnoreCase(response.getResponseCode().name(), ResponseCode.SERVER_ERROR.name())) {
+                    return Results.internalServerError(jsonNode);
+                }
+                return Results.ok(jsonNode);
+            });
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+        }
     }
 
     public CompletionStage<Result> read(String identifier) {
