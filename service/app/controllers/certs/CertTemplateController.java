@@ -17,12 +17,10 @@ import play.mvc.Result;
 import play.mvc.Results;
 import utils.RequestMapper;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.stream.Collectors;
 
 public class CertTemplateController extends BaseController {
 
@@ -32,7 +30,7 @@ public class CertTemplateController extends BaseController {
     public CompletionStage<Result> create() {
         try {
             Map<String, Object> template = getTemplate(getRequest(request()));
-            validateTemplate(template);
+            validateTemplate(template, true);
             String identifier = (String) template.get("identifier");
             if (StringUtils.isBlank(identifier))
                 identifier = UUID.randomUUID() + "";
@@ -72,6 +70,7 @@ public class CertTemplateController extends BaseController {
         try {
             Map<String, Object> template = getTemplate(getRequest(request()));
             template.put("identifier", identifier);
+            validateTemplate(template, false);
             CompletableFuture<Map<String, Object>> future = ElasticSearchUtil.addDocument(indexName, docType, template, identifier);
             return future.handleAsync((map, exception) -> {
                 Response response = new Response();
@@ -160,9 +159,13 @@ public class CertTemplateController extends BaseController {
         return null;
     }
 
-    private void validateTemplate(Map<String, Object> template) throws BaseException {
+    private void validateTemplate(Map<String, Object> template, boolean validateRequired) throws BaseException {
         if (MapUtils.isNotEmpty(template)) {
-            if (!template.keySet().containsAll(Arrays.asList("name", "template")))
+            List<String> invalidKeys = template.keySet().stream().filter(k -> !Arrays.asList("name", "template", "identifier", "params").contains(k)).collect(Collectors.toList());
+            if(invalidKeys.size() > 0) {
+                throw new BaseException("CLIENT_ERROR", "template has invalid properties: " + invalidKeys, ResponseCode.BAD_REQUEST.getCode());
+            }
+            if (validateRequired && !template.keySet().containsAll(Arrays.asList("name", "template")))
                 throw new BaseException("CLIENT_ERROR", "name or template missing in request.", ResponseCode.BAD_REQUEST.getCode());
         } else {
             throw new BaseException("CLIENT_ERROR", "Request is empty.", ResponseCode.BAD_REQUEST.getCode());
