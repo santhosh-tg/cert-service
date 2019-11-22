@@ -206,6 +206,11 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        <repository>
+            <id>itext</id>
+            <name>iText Repository - releases</name>
+            <url>https://repo.itextsupport.com/releases</url>
+        </repository>
     </repositories>    <!--<repositories>-->
         <!--<repository>-->
             <!--<id>scalaz-bintray</id>-->
