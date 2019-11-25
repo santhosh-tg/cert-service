@@ -1,7 +1,5 @@
 package controllers;
 
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,26 +8,20 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.sunbird.message.Localizer;
+import org.sunbird.es.ElasticSearchUtil;
 import org.sunbird.response.Response;
 
 import akka.actor.ActorRef;
-import play.Application;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({org.sunbird.Application.class, BaseController.class, ActorRef.class, Await.class})
+@PrepareForTest({org.sunbird.Application.class, BaseController.class, ActorRef.class, Await.class, ElasticSearchUtil.class})
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*", "javax.security.*"})
 
 public class BaseControllerTest {
-  Localizer localizer = Localizer.getInstance();
-  BaseController controllerObject;
-  TestHelper testHelper;
-  public static Application app;
-  public static Map<String, String[]> headerMap;
   private org.sunbird.Application application;
   private static ActorRef actorRef;
   private static BaseController baseController;
@@ -39,12 +31,18 @@ public class BaseControllerTest {
   }
 
   public void baseControllerTestsetUp() {
-
-    application = PowerMockito.mock(org.sunbird.Application.class);
-    PowerMockito.mockStatic(org.sunbird.Application.class);
-    PowerMockito.when(org.sunbird.Application.getInstance()).thenReturn(application);
-    application.init();
-    mockRequestHandler();
+    try{
+      application = PowerMockito.mock(org.sunbird.Application.class);
+      PowerMockito.mockStatic(org.sunbird.Application.class);
+      PowerMockito.when(org.sunbird.Application.getInstance()).thenReturn(application);
+      application.init();
+      mockRequestHandler();
+      PowerMockito.mockStatic(ElasticSearchUtil.class);
+      PowerMockito.doNothing().when(ElasticSearchUtil.class, "initialiseESClient", Mockito.anyString(), Mockito.anyString());
+    }
+    catch (Exception e){
+      e.printStackTrace();
+    }
   }
 
     
