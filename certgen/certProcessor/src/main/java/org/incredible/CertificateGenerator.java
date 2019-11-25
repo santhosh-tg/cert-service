@@ -11,7 +11,7 @@ import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
-import org.incredible.certProcessor.views.HTMLGenerator;
+import org.incredible.certProcessor.views.HtmlGenerator;
 import org.incredible.certProcessor.views.HTMLTemplateProvider;
 import org.incredible.pojos.CertificateExtension;
 import org.incredible.pojos.CertificateResponse;
@@ -59,7 +59,7 @@ public class CertificateGenerator {
         String accessCode = generateQrCodeForCertificate(certificateExtension);
         String htmlContent = htmlTemplateProvider.getTemplateContent(directory);
         if (htmlTemplateProvider.checkHtmlTemplateIsValid(htmlContent)) {
-            HTMLGenerator htmlGenerator = new HTMLGenerator(htmlContent);
+            HtmlGenerator htmlGenerator = new HtmlGenerator(htmlContent);
             htmlGenerator.generate(certificateExtension, directory);
             uuid = getUUID(certificateExtension.getId());
         } else {

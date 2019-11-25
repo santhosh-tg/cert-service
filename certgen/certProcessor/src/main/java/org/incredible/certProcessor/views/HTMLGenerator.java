@@ -19,16 +19,16 @@ import java.util.Iterator;
 import java.util.Set;
 
 
-public class HTMLGenerator {
+public class HtmlGenerator {
 
-    private static Logger logger = LoggerFactory.getLogger(HTMLGenerator.class);
+    private static Logger logger = LoggerFactory.getLogger(HtmlGenerator.class);
 
     private String htmlString;
 
     private Set<String> htmlReferenceVariable;
 
 
-    public HTMLGenerator(String htmlString) {
+    public HtmlGenerator(String htmlString) {
         this.htmlString = htmlString;
         htmlReferenceVariable = HTMLTemplateProvider.storeAllHTMLTemplateVariables(this.htmlString);
     }

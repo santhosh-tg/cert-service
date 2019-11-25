@@ -39,7 +39,7 @@ public class HTMLTemplateFile extends HTMLTemplateProvider {
     }
 
     private static String getPath(String file) {
-        ClassLoader loader = HTMLGenerator.class.getClassLoader();
+        ClassLoader loader = HtmlGenerator.class.getClassLoader();
 
         String result = null;
         try {
