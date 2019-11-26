@@ -1,7 +1,7 @@
 package org.incredible.certProcessor.views;
 
 import com.itextpdf.html2pdf.HtmlConverter;
-import com.itextpdf.licensekey.LicenseKey;
+/*import com.itextpdf.licensekey.LicenseKey;*/
 import org.incredible.certProcessor.JsonKey;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import java.io.InputStream;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({PdfConverter.class, HtmlConverter.class, LicenseKey.class})
+@PrepareForTest({PdfConverter.class, HtmlConverter.class})
 @PowerMockIgnore("javax.management.*")
 public class PdfConverterTest {
 
@@ -36,14 +36,14 @@ public class PdfConverterTest {
     String directory = htmlFile.getParent();
     mockStatic(HtmlConverter.class);
     mockStatic(System.class);
-    mockStatic(LicenseKey.class);
+    /*mockStatic(LicenseKey.class);*/
     PowerMockito.when(System.getenv(Mockito.anyString())).thenReturn(licenseDetails(JsonKey.ITEXT_LICENSE_ENABLED)).
             thenReturn(licenseDetails(JsonKey.ITEXT_LICENSE_PATH));
     PowerMockito.doNothing().when(HtmlConverter.class, "convertToPdf", Mockito.any(File.class), Mockito.any(File.class));
-    PowerMockito.doNothing().when(LicenseKey.class,"loadLicenseFile", Mockito.any(InputStream.class));
+    /*PowerMockito.doNothing().when(LicenseKey.class,"loadLicenseFile", Mockito.any(InputStream.class));*/
     PdfConverter.convertor(htmlFile, certUuid, directory);
     PowerMockito.verifyStatic(VerificationModeFactory.times(1));
-    LicenseKey.loadLicenseFile(Mockito.any(InputStream.class));
+    /*LicenseKey.loadLicenseFile(Mockito.any(InputStream.class));*/
     PowerMockito.verifyStatic(VerificationModeFactory.times(1));
     HtmlConverter.convertToPdf(Mockito.any(File.class), Mockito.any(File.class));
   }

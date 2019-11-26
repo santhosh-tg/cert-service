@@ -43,6 +43,6 @@ public interface JsonKey {
     String VERIFY = "verify";
     String BASE_PATH = "basePath";
 
-    String ITEXT_LICENSE_ENABLED = "itext_license_enabled";
-    String ITEXT_LICENSE_PATH = "itext_license_path";
+    String ITEXT_LICENSE_ENABLED = "ITEXT_LICENSE_ENABLED";
+    String ITEXT_LICENSE_PATH = "ITEXT_LICENSE_PATH";
 }
