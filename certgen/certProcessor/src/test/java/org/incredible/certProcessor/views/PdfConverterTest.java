@@ -42,7 +42,7 @@ public class PdfConverterTest {
     PowerMockito.doNothing().when(HtmlConverter.class, "convertToPdf", Mockito.any(File.class), Mockito.any(File.class));
     /*PowerMockito.doNothing().when(LicenseKey.class,"loadLicenseFile", Mockito.any(InputStream.class));*/
     PdfConverter.convertor(htmlFile, certUuid, directory);
-    PowerMockito.verifyStatic(VerificationModeFactory.times(1));
+    /*PowerMockito.verifyStatic(VerificationModeFactory.times(1));*/
     /*LicenseKey.loadLicenseFile(Mockito.any(InputStream.class));*/
     PowerMockito.verifyStatic(VerificationModeFactory.times(1));
     HtmlConverter.convertToPdf(Mockito.any(File.class), Mockito.any(File.class));
