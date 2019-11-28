@@ -108,11 +108,11 @@ public class BaseController extends Controller {
 			if (validatorFunction != null) {
 				validatorFunction.apply(request);
 			}
-			return new RequestHandler().handleRequest(request, httpExecutionContext, operation);
+			return new RequestHandler().handleRequest(request, httpExecutionContext, operation,req);
 		} catch (BaseException ex) {
-			return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+			return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex, httpExecutionContext,req);
 		} catch (Exception ex) {
-			return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+			return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex, httpExecutionContext,req);
 		}
 
 	}
@@ -124,13 +124,13 @@ public class BaseController extends Controller {
 	 * @param operation
 	 * @return
 	 */
-	public CompletionStage<Result> handleRequest(Request req, String operation) {
+	public CompletionStage<Result> handleRequest(Request req, String operation,play.mvc.Http.Request request) {
 		try {
-			return new RequestHandler().handleRequest(req, httpExecutionContext, operation);
+			return new RequestHandler().handleRequest(req, httpExecutionContext, operation,request);
 		} catch (BaseException ex) {
-			return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+			return (CompletionStage<Result>) RequestHandler.handleFailureResponse(ex, httpExecutionContext,request);
 		} catch (Exception ex) {
-			return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+			return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex, httpExecutionContext,request);
 		}
 
 	}
@@ -143,21 +143,18 @@ public class BaseController extends Controller {
 	 */
 	public CompletionStage<Result> handleLogRequest() {
 		startTrace("handleLogRequest");
-		Response response = new Response();
-		/*
-		 * if (LogValidator.isLogParamsPresent(request)) { if
-		 * (LogValidator.isValidLogLevelPresent((String)
-		 * request.get(JsonKey.LOG_LEVEL))) {
-		 * ProjectLogger.setUserOrgServiceProjectLogger( (String)
-		 * request.get(JsonKey.LOG_LEVEL)); response.put(JsonKey.ERROR, false);
-		 * response.put( JsonKey.MESSAGE, "Log Level successfully set to " +
-		 * request.get(JsonKey.LOG_LEVEL)); } else { List<Enum> supportedLogLevelsValues
-		 * = new ArrayList<>(EnumSet.allOf(LoggerEnum.class));
-		 * response.put(JsonKey.ERROR, true); response.put( JsonKey.MESSAGE,
-		 * "Valid Log Levels are " + Arrays.asList(supportedLogLevelsValues.toArray()));
-		 * } } else { response.put(JsonKey.ERROR, true); response.put( JsonKey.MESSAGE,
-		 * "Missing Mandatory Request Param " + JsonKey.LOG_LEVEL); }
-		 */
-		return RequestHandler.handleSuccessResponse(response, httpExecutionContext);
+	    Response response = new Response();
+	    Request request = null;
+	    try {
+	      request = (Request) RequestMapper.mapRequest(request(), Request.class);
+	    } catch (Exception ex) {
+	      // ProjectLogger.log(String.format("%s:%s:exception occurred in mapping
+	      // request", this.getClass().getSimpleName(), "handleLogRequest"),
+	      // LoggerEnum.ERROR.name());
+	      return (CompletionStage<Result>)
+	          RequestHandler.handleFailureResponse(ex, httpExecutionContext, null);
+	    }
+	    return (CompletionStage<Result>)
+	        RequestHandler.handleSuccessResponse(response, httpExecutionContext, null);
 	}
 }

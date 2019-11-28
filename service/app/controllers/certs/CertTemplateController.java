@@ -62,7 +62,7 @@ public class CertTemplateController extends BaseController {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex, httpExecutionContext,request());
         }
     }
 
@@ -99,7 +99,7 @@ public class CertTemplateController extends BaseController {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return (CompletionStage<Result>)RequestHandler.handleFailureResponse(ex, httpExecutionContext,request());
         }
     }
 
@@ -172,11 +172,4 @@ public class CertTemplateController extends BaseController {
         }
     }
 
-    private CompletionStage<Result> returnResponse(Map<String, Object> result) {
-        Response response = new Response();
-        response.putAll(result);
-        CompletableFuture<JsonNode> future = new CompletableFuture<>();
-        future.complete(Json.toJson(response));
-        return future.thenApplyAsync(Results::ok, httpExecutionContext.current());
-    }
 }
