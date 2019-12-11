@@ -114,4 +114,7 @@ public interface JsonKey {
     String CRITERIA = "criteria";
     String NARRATIVE = "narrative";
     String BASE_PATH = "basePath";
+    String UPLOAD_CERT = "uploadCertificate";
+    String GENERATE_PDF = "generatePDF";
+    String DIRECTORY = "directory";
 }

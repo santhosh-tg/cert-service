@@ -30,11 +30,14 @@ public class PdfConverter {
                     logger.error("Exception in loading license");
                 }
             }*/
-            HtmlConverter.convertToPdf(htmlSource, file);
+        	HeadlessChromeHtmlToPdfConverter.convert(htmlSource, file);
+            //HtmlConverter.convertToPdf(htmlSource, file);
             logger.info("Pdf file is created ");
-        } catch (FileNotFoundException e) {
+        } /*catch (FileNotFoundException e) {
             logger.error("exception while generating pdf file {}", e.getMessage());
         } catch (IOException e) {
+            logger.error("exception while generating pdf file {}", e.getMessage());
+        } */catch (Exception e) {
             logger.error("exception while generating pdf file {}", e.getMessage());
         }
     }
