@@ -10,7 +10,7 @@ ADD fonts /usr/share
 RUN mkdir -p /usr/share/fonts/truetype/sunbird-fonts/
 RUN find $PWD/fonts/ -name "*.ttf" -exec install -m644 {} /usr/share/fonts/truetype/sunbird-fonts/ \; || return 1
 RUN apk --no-cache add msttcorefonts-installer fontconfig \
-    && apk install -m644 
+    && apk install -m644 \
     && update-ms-fonts \
     && fc-cache -f
 ADD ./cert-service-1.0.0-dist.zip /home/sunbird/
