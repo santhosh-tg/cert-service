@@ -9,13 +9,8 @@ RUN apk update \
 RUN apk --no-cache add msttcorefonts-installer fontconfig \
     && update-ms-fonts \
     && fc-cache -f
-RUN wget https://github.com/google/fonts/archive/master.tar.gz -O gf.tar.gz
-RUN tar -xf gf.tar.gz
-RUN mkdir -p /usr/share/fonts/truetype/google-fonts
-RUN find $PWD/fonts-master/ -name "*.ttf" -exec install -m644 {} /usr/share/fonts/truetype/google-fonts/ \; || return 1
-RUN rm -f gf.tar.gz
-RUN fc-cache -f && rm -rf /var/cache/*
 ADD ./cert-service-1.0.0-dist.zip /home/sunbird/
+COPY fonts /usr/share
 RUN unzip /home/sunbird/cert-service-1.0.0-dist.zip -d /home/sunbird/
 RUN chown -R sunbird:sunbird /home/sunbird
 USER sunbird
