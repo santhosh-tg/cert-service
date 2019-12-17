@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.sunbird</groupId>
     <artifactId>cert-play-service</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
     <name>cert-play-service</name>
     <properties>
-        <project.version>1.0.0</project.version>
+        <project.version>1.2.0</project.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         
