@@ -2,9 +2,11 @@ package org.incredible.certProcessor.views;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HeadlessChromeHtmlToPdfConverter {
-
+    private static Logger logger = LoggerFactory.getLogger(HeadlessChromeHtmlToPdfConverter.class);
     public static void convert(File htmlFile,File pdfFile) {
         Process process = null;
         try {
@@ -16,19 +18,12 @@ public class HeadlessChromeHtmlToPdfConverter {
                 } else {
                     process = rt.exec(new String[]{"sh", "-c", "chromium-browser --no-sandbox --headless --print-to-pdf="+pdfFile.getAbsolutePath()+" "+htmlFile.getAbsolutePath()});
                 }
-            System.out.println("Input stream ::: "+convertInputStreamToString(process.getInputStream()));
-            System.out.println("Error stream ::: "+convertInputStreamToString(process.getErrorStream()));
+            logger.info("Input stream ::: "+convertInputStreamToString(process.getInputStream()));
+            logger.info("Error stream ::: "+convertInputStreamToString(process.getErrorStream()));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        //for(int i=0; i<40;i++) {
-            File hFile = new File("/home/amit/sunbird/cert-service/service/conf/0125450863553740809_certificate", "index.html");
-            File pFile = new File("/home/amit/sunbird/cert-service/service/conf/0125450863553740809_certificate", 43+".pdf");
-            convert(hFile, pFile);
-       // }
     }
 
     private static String convertInputStreamToString(InputStream inputStream)
@@ -44,5 +39,4 @@ public class HeadlessChromeHtmlToPdfConverter {
         inputStream.close();
         return result.toString(StandardCharsets.UTF_8.name());
     }
-
 }

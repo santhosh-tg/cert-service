@@ -31,7 +31,6 @@ public class PdfConverter {
                 }
             }*/
             HeadlessChromeHtmlToPdfConverter.convert(htmlSource, file);
-            //HtmlConverter.convertToPdf(htmlSource, file);
             logger.info("Pdf file is created ");
         }catch (Exception e) {
             logger.error("exception while generating pdf file {}", e.getMessage());
