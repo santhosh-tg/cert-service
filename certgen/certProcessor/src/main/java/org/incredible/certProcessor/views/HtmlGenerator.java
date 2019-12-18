@@ -84,7 +84,7 @@ public class HtmlGenerator {
             writer.flush();
             writer.close();
             logger.info("html file is created {}", file.getName());
-            //PdfConverter.convertor(file, certUuid, directory);
+            PdfConverter.convertor(file, certUuid, directory);
         } catch (IOException e) {
             logger.error("IO exception while creating html file :{}", e.getMessage());
         }

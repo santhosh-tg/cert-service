@@ -1,9 +1,6 @@
 package org.sunbird.cert.actor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import akka.actor.ActorRef;
-
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -22,7 +19,6 @@ import org.sunbird.BaseException;
 import org.sunbird.CertMapper;
 import org.sunbird.CertsConstant;
 import org.sunbird.JsonKey;
-import org.sunbird.actor.core.ActorCache;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 import org.sunbird.cloud.storage.IStorageService;
@@ -131,36 +127,19 @@ public class CertificateGeneratorActor extends BaseActor {
             CertificateResponse certificateResponse = new CertificateResponse();
             try {
                 certificateResponse = certificateGenerator.createCertificate(certModel, htmlTemplateZip);
-                Map<String, Object> uploadRes = getUploadUrl(properties.get("tag"),certificateResponse.getUuid());
+                Map<String, Object> uploadRes = uploadCertificate(directory + certificateResponse.getUuid(), certStore, certStoreFactory.setCloudPath(storeParams));
                 certUrlList.add(getResponse(certificateResponse, getResultWithBasePath(uploadRes, properties.get(JsonKey.BASE_PATH))));
-                String uuid = certificateResponse.getUuid();
-                generatePDFCertificate(directory,uuid,certStoreFactory.setCloudPath(storeParams),certStore);
             } catch (Exception ex) {
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
-            } 
+            } finally {
+                certStoreFactory.cleanUp(certificateResponse.getUuid(), directory);
+            }
         }
         Response response = new Response();
         response.getResult().put("response", certUrlList);
         sender().tell(response, getSelf());
         logger.info("onReceive method call End");
-    }
-    
-    private void generatePDFCertificate(String directory, String certUUID, String certStoreFactory, ICertStore certStore) {
-        Request request = new Request();
-        request.setOperation(JsonKey.GENERATE_PDF);
-        request.getRequest().put(JsonKey.DIRECTORY,directory);
-        request.getRequest().put(JsonKey.UUID,certUUID);
-        request.getRequest().put("certStoreFactory",certStoreFactory);
-        request.getRequest().put("certStore",certStore);
-        ActorCache.getActorRef(JsonKey.GENERATE_PDF).tell(request,ActorRef.noSender());
-    }
-    
-    private Map<String, Object> getUploadUrl(String tag, String certUUID) {
-        Map<String, Object> urlMap = new HashMap<>();
-        urlMap.put(JsonKey.JSON_URL,"/"+tag+"/"+certUUID+".json");
-        urlMap.put(JsonKey.PDF_URL,"/"+tag+"/"+certUUID+".pdf");
-        return urlMap;
     }
 
     /**
