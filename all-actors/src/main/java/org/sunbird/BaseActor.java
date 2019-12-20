@@ -16,7 +16,7 @@ import java.util.Locale;
 public abstract class BaseActor extends UntypedAbstractActor {
     private Logger logger = Logger.getLogger(BaseActor.class);
     public abstract void onReceive(Request request) throws Throwable;
-    protected Localizer localizer = Localizer.getInstance();
+    protected Localizer localizer = getLocalizer();
    
     @Override
     public void onReceive(Object message) throws Throwable {
@@ -102,5 +102,9 @@ public abstract class BaseActor extends UntypedAbstractActor {
      */
     public void endTrace(String tag) {
         logger.info(String.format("%s:%s:ended at %s", this.getClass().getSimpleName(), tag, getTimeStamp()));
+    }
+
+    public Localizer getLocalizer(){
+        return Localizer.getInstance();
     }
 }
