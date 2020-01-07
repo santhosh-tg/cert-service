@@ -29,13 +29,13 @@ public class HeadlessChromeHtmlToPdfConverter {
                 appInvokeCommand = "/Applications/Chromium.app/Contents/MacOS/Chromium";
                 process = rt.exec(appInvokeCommand + " " + appArgs);
             } else {
+                long start = System.currentTimeMillis();
                 appInvokeCommand = "chromium-browser";
                 process = rt.exec(new String[]{"sh", "-c", appInvokeCommand + " " + appArgs});
+                logger.info("Time took to run command "+ (System.currentTimeMillis()-start)+"");
             }
-            logger.info("Input stream ::: " + convertInputStreamToString(process.getInputStream()));
-            logger.info("Error stream ::: " + convertInputStreamToString(process.getErrorStream()));
-
         } catch (Exception e) {
+            logger.error("HeadlessChromeHtmlToPdfConverter: convert: error occurred "+e);
             e.printStackTrace();
         }
     }
