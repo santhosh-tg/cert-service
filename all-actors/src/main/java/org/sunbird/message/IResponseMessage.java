@@ -14,4 +14,5 @@ public interface IResponseMessage {
   String MANDATORY_PARAMETER_MISSING = "Mandatory parameter {0} is missing.";
   String INVALID_PARAM_VALUE = "Invalid value {0} for parameter {1}.";
   String ERROR_UPLOADING_CERTIFICATE="ERROR_UPLOADING_CERTIFICATE";
+  String PDF_GENERATION_FAILED = "Failed to Generate Certificate";
 }

@@ -156,18 +156,24 @@ public class CertificateGeneratorActor extends BaseActor {
 
     private Map<String, Object> uploadCertificate(String fileName, ICertStore certStore, String cloudPath) throws BaseException, IOException {
         certStore.init();
-        long start=System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         Map<String, Object> resMap = new HashMap<>();
         File file = FileUtils.getFile(fileName.concat(".pdf"));
-        resMap.put(JsonKey.PDF_URL, certStore.save(file, cloudPath));
-        file = FileUtils.getFile(fileName.concat(".json"));
-        resMap.put(JsonKey.JSON_URL, certStore.save(file, cloudPath));
-        if (StringUtils.isBlank((String) resMap.get(JsonKey.PDF_URL)) || StringUtils.isBlank((String) resMap.get(JsonKey.JSON_URL))) {
-            logger.error("CertificateGeneratorActor:uploadCertificate:Exception Occurred while uploading certificate pdfUrl and jsonUrl is null");
-            throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.ERROR_UPLOADING_CERTIFICATE, ResponseCode.SERVER_ERROR.getCode());
+        if (file.exists()) {
+            resMap.put(JsonKey.PDF_URL, certStore.save(file, cloudPath));
+            file = FileUtils.getFile(fileName.concat(".json"));
+            resMap.put(JsonKey.JSON_URL, certStore.save(file, cloudPath));
+            if (StringUtils.isBlank((String) resMap.get(JsonKey.PDF_URL)) || StringUtils.isBlank((String) resMap.get(JsonKey.JSON_URL))) {
+                logger.error("CertificateGeneratorActor:uploadCertificate:Exception Occurred while uploading certificate pdfUrl and jsonUrl is null");
+                throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.ERROR_UPLOADING_CERTIFICATE, ResponseCode.SERVER_ERROR.getCode());
+            }
+            logger.info("CertificateGeneratorActor: Time took to upload certificate " + (System.currentTimeMillis() - start) + "");
+            return resMap;
         }
-        logger.info("CertificateGeneratorActor: Time took to upload certificate "+ (System.currentTimeMillis()-start)+"");
-        return resMap;
+        else{
+            logger.error("CertificateGeneratorActor:uploadCertificate: unable to generate pdf skipping uploading");
+            throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.PDF_GENERATION_FAILED, ResponseCode.PDF_GENERATTION_FAILED.getCode());
+        }
     }
 
 
@@ -225,5 +231,4 @@ public class CertificateGeneratorActor extends BaseActor {
             return certVar.getStorageParamsFromEvn();
         }
     }
-
 }
