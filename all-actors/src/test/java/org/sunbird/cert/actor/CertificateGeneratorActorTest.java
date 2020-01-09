@@ -27,10 +27,7 @@ import org.incredible.certProcessor.views.HtmlGenerator;
 import org.incredible.pojos.CertificateExtension;
 import org.incredible.pojos.CertificateResponse;
 import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -63,6 +60,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
+@Ignore
 @PrepareForTest({HeadlessChromeHtmlToPdfConverter.class,
         CloudStorage.class,
         ICertStore.class,
