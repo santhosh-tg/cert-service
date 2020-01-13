@@ -1,13 +1,9 @@
 package org.incredible.certProcessor.views;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 public class HeadlessChromeHtmlToPdfConverter {
     private static Logger logger = LoggerFactory.getLogger(HeadlessChromeHtmlToPdfConverter.class);
@@ -32,25 +28,11 @@ public class HeadlessChromeHtmlToPdfConverter {
                 appInvokeCommand = "chromium-browser";
                 process = rt.exec(new String[]{"sh", "-c", appInvokeCommand + " " + appArgs});
             }
-            logger.info("Input stream ::: " + convertInputStreamToString(process.getInputStream()));
-            logger.info("Error stream ::: " + convertInputStreamToString(process.getErrorStream()));
-
+            if(process.waitFor()==1){
+                process.destroy();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private static String convertInputStreamToString(InputStream inputStream)
-            throws IOException {
-        if (inputStream == null)
-            return "Empty";
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = inputStream.read(buffer)) != -1) {
-            result.write(buffer, 0, length);
-        }
-        inputStream.close();
-        return result.toString(StandardCharsets.UTF_8.name());
     }
 }
