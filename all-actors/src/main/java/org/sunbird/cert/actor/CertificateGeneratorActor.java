@@ -133,7 +133,7 @@ public class CertificateGeneratorActor extends BaseActor {
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
             } finally {
-                certStoreFactory.cleanUp(certificateResponse.getUuid(), directory);
+//                certStoreFactory.cleanUp(certificateResponse.getUuid(), directory);
             }
         }
         Response response = new Response();
@@ -158,6 +158,10 @@ public class CertificateGeneratorActor extends BaseActor {
         certStore.init();
         Map<String, Object> resMap = new HashMap<>();
         File file = FileUtils.getFile(fileName.concat(".pdf"));
+        if(!file.exists()){
+            logger.error("CertificateGeneratorActor:uploadCertificate:Exception Occurred while GENERATING certificate FILE DOESN'T EXISTS");
+            throw new BaseException("INTERNAL_SERVER_ERROR", IResponseMessage.ERROR_GENERATING_CERTIFICATE, ResponseCode.SERVER_ERROR.getCode());
+        }
         resMap.put(JsonKey.PDF_URL, certStore.save(file, cloudPath));
         file = FileUtils.getFile(fileName.concat(".json"));
         resMap.put(JsonKey.JSON_URL, certStore.save(file, cloudPath));

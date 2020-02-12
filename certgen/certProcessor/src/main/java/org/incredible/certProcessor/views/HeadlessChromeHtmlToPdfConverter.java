@@ -1,9 +1,13 @@
 package org.incredible.certProcessor.views;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class HeadlessChromeHtmlToPdfConverter {
     private static Logger logger = LoggerFactory.getLogger(HeadlessChromeHtmlToPdfConverter.class);
@@ -14,17 +18,27 @@ public class HeadlessChromeHtmlToPdfConverter {
             String operatingSystem = System.getProperty("os.name");
             boolean isWindows = operatingSystem.toLowerCase().startsWith("windows");
             boolean isMac = operatingSystem.contains("Mac OS X");
+            String appInvokeCommand = "";
+            String appArgs = "--no-sandbox --headless --print-to-pdf=" + pdfFile.getAbsolutePath() + " " + htmlFile.getAbsolutePath();
             Runtime rt = Runtime.getRuntime();
+            logger.info("HeadlessChromeHtmlToPdfConverter: convert: operating system used is {}", operatingSystem);
             if (isWindows) {
-                process = rt.exec(new String[]{"cmd.exe", "/c", "chromium-browser --no-sandbox --headless --print-to-pdf=" + pdfFile.getAbsolutePath() + " " + htmlFile.getAbsolutePath()});
+                appInvokeCommand = "chromium-browser";
+                process = rt.exec(new String[]{"cmd.exe", "/c", appInvokeCommand + " " + appArgs});
             } else if (isMac) {
-                process = rt.exec("/Applications/Chromium.app/Contents/MacOS/Chromium --headless --print-to-pdf=" + pdfFile.getAbsolutePath() + " " + htmlFile.getAbsolutePath());
+                appInvokeCommand = "/Applications/Chromium.app/Contents/MacOS/Chromium";
+                process = rt.exec(appInvokeCommand + " " + appArgs);
             } else {
-                process = rt.exec(new String[]{"sh", "-c", "chromium-browser --no-sandbox --headless --print-to-pdf=" + pdfFile.getAbsolutePath() + " " + htmlFile.getAbsolutePath()});
+                appInvokeCommand = "chromium-browser";
+                process = rt.exec(new String[]{"sh", "-c", appInvokeCommand + " " + appArgs});
             }
+
             logger.info("Input stream ::: " + convertInputStreamToString(process.getInputStream()));
             logger.info("Error stream ::: " + convertInputStreamToString(process.getErrorStream()));
 
+            if(process.waitFor()==1){
+                process.destroy();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
