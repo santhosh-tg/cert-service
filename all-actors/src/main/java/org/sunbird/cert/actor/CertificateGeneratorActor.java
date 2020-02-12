@@ -133,7 +133,7 @@ public class CertificateGeneratorActor extends BaseActor {
                 logger.error("CertificateGeneratorActor:generateCertificate:Exception Occurred while generating certificate. : " + ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
             } finally {
-//                certStoreFactory.cleanUp(certificateResponse.getUuid(), directory);
+                certStoreFactory.cleanUp(certificateResponse.getUuid(), directory);
             }
         }
         Response response = new Response();
