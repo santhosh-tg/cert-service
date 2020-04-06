@@ -17,7 +17,7 @@ public class SignatureException extends Exception {
         private static final long serialVersionUID = 4996784337180620650L;
 
         public VerificationException(String message) {
-            super("Unable to verify signature: " + message);
+            super("Unable to verify signature " + message);
         }
     }
 

@@ -4,7 +4,7 @@ import org.incredible.pojos.RankAssessment;
 
 public class RankAssessmentBuilder implements IBuilder<RankAssessment> {
 
-    private RankAssessment rankAssessment;
+    private RankAssessment rankAssessment = new RankAssessment();
 
     public RankAssessmentBuilder setMaxValue(float maxValue) {
         rankAssessment.setMaxValue(maxValue);

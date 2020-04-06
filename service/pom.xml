@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.sunbird</groupId>
         <artifactId>cert-play-service</artifactId>
-        <version>1.0.0</version>
+        <version>1.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cert-service</artifactId>
     <name>cert-service</name>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <packaging>play2</packaging>
 
     <pluginRepositories>
@@ -75,6 +75,24 @@
             <artifactId>filters-helpers_2.12</artifactId>
             <version>${play2.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.sunbird</groupId>
+            <artifactId>es-utils</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+       <!-- <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>typography</artifactId>
+            <version>2.0.4</version>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.itextpdf</groupId>
+                    <artifactId>io</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>-->
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
@@ -193,13 +211,18 @@
         <repository>
             <id>oss-sonatype</id>
             <name>oss-sonatype</name>
-            <url>https://oss.sonatype.org/content/repositories/orgsunbird-1033</url>
+            <url>https://oss.sonatype.org/content/repositories/orgsunbird-1069</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
             <releases>
                 <enabled>true</enabled>
             </releases>
+        </repository>
+        <repository>
+            <id>itext</id>
+            <name>iText Repository - releases</name>
+            <url>https://repo.itextsupport.com/releases</url>
         </repository>
     </repositories>    <!--<repositories>-->
         <!--<repository>-->

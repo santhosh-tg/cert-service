@@ -8,7 +8,7 @@ import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 
 public class AssertionObjectBuilder implements IBuilder<Assertion> {
 
-    public Assertion assertion;
+    public Assertion assertion = new Assertion();
 
 
     private static ObjectMapper mapper = new ObjectMapper();
@@ -45,7 +45,6 @@ public class AssertionObjectBuilder implements IBuilder<Assertion> {
         try {
             stringRep = mapper.writeValueAsString(this);
         } catch (JsonProcessingException jpe) {
-            jpe.printStackTrace();
         }
         return stringRep;
     }

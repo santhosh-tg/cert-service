@@ -1,6 +1,5 @@
 package org.incredible.certProcessor.views;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.incredible.pojos.CertificateExtension;
 
@@ -10,6 +9,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class HTMLVarResolver {
 
@@ -20,14 +20,16 @@ public class HTMLVarResolver {
         this.certificateExtension = certificateExtension;
     }
 
-    private ObjectMapper mapper = new ObjectMapper();
-
     public String getRecipientName() {
         return certificateExtension.getRecipient().getName();
     }
 
+    public String getRecipientId() {
+        return certificateExtension.getRecipient().getIdentity();
+    }
 
     public String getCourseName() {
+        //todo need to resolve
         return certificateExtension.getBadge().getName();
     }
 
@@ -39,33 +41,20 @@ public class HTMLVarResolver {
             String idStr = path.substring(path.lastIndexOf('/') + 1);
             return StringUtils.substringBefore(idStr, ".") + ".png";
         } catch (URISyntaxException e) {
-            e.printStackTrace();
             return null;
         }
     }
-
-
-    public String getTitle() {
-        return "certificate";
-    }
-
-
-    public String getDated() {
-        return certificateExtension.getIssuedOn();
-    }
-
 
     public String getIssuedDate() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String dateInFormat;
         try {
             Date parsedIssuedDate = simpleDateFormat.parse(certificateExtension.getIssuedOn());
-            DateFormat format = new SimpleDateFormat("dd MMMM yyy");
+            DateFormat format = new SimpleDateFormat("dd MMMM yyy", Locale.getDefault());
             format.format(parsedIssuedDate);
             dateInFormat = format.format(parsedIssuedDate);
             return dateInFormat;
         } catch (ParseException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -78,9 +67,24 @@ public class HTMLVarResolver {
         return certificateExtension.getSignatory()[0].getDesignation();
     }
 
+    public String getSignatory1Image() {
+        return certificateExtension.getSignatory()[1].getImage();
+    }
+
+    public String getSignatory1Designation() {
+        return certificateExtension.getSignatory()[1].getDesignation();
+    }
+
     public String getCertificateName() {
         return certificateExtension.getBadge().getName();
     }
 
+    public String getcertificateDescription() {
+        return certificateExtension.getBadge().getDescription();
+    }
+
+    public String getExpiryDate() {
+        return certificateExtension.getExpires();
+    }
 
 }

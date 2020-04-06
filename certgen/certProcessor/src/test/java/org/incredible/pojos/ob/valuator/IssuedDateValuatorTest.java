@@ -48,7 +48,7 @@ public class IssuedDateValuatorTest {
 
     @Test(expected = InvalidDateFormatException.class)
     public void evaluatesIssuedDateInExceptionForDifferentFormats() throws InvalidDateFormatException {
-        Date date = issuedDateValuator.convertToDate("2019-02");
+        issuedDateValuator.convertToDate("2019-02");
         fail("issued date cannot be this format");
     }
 }

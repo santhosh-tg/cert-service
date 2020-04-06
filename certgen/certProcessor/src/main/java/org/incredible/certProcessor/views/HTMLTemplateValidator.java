@@ -6,14 +6,15 @@ import org.slf4j.LoggerFactory;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class HTMLTemplateValidator {
 
     private static Logger logger = LoggerFactory.getLogger(HTMLTemplateValidator.class);
 
-    private HashSet<String> htmlTemplateVariable;
+    private Set<String> htmlTemplateVariable;
 
-    public HTMLTemplateValidator(HashSet<String> htmlTemplateVariable) {
+    public HTMLTemplateValidator(Set<String> htmlTemplateVariable) {
         this.htmlTemplateVariable = htmlTemplateVariable;
     }
 
@@ -28,11 +29,13 @@ public class HTMLTemplateValidator {
                     invalidVariables.add(htmlVar);
                 }
             }
-            if (invalidVariables.size() == 0) {
+            if (invalidVariables.isEmpty()) {
                 logger.info("HTML template is valid");
                 htmlTemplateVariable.clear();
                 return true;
-            } else throw new Exception("HTML template is not valid");
+            } else {
+                throw new Exception("HTML template is not valid");
+            }
 
         } catch (Exception e) {
             logger.error("Exception while validating html template due to following invariables {} {}", invalidVariables, e.getMessage());

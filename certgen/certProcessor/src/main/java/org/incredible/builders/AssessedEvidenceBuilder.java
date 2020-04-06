@@ -41,7 +41,7 @@ public class AssessedEvidenceBuilder implements IBuilder<AssessedEvidence> {
         return this;
     }
 
-    private AssessedEvidenceBuilder setSignature(Signature signature) {
+    public AssessedEvidenceBuilder setSignature(Signature signature) {
         assessedEvidence.setSignature(signature);
         return this;
     }

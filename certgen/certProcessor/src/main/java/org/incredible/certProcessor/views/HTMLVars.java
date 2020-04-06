@@ -16,15 +16,23 @@ public class HTMLVars {
     }
 
     public enum SupportedVars {
+        //badge class
+        $certificateName,
+        $certificateDescription,
+        //CompositeIdentityObject - profile
         $recipientName,
-        $courseName,
-        $title,
-        $qrCodeImage,
-        $dated,
+        $recipientId,
+        //Assertion class
         $issuedDate,
+        $expiryDate,
+        //Signatory class
         $signatory0Image,
         $signatory0Designation,
-        $certificateName
+        $signatory1Image,
+        $signatory1Designation,
+        //others
+        $courseName,
+        $qrCodeImage,
     }
 }
 

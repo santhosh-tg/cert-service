@@ -4,8 +4,9 @@ import controllers.BaseControllerTest;
 import controllers.TestHelper;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.sunbird.es.ElasticSearchUtil;
 import play.Application;
 import play.mvc.Result;
 import play.test.Helpers;
@@ -16,14 +17,14 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
+@PrepareForTest(ElasticSearchUtil.class)
 public class HealthControllerTest extends BaseControllerTest {
     TestHelper testHelper;
     public static Application app;
     public static Map<String, String[]> headerMap;
 
     @Before
-    public void setUp() throws Exception {
-
+    public void setUp(){
         testHelper = new TestHelper();
         app = Helpers.fakeApplication();
         Helpers.start(app);
@@ -31,13 +32,12 @@ public class HealthControllerTest extends BaseControllerTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown(){
         headerMap = null;
         app = null;
         testHelper = null;
     }
     
-    @Ignore
     @Test
     public void testGetHealthSuccess() {
         Map<String, Object> reqMap = new HashMap<>();

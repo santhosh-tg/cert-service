@@ -8,5 +8,13 @@ GET  /:service/health                      @controllers.health.HealthController.
 POST /v1/certs/generate                    @controllers.certs.CertsGenerationController.generateCerificate()
 POST /private/cert/v1/certs/generate        @controllers.certs.CertsGenerationController.generateCerificate()
 POST /v1/user/certs/download               @controllers.certs.CertsGenerationController.generateSignUrl()
+POST /v1/certs/verify                      @controllers.certs.CertsGenerationController.verifyCerificate()
+GET  /assets/*file        controllers.Assets.at(path="/public", file)
 # Logs Management APIs
 # POST    /v1.3/system/log/update            @controllers.logsmanager.LogController.setLogLevel()
+
+# Certificate Template APIs
+
+POST /cert/v1/template/create @controllers.certs.CertTemplateController.create()
+PATCH /cert/v1/template/update/:identifier @controllers.certs.CertTemplateController.update(identifier: String)
+GET /cert/v1/template/read/:identifier @controllers.certs.CertTemplateController.read(identifier: String)

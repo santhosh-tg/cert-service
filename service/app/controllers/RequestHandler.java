@@ -39,7 +39,6 @@ public class RequestHandler extends BaseController {
      */
     public CompletionStage<Result> handleRequest(Request request, HttpExecutionContext httpExecutionContext, String operation) throws Exception {
         Object obj;
-        CompletableFuture<String> cf = new CompletableFuture<>();
         request.setOperation(operation);
         //ProjectLogger.log(String.format("%s:%s:Requested operation %s",this.getClass().getSimpleName(),"handleRequest",operation), LoggerEnum.DEBUG.name());
         //startTrace("handleRequest");

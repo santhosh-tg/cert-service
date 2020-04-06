@@ -1,11 +1,13 @@
 package org.sunbird;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.pojos.SignatoryExtension;
+import org.incredible.pojos.ob.Criteria;
 import org.incredible.pojos.ob.Issuer;
-import org.sunbird.request.Request;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class CertMapper {
 
-    private static Map<String, String> properties;
+    private Map<String, String> properties;
 
     public CertMapper(Map<String, String> properties) {
         this.properties = properties;
@@ -25,8 +27,13 @@ public class CertMapper {
     public List<CertModel> toList(Map<String, Object> request) {
         Map<String, Object> json = (Map<String, Object>) request.get(JsonKey.CERTIFICATE);
         List<Map<String, Object>> dataList = (List<Map<String, Object>>) json.get(JsonKey.DATA);
-        Issuer issuer = getIssuer((Map<String, Object>) json.get(JsonKey.ISSUER), (String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ORG_ID));
+        Map<String, Object> issuerData = (Map<String, Object>) json.get(JsonKey.ISSUER);
+        Issuer issuer = getIssuer(issuerData);
+        List<String> publicKeys = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY),
+                (Map<String, Object>) json.get(JsonKey.KEYS));
+        issuer.setPublicKey(publicKeys.toArray(new String[0]));
         SignatoryExtension[] signatoryArr = getSignatoryArray((List<Map<String, Object>>) json.get(JsonKey.SIGNATORY_LIST));
+        Criteria criteria = getCriteria((Map<String, Object>) json.get(JsonKey.CRITERIA));
         List<CertModel> certList = dataList.stream().map(data -> getCertModel(data)).collect(Collectors.toList());
         certList.stream().forEach(cert -> {
             cert.setIssuer(issuer);
@@ -34,8 +41,9 @@ public class CertMapper {
             cert.setCourseName((String) json.get(JsonKey.COURSE_NAME));
             cert.setCertificateDescription((String) json.get(JsonKey.DESCRIPTION));
             cert.setCertificateLogo((String) json.get(JsonKey.LOGO));
+            cert.setCriteria(criteria);
             String issuedDate = (String) json.get(JsonKey.ISSUE_DATE);
-            if(StringUtils.isBlank(issuedDate)){
+            if (StringUtils.isBlank(issuedDate)) {
                 cert.setIssuedDate(getCurrentDate());
             } else {
                 cert.setIssuedDate((String) json.get(JsonKey.ISSUE_DATE));
@@ -51,12 +59,12 @@ public class CertMapper {
         return dtf.format(now);
     }
 
-    private static SignatoryExtension[] getSignatoryArray(List<Map<String, Object>> signatoryList) {
+    private SignatoryExtension[] getSignatoryArray(List<Map<String, Object>> signatoryList) {
         return signatoryList.stream().map(signatory ->
                 getSignatory(signatory)).toArray(SignatoryExtension[]::new);
     }
 
-    private static SignatoryExtension getSignatory(Map<String, Object> signatory) {
+    private SignatoryExtension getSignatory(Map<String, Object> signatory) {
         SignatoryExtension signatoryExt = new SignatoryExtension(properties.get(JsonKey.SIGNATORY_EXTENSION));
         signatoryExt.setIdentity((String) signatory.get(JsonKey.ID));
         signatoryExt.setDesignation((String) signatory.get(JsonKey.DESIGNATION));
@@ -66,20 +74,18 @@ public class CertMapper {
     }
 
 
-    private static Issuer getIssuer(Map<String, Object> issuerData, String rootOrgId) {
+    private Issuer getIssuer(Map<String, Object> issuerData) {
         Issuer issuer = new Issuer(properties.get(JsonKey.CONTEXT));
         issuer.setName((String) issuerData.get(JsonKey.NAME));
         issuer.setUrl((String) issuerData.get(JsonKey.URL));
-        List<String> keyList = validatePublicKeys((List<String>) issuerData.get(JsonKey.PUBLIC_KEY), rootOrgId);
-        if (CollectionUtils.isNotEmpty(keyList)) {
-            String[] keyArr = keyList.stream().toArray(String[]::new);
-            issuer.setPublicKey(keyArr);
-        }
         return issuer;
     }
 
+    private Criteria getCriteria(Map<String, Object> criteriaData) {
+        return new ObjectMapper().convertValue(criteriaData, Criteria.class);
+    }
 
-    private static CertModel getCertModel(Map<String, Object> data) {
+    private CertModel getCertModel(Map<String, Object> data) {
         CertModel certModel = new CertModel();
         certModel.setRecipientName((String) data.get(JsonKey.RECIPIENT_NAME));
         certModel.setRecipientEmail((String) data.get(JsonKey.RECIPIENT_EMAIl));
@@ -90,20 +96,22 @@ public class CertMapper {
         return certModel;
     }
 
-    private static List<String> validatePublicKeys(List<String> publicKeys, String rootOrgId) {
+    private List<String> validatePublicKeys(List<String> publicKeys, Map<String, Object> keys) {
+        if (CollectionUtils.isEmpty(publicKeys) && MapUtils.isNotEmpty(keys)) {
+            publicKeys = new ArrayList<>();
+            publicKeys.add((String) keys.get(JsonKey.ID));
+        }
         List<String> validatedPublicKeys = new ArrayList<>();
-        publicKeys.forEach((publicKey) -> {
-            if (!publicKey.startsWith("http")) {
-                if (null == rootOrgId || (rootOrgId != null && rootOrgId.isEmpty()))
-                    validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + publicKey.concat("_publicKey.json"));
-                else
-                    validatedPublicKeys.add(properties.get(JsonKey.DOMAIN_URL).concat("/") + properties.get(JsonKey.SLUG).concat("/") + rootOrgId.concat("/") + publicKey.concat("_publicKey.json"));
-
-            } else {
-                validatedPublicKeys.add(publicKey);
-            }
-        });
-
+        if (CollectionUtils.isNotEmpty(publicKeys)) {
+            publicKeys.forEach((publicKey) -> {
+                if (!publicKey.startsWith("http")) {
+                    validatedPublicKeys.add(properties.get(JsonKey.BASE_PATH)
+                            .concat("/") + JsonKey.KEYS.concat("/") + publicKey.concat("_publicKey.json"));
+                } else {
+                    validatedPublicKeys.add(publicKey);
+                }
+            });
+        }
         return validatedPublicKeys;
     }
 }

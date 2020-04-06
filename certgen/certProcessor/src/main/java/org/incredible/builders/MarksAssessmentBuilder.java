@@ -3,7 +3,8 @@ package org.incredible.builders;
 import org.incredible.pojos.MarksAssessment;
 
 public class MarksAssessmentBuilder implements IBuilder<MarksAssessment> {
-  private   MarksAssessment marksAssessment;
+
+    private MarksAssessment marksAssessment = new MarksAssessment();
 
 
     public MarksAssessmentBuilder setMinValue(float minValue) {
