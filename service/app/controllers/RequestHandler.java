@@ -2,6 +2,7 @@ package controllers;
 
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import org.apache.commons.lang3.StringUtils;
 import org.sunbird.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
@@ -10,6 +11,7 @@ import org.sunbird.response.Response;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import org.sunbird.response.ResponseParams;
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Result;
@@ -66,6 +68,10 @@ public class RequestHandler extends BaseController {
             future.complete(Json.toJson(response));
             if (ex.getResponseCode() == Results.badRequest().status()) {
                 return future.thenApplyAsync(Results::badRequest, httpExecutionContext.current());
+            } else if (ex.getResponseCode() == 503) {
+                return CompletableFuture.completedFuture(Results.status(
+                        ex.getResponseCode(),
+                        Json.toJson(createResponseOnException(ex))));
             } else {
                 return future.thenApplyAsync(Results::internalServerError, httpExecutionContext.current());
             }
@@ -75,6 +81,23 @@ public class RequestHandler extends BaseController {
             future.complete(Json.toJson(response));
             return future.thenApplyAsync(Results::internalServerError, httpExecutionContext.current());
         }
+    }
+
+    public static Response createResponseOnException(BaseException exception) {
+        Response response = new Response();
+        response.setResponseCode(ResponseCode.getResponseCode(exception.getResponseCode()));
+        response.setParams(createResponseParamObj(response.getResponseCode(), exception.getMessage()));
+        return response;
+    }
+
+    public static ResponseParams createResponseParamObj(ResponseCode code, String message) {
+        ResponseParams params = new ResponseParams();
+        if (code.getCode() != 200) {
+            params.setErr(code.name());
+            params.setErrmsg(StringUtils.isNotBlank(message) ? message : code.name());
+        }
+        params.setStatus(ResponseCode.getResponseCode(code.getCode()).name());
+        return params;
     }
 
     /**
