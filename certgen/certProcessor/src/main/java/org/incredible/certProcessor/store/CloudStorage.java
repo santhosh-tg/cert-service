@@ -19,6 +19,16 @@ public class CloudStorage {
         this.storageService = storageService;
     }
 
+    public  String upload(String container, String path, File file, boolean isDirectory,int retryCount) {
+        String objectKey = path + file.getName();
+        String url = storageService.upload(container,
+                file.getAbsolutePath(),
+                objectKey,
+                Option.apply(isDirectory),
+                Option.apply(1),
+                Option.apply(retryCount), Option.apply(1));
+        return url;
+    }
 
     public  String uploadFile(String container, String path, File file, boolean isDirectory,int retryCount) {
         String objectKey = path + file.getName();
@@ -30,6 +40,7 @@ public class CloudStorage {
                 Option.apply(retryCount), Option.apply(1));
         return UrlManager.getSharableUrl(url,container);
          }
+
 
     public void downloadFile(String container, String fileName, String localPath, boolean isDirectory) {
         storageService.download(container, fileName, localPath, Option.apply(isDirectory));

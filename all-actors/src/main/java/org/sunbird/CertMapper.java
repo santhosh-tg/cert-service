@@ -5,6 +5,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.incredible.certProcessor.CertModel;
+import org.incredible.certProcessor.JsonKey;
 import org.incredible.pojos.SignatoryExtension;
 import org.incredible.pojos.ob.Criteria;
 import org.incredible.pojos.ob.Issuer;

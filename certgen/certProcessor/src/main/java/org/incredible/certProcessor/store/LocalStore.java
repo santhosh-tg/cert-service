@@ -29,6 +29,10 @@ public class LocalStore implements ICertStore {
         return domainUrl + "/" + JsonKey.ASSETS + "/" + file.getName();
     }
 
+    @Override
+    public String getPrivateLink(File file, String uploadPath) throws IOException {
+        return save(file,uploadPath);
+    }
 
     @Override
     public void get(String url, String fileName, String localPath) throws IOException {
