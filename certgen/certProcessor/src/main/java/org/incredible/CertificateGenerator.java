@@ -83,12 +83,14 @@ public class CertificateGenerator {
     private void checkDirectoryExists() {
         File file = new File(directory);
         if (!file.exists()) {
+            logger.info("File directory does not exist."+file.getName());
             file.mkdirs();
         }
     }
 
     public Map<String,Object> generateQrCode() throws WriterException,
             FontFormatException, NotFoundException, IOException {
+        checkDirectoryExists();
         Map<String,Object> qrMap = new HashMap<>();
         AccessCodeGenerator accessCodeGenerator = new AccessCodeGenerator(Double.valueOf(properties.get(JsonKey.ACCESS_CODE_LENGTH)));
         String accessCode = accessCodeGenerator.generate();
