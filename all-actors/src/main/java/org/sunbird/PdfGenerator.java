@@ -72,7 +72,7 @@ public class PdfGenerator {
         HttpPost httpPost = new HttpPost(PRINT_SERVICE_URL);
         String json = mapper.writeValueAsString(request);
         json = new String(json.getBytes(), StandardCharsets.UTF_8);
-        StringEntity entity = new StringEntity(json);
+        StringEntity entity = new StringEntity(json, StandardCharsets.UTF_8);
         httpPost.setEntity(entity);
         httpPost.setHeader("Accept", "application/json");
         httpPost.setHeader("Content-type", "application/json");
