@@ -2,6 +2,7 @@ package org.sunbird;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.incredible.certProcessor.JsonKey;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,8 +88,6 @@ public class CertsConstant {
     private static String getDomainUrlFromEnv() {
         String domainUrl = getPropertyFromEnv(JsonKey.DOMAIN_URL);
         return StringUtils.isNotBlank(domainUrl) ? domainUrl : "https://dev.sunbirded.org";
-//        validateEnvProperty(domainUrl);
-//        return domainUrl;
     }
 
     private static String getContainerNameFromEnv() {
@@ -112,8 +111,6 @@ public class CertsConstant {
 
     private static String getEncServiceUrl() {
         String encServiceUrl = getPropertyFromEnv(JsonKey.ENC_SERVICE_URL);
-//        validateEnvProperty(encServiceUrl);
-//        return encServiceUrl;
         return StringUtils.isNotBlank(encServiceUrl) ? encServiceUrl : "http://enc-service:8013";
 
     }
@@ -175,8 +172,6 @@ public class CertsConstant {
     private static String getSlugFormEnv() {
         String slug = getPropertyFromEnv(JsonKey.SLUG);
         return StringUtils.isNotBlank(slug) ? slug : "certs";
-//        validateEnvProperty(slug);
-//        return slug;
     }
 
     public String getSlug() {

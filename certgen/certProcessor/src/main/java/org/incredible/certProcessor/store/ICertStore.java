@@ -9,6 +9,8 @@ public interface ICertStore {
 
     String save(File file, String uploadPath) throws IOException;
 
+    String getPrivateLink(File file, String uploadPath) throws IOException;
+
     void get(String url, String fileName, String localPath) throws IOException, StorageServiceException;
 
     void get(String fileName) throws StorageServiceException;
