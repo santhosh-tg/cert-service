@@ -38,7 +38,7 @@ public class CloudStorage {
                 Option.apply(isDirectory),
                 Option.apply(1),
                 Option.apply(retryCount), Option.apply(1));
-        return UrlManager.getSharableUrl(url,container);
+        return UrlManager.removeQueryParams(url);
          }
 
 
