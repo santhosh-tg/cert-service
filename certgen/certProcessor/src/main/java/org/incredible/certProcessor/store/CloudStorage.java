@@ -38,7 +38,8 @@ public class CloudStorage {
                 Option.apply(isDirectory),
                 Option.apply(1),
                 Option.apply(retryCount), Option.apply(1));
-        return UrlManager.removeQueryParams(url);
+        //storageService.upload() method returns signed url
+        return UrlManager.removeQueryParams(url); //removes query params (signed text part)
          }
 
 

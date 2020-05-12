@@ -30,7 +30,7 @@ public class PdfGenerator {
 
     private static Logger logger = LoggerFactory.getLogger(PdfGenerator.class);
     private static ObjectMapper mapper = new ObjectMapper();
-    private static final String PRINT_SERVICE_URL = "http://localhost:5000/v1/print/pdf";
+    private static final String PRINT_SERVICE_URL = "http://print-service:5000/v1/print/pdf";
 
     public static String generate(String htmlTemplateUrl, CertificateExtension certificateExtension , String qrImageUrl,
                                   String container, String path) throws IOException {
