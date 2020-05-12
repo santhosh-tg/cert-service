@@ -53,7 +53,7 @@ public class AzureStore extends CloudStore {
     }
 
     @Override
-    public String getPrivateLink(File file, String uploadPath) {
+    public String getPublicLink(File file, String uploadPath) {
         String path = getPath(uploadPath);
         return cloudStorage.upload(azureStoreConfig.getAzureStoreConfig().getContainerName(), path, file, false, retryCount);
     }

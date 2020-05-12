@@ -53,7 +53,7 @@ public class AwsStore extends CloudStore {
     }
 
     @Override
-    public String getPrivateLink(File file, String uploadPath) {
+    public String getPublicLink(File file, String uploadPath) {
         String path = getPath(uploadPath);
         return cloudStorage.upload(awsStoreConfig.getAwsStoreConfig().getContainerName(), path, file, false, retryCount);
     }

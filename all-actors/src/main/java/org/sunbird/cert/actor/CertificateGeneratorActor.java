@@ -148,8 +148,8 @@ public class CertificateGeneratorActor extends BaseActor {
         QRStorageParams qrStorageParams = new QRStorageParams(certVar.getCloudStorageType());
         StoreConfig storeConfig = new StoreConfig(qrStorageParams.storeParams);
         ICertStore certStore = certStoreFactory.getCertStore(storeConfig, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
-        String qrImageUrl = certStore.getPrivateLink(qrCodeFile, certStoreFactory.setCloudPath(storeConfig));
-        logger.info("QR code is created for the certificate : "+qrCodeFile.getName());
+        String qrImageUrl = certStore.getPublicLink(qrCodeFile, certStoreFactory.setCloudPath(storeConfig));
+        logger.info("QR code is created for the certificate : "+ qrCodeFile.getName() + " URL : " + qrImageUrl);
         return qrImageUrl;
     }
 
