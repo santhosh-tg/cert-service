@@ -30,7 +30,7 @@ public class LocalStore implements ICertStore {
     }
 
     @Override
-    public String getPrivateLink(File file, String uploadPath) throws IOException {
+    public String getPublicLink(File file, String uploadPath) throws IOException {
         return save(file,uploadPath);
     }
 
