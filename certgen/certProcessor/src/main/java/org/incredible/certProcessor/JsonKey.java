@@ -1,5 +1,6 @@
 package org.incredible.certProcessor;
 
+
 public interface JsonKey {
 
     String CLAIM = "claim";
@@ -105,4 +106,6 @@ public interface JsonKey {
     String PUBLIC_AWS_STORAGE_KEY = "PUBLIC_AWS_STORAGE_KEY";
     String PUBLIC_AWS_STORAGE_SECRET = "PUBLIC_AWS_STORAGE_SECRET";
     String PUBLIC_CONTAINER_NAME = "PUBLIC_CONTAINER_NAME";
+    String VALIDATE_TEMPLATE = "validateTemplate";
+    String TEMPLATE_URL = "templateUrl";
 }

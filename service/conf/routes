@@ -10,6 +10,7 @@ POST /private/cert/v1/certs/generate        @controllers.certs.CertsGenerationCo
 POST /v1/user/certs/download               @controllers.certs.CertsGenerationController.generateSignUrl()
 POST /v1/certs/verify                      @controllers.certs.CertsGenerationController.verifyCerificate()
 GET  /assets/*file        controllers.Assets.at(path="/public", file)
+POST /cert/v1/template/validate  @controllers.certs.CertsGenerationController.validateTemplate()
 # Logs Management APIs
 # POST    /v1.3/system/log/update            @controllers.logsmanager.LogController.setLogLevel()
 
