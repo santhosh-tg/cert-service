@@ -21,6 +21,7 @@ public class CloudStorage {
 
     public  String upload(String container, String path, File file, boolean isDirectory,int retryCount) {
         String objectKey = path + file.getName();
+
         String url = storageService.upload(container,
                 file.getAbsolutePath(),
                 objectKey,
@@ -46,5 +47,9 @@ public class CloudStorage {
     public void downloadFile(String container, String fileName, String localPath, boolean isDirectory) {
         storageService.download(container, fileName, localPath, Option.apply(isDirectory));
         logger.info(fileName + " downloaded successfully");
+    }
+
+    public void closeConnection(){
+        storageService.closeContext();
     }
 }

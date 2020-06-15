@@ -66,11 +66,17 @@ public class AzureStore extends CloudStore {
             StorageConfig storageConfig = new StorageConfig(azureStoreConfig.getType(), storageKey, storageSecret);
             logger.info("StorageParams:init:all storage params initialized for azure block");
             storageService = StorageServiceFactory.getStorageService(storageConfig);
+
             cloudStorage = new CloudStorage(storageService);
         } else {
             logger.error("StorageParams:init:provided cloud store type doesn't match supported storage devices:".concat(azureStoreConfig.getType()));
         }
 
+    }
+
+    @Override
+    public void close(){
+        cloudStorage.closeConnection();
     }
 }
 

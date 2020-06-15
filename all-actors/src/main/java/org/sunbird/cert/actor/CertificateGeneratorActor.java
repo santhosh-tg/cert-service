@@ -104,8 +104,7 @@ public class CertificateGeneratorActor extends BaseActor {
 
         CertStoreFactory certStoreFactory = new CertStoreFactory(properties);
         StoreConfig storeParams = new StoreConfig(getStorageParamsFromRequestOrEnv((Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.STORE)));
-        ICertStore certStore = certStoreFactory.getCertStore(storeParams, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
-
+       ICertStore certStore = certStoreFactory.getCertStore(storeParams, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
         String htmlTemplateUrl =  (String)((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
 
         CertMapper certMapper = new CertMapper(properties);
@@ -137,6 +136,7 @@ public class CertificateGeneratorActor extends BaseActor {
                 certStoreFactory.cleanUp(certificateResponse.getUuid(), directory);
             }
         }
+        certStore.close();
         Response response = new Response();
         response.getResult().put("response", certUrlList);
         sender().tell(response, getSelf());
@@ -149,6 +149,7 @@ public class CertificateGeneratorActor extends BaseActor {
         StoreConfig storeConfig = new StoreConfig(qrStorageParams.storeParams);
         ICertStore certStore = certStoreFactory.getCertStore(storeConfig, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
         String qrImageUrl = certStore.getPublicLink(qrCodeFile, certStoreFactory.setCloudPath(storeConfig));
+        certStore.close();
         logger.info("QR code is created for the certificate : "+ qrCodeFile.getName() + " URL : " + qrImageUrl);
         return qrImageUrl;
     }

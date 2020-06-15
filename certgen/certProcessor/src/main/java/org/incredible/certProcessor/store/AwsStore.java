@@ -72,4 +72,9 @@ public class AwsStore extends CloudStore {
         }
 
     }
+
+    @Override
+    public void close(){
+        cloudStorage.closeConnection();
+    }
 }

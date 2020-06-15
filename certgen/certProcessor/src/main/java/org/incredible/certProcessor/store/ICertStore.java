@@ -17,5 +17,7 @@ public interface ICertStore {
 
     void init();
 
+    void close();
+
 
 }
