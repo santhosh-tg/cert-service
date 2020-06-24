@@ -20,6 +20,9 @@ public class AwsStore extends CloudStore {
 
     private BaseStorageService storageService = null;
 
+    private CloudStorage cloudStorage = null;
+
+
     public AwsStore(StoreConfig awsStoreConfig) {
         this.awsStoreConfig = awsStoreConfig;
     }
@@ -32,14 +35,12 @@ public class AwsStore extends CloudStore {
         if (StringUtils.isNotBlank(awsStoreConfig.getAwsStoreConfig().getPath())) {
             stringBuilder.append(awsStoreConfig.getAwsStoreConfig().getPath() + "/");
         }
-        CloudStorage cloudStorage = new CloudStorage(storageService);
         int retryCount = Integer.parseInt(awsStoreConfig.getCloudRetryCount());
         return cloudStorage.uploadFile(awsStoreConfig.getAwsStoreConfig().getContainerName(), stringBuilder.toString(), file, false, retryCount);
     }
 
     @Override
     public void download(String fileName, String localPath) throws StorageServiceException {
-        CloudStorage cloudStorage = new CloudStorage(storageService);
         cloudStorage.downloadFile(awsStoreConfig.getAwsStoreConfig().getContainerName(), fileName, localPath, false);
     }
 
@@ -51,9 +52,16 @@ public class AwsStore extends CloudStore {
             StorageConfig storageConfig = new StorageConfig(awsStoreConfig.getType(), storageKey, storageSecret);
             logger.info("StorageParams:init:all storage params initialized for aws block");
             storageService = StorageServiceFactory.getStorageService(storageConfig);
+            cloudStorage = new CloudStorage(storageService);
         } else {
             logger.error("StorageParams:init:provided cloud store type doesn't match supported storage devices:".concat(awsStoreConfig.getType()));
         }
 
+    }
+
+
+    @Override
+    public void close(){
+        cloudStorage.closeConnection();
     }
 }

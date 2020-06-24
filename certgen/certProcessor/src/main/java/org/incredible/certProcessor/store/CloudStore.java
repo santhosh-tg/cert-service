@@ -29,5 +29,6 @@ public abstract class CloudStore implements ICertStore {
 
     abstract public void download(String fileName, String localPath) throws StorageServiceException;
 
+    abstract public void close();
 
 }

@@ -121,6 +121,7 @@ public class HTMLTemplateZip extends HTMLTemplateProvider {
 
     private void readIndexHtmlFile(String absolutePath) throws IOException {
         String htmlFileName = "/index.html";
+//        String htmlFileName = "/cert.svg";
         if (!isFileExists(new File(absolutePath + htmlFileName))) {
             unzip(zipFilePath + getZipFileName(), absolutePath);
         }

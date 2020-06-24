@@ -79,6 +79,7 @@ public class HtmlGenerator {
     private void createHTMLFile(VelocityContext context, String certUuid, String directory) {
         try {
             File file = new File(directory, certUuid + ".html");
+//           File file = new File(directory, certUuid + ".svg");
             Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
             Velocity.evaluate(context, writer, "velocity", htmlString);
             writer.flush();

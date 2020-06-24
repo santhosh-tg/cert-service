@@ -136,6 +136,7 @@ public class CertificateGeneratorActor extends BaseActor {
                 certStoreFactory.cleanUp(certificateResponse.getUuid(), directory);
             }
         }
+        certStore.close();
         Response response = new Response();
         response.getResult().put("response", certUrlList);
         sender().tell(response, getSelf());

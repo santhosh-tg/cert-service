@@ -10,12 +10,27 @@ public class PdfConverter {
 
     private static Logger logger = LoggerFactory.getLogger(PdfConverter.class);
 
-    public static void convertor(File htmlSource, String certUuid, String directory) {
+    public static void convertor(File sourceFile, String certUuid, String directory) {
         File file = new File(directory, certUuid + ".pdf");
+//      File file = new File(directory, certUuid + "cert.png");
+//      File file = new File(directory, certUuid + ".jpeg");
         try {
-            HeadlessChromeHtmlToPdfConverter.convert(htmlSource, file);
-            logger.info("Pdf file is created ");
-        }catch (Exception e) {
+            //html to pdf convertion using headLess chrome
+            HeadlessChromeHtmlToPdfConverter.convert(sourceFile, file);
+
+            //using Itext
+//            ItextHtmlToPdfConverter.convert(sourceFile,file);
+
+            //svg to pdf
+//            BatikSvgToPdfConverter.convert(sourceFile.getAbsolutePath(), file);
+
+            //svg to png
+//            BatikSvgToPngConverter.convert(sourceFile.getAbsolutePath(), file);
+
+            //svg to jpeg
+//            BatikSvgToJpegConverter.convert(sourceFile.getAbsolutePath(), file);
+            logger.info("Pdf file is created for the {} ", certUuid);
+        } catch (Exception e) {
             logger.error("exception while generating pdf file {}", e.getMessage());
         }
     }

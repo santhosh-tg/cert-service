@@ -35,4 +35,8 @@ public class CloudStorage {
         storageService.download(container, fileName, localPath, Option.apply(isDirectory));
         logger.info(fileName + " downloaded successfully");
     }
+
+    public void closeConnection(){
+        storageService.closeContext();
+    }
 }
