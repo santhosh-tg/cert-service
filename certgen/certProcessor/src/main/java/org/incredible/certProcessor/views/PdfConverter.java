@@ -16,10 +16,10 @@ public class PdfConverter {
 //      File file = new File(directory, certUuid + ".jpeg");
         try {
             //html to pdf convertion using headLess chrome
-            HeadlessChromeHtmlToPdfConverter.convert(sourceFile, file);
+//            HeadlessChromeHtmlToPdfConverter.convert(sourceFile, file);
 
             //using Itext
-//            ItextHtmlToPdfConverter.convert(sourceFile,file);
+            ItextHtmlToPdfConverter.convert(sourceFile,file);
 
             //svg to pdf
 //            BatikSvgToPdfConverter.convert(sourceFile.getAbsolutePath(), file);
