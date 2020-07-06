@@ -42,10 +42,11 @@ public class HealthController extends BaseController {
   public CompletionStage<Result> getHealth() throws BaseException {
     try {
       handleSigTerm();
+      logger.info("complete health method called.");
       CompletionStage<Result> response = handleRequest(request(), null, HEALTH_ACTOR_OPERATION_NAME);
       return response;
     }  catch (Exception e) {
-      return RequestHandler.handleFailureResponse(e,httpExecutionContext);
+      return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(e,request()));
     }
   }
 
@@ -65,7 +66,7 @@ public class HealthController extends BaseController {
               ? cf.thenApplyAsync(Results::ok)
               : cf.thenApplyAsync(Results::badRequest);
     } catch (Exception e) {
-      return RequestHandler.handleFailureResponse(e,httpExecutionContext);
+      return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(e,request()));
     }
   }
 

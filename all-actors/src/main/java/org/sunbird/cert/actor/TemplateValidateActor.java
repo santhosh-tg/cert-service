@@ -25,8 +25,9 @@ import java.util.Set;
  * This actor is responsible for Template validation
  */
 @ActorConfig(
-        tasks = {JsonKey.VALIDATE_TEMPLATE},
-        asyncTasks = {}
+  dispatcher = "cert-dispatcher",
+  tasks = {JsonKey.VALIDATE_TEMPLATE},
+  asyncTasks = {}
 )
 public class TemplateValidateActor extends BaseActor {
 

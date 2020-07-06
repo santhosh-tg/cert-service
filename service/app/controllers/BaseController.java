@@ -40,7 +40,7 @@ public class BaseController extends Controller {
 	 */
 	@Inject
 	protected HttpExecutionContext httpExecutionContext;
-	protected final static Localizer localizerObject = Localizer.getInstance();
+	protected final static Localizer locale = Localizer.getInstance();
 	public static final String RESPONSE = "Response";
 	public static final String SUCCESS = "Success";
 
@@ -108,11 +108,11 @@ public class BaseController extends Controller {
 			if (validatorFunction != null) {
 				validatorFunction.apply(request);
 			}
-			return new RequestHandler().handleRequest(request, httpExecutionContext, operation);
+			return new RequestHandler().handleRequest(request, operation,req);
 		} catch (BaseException ex) {
-			return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex, req));
 		} catch (Exception ex) {
-			return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex, req));
 		}
 
 	}
@@ -124,13 +124,13 @@ public class BaseController extends Controller {
 	 * @param operation
 	 * @return
 	 */
-	public CompletionStage<Result> handleRequest(Request req, String operation) {
+	public CompletionStage<Result> handleRequest(Request req, String operation, play.mvc.Http.Request httpReq) throws Exception {
 		try {
-			return new RequestHandler().handleRequest(req, httpExecutionContext, operation);
+			return new RequestHandler().handleRequest(req, operation, httpReq);
 		} catch (BaseException ex) {
-			return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,httpReq));
 		} catch (Exception ex) {
-			return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex, httpReq));
 		}
 
 	}
@@ -158,6 +158,6 @@ public class BaseController extends Controller {
 		 * } } else { response.put(JsonKey.ERROR, true); response.put( JsonKey.MESSAGE,
 		 * "Missing Mandatory Request Param " + JsonKey.LOG_LEVEL); }
 		 */
-		return RequestHandler.handleSuccessResponse(response, httpExecutionContext);
+		return CompletableFuture.completedFuture( RequestHandler.handleSuccessResponse(response,null));
 	}
 }

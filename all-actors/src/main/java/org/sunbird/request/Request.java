@@ -18,8 +18,8 @@ public class Request implements Serializable {
 
   private static final long serialVersionUID = -2362783406031347676L;
   private static final Integer MIN_TIMEOUT = 0;
-  private static final Integer MAX_TIMEOUT = 30;
-  private static final int WAIT_TIME_VALUE = 30;
+  private static final Integer MAX_TIMEOUT = 120;
+  private static final int WAIT_TIME_VALUE = 120;
 
   protected Map<String, Object> context;
   private String id;
