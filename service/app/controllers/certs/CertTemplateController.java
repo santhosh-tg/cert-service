@@ -5,8 +5,8 @@ import controllers.BaseController;
 import controllers.RequestHandler;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.incredible.certProcessor.JsonKey;
 import org.sunbird.BaseException;
-import org.sunbird.JsonKey;
 import org.sunbird.es.ElasticSearchUtil;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
@@ -44,7 +44,7 @@ public class CertTemplateController extends BaseController {
                         response.put(JsonKey.MESSAGE, ex.getMessage());
                     } else {
                         response.setResponseCode(ResponseCode.SERVER_ERROR);
-                        response.put(JsonKey.MESSAGE,localizerObject.getMessage(IResponseMessage.INTERNAL_ERROR,null));
+                        response.put(JsonKey.MESSAGE,locale.getMessage(IResponseMessage.INTERNAL_ERROR,null));
                     }
                 } else {
                     response.putAll(map);
@@ -61,8 +61,7 @@ public class CertTemplateController extends BaseController {
             });
 
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,request()));
         }
     }
 
@@ -81,7 +80,7 @@ public class CertTemplateController extends BaseController {
                         response.put(JsonKey.MESSAGE, ex.getMessage());
                     } else {
                         response.setResponseCode(ResponseCode.SERVER_ERROR);
-                        response.put(JsonKey.MESSAGE,localizerObject.getMessage(IResponseMessage.INTERNAL_ERROR,null));
+                        response.put(JsonKey.MESSAGE,locale.getMessage(IResponseMessage.INTERNAL_ERROR,null));
                     }
                 } else {
                     response.putAll(map);
@@ -98,8 +97,7 @@ public class CertTemplateController extends BaseController {
             });
 
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return RequestHandler.handleFailureResponse(ex, httpExecutionContext);
+            return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,request()));
         }
     }
 
@@ -114,7 +112,7 @@ public class CertTemplateController extends BaseController {
                             response.put(JsonKey.MESSAGE, ex.getMessage());
                         } else {
                             response.setResponseCode(ResponseCode.SERVER_ERROR);
-                            response.put(JsonKey.MESSAGE,localizerObject.getMessage(IResponseMessage.INTERNAL_ERROR,null));
+                            response.put(JsonKey.MESSAGE,locale.getMessage(IResponseMessage.INTERNAL_ERROR,null));
                         }
                     } else {
                         if(MapUtils.isNotEmpty(template)) {

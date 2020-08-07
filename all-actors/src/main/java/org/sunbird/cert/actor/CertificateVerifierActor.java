@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.incredible.UrlManager;
 import org.incredible.certProcessor.CertificateFactory;
+import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.certProcessor.store.CertStoreFactory;
 import org.incredible.certProcessor.store.ICertStore;
@@ -15,7 +16,6 @@ import org.incredible.certProcessor.store.StoreConfig;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
 import org.sunbird.CertsConstant;
-import org.sunbird.JsonKey;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.message.IResponseMessage;
@@ -43,8 +43,9 @@ import java.util.Map;
  * This actor is responsible for certificate verification.
  */
 @ActorConfig(
-        tasks = {JsonKey.VERIFY_CERT},
-        asyncTasks = {}
+  dispatcher = "cert-dispatcher",
+  tasks = {JsonKey.VERIFY_CERT},
+  asyncTasks = {}
 )
 public class CertificateVerifierActor extends BaseActor {
 

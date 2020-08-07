@@ -1,5 +1,11 @@
 package org.incredible.certProcessor.views;
 
+import org.apache.velocity.runtime.RuntimeInstance;
+import org.apache.velocity.runtime.parser.ParseException;
+import org.apache.velocity.runtime.parser.node.ASTReference;
+import org.apache.velocity.runtime.parser.node.ParserVisitor;
+import org.apache.velocity.runtime.parser.node.SimpleNode;
+import org.apache.velocity.runtime.visitor.BaseVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,37 +18,57 @@ public class HTMLTemplateValidator {
 
     private static Logger logger = LoggerFactory.getLogger(HTMLTemplateValidator.class);
 
-    private Set<String> htmlTemplateVariable;
+    /**
+     *  variables present in the html template
+     */
+    private static Set<String> htmlTemplateVariable;
 
-    public HTMLTemplateValidator(Set<String> htmlTemplateVariable) {
-        this.htmlTemplateVariable = htmlTemplateVariable;
+
+    public HTMLTemplateValidator(String htmlString) {
+        storeAllHTMLTemplateVariables(htmlString);
     }
 
-    public Boolean validate() {
-        HashSet<String> invalidVariables = new HashSet<>();
+
+    public Set<String> validate() {
+        Set<String> invalidVariables = new HashSet<>();
         Iterator<String> iterator = htmlTemplateVariable.iterator();
-        List<String> allVars = HTMLVars.get();
-        try {
-            while (iterator.hasNext()) {
-                String htmlVar = iterator.next();
-                if (!allVars.contains(htmlVar)) {
-                    invalidVariables.add(htmlVar);
-                }
+        List<String> validHtmlVars = HTMLVars.get();
+        while (iterator.hasNext()) {
+            String templateVars = iterator.next();
+            if (!validHtmlVars.contains(templateVars)) {
+                invalidVariables.add(templateVars);
             }
-            if (invalidVariables.isEmpty()) {
-                logger.info("HTML template is valid");
-                htmlTemplateVariable.clear();
-                return true;
-            } else {
-                throw new Exception("HTML template is not valid");
-            }
-
-        } catch (Exception e) {
-            logger.error("Exception while validating html template due to following invariables {} {}", invalidVariables, e.getMessage());
-            htmlTemplateVariable.clear();
-            return false;
         }
-
+        return invalidVariables;
     }
+
+
+    private static ParserVisitor visitor = new BaseVisitor() {
+        @Override
+        public Object visit(final ASTReference node, final Object data) {
+            htmlTemplateVariable.add(node.literal());
+            return null;
+        }
+    };
+
+    /**
+     * to get all the reference variables present in htmlString
+     *
+     * @param htmlString html file read in the form of string
+     * @return set of reference variables
+     */
+    public static Set<String> storeAllHTMLTemplateVariables(String htmlString) {
+        htmlTemplateVariable = new HashSet<>();
+        RuntimeInstance runtimeInstance = new RuntimeInstance();
+        SimpleNode node = null;
+        try {
+            node = runtimeInstance.parse(htmlString, null);
+        } catch (ParseException e) {
+            logger.debug("exception while storing template variables");
+        }
+        visitor.visit(node, null);
+        return htmlTemplateVariable;
+    }
+
 
 }

@@ -2,8 +2,8 @@ package controllers.certs;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.incredible.certProcessor.JsonKey;
 import org.sunbird.BaseException;
-import org.sunbird.JsonKey;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;

@@ -8,7 +8,8 @@ package org.sunbird.cert.actor.operation;
 public enum CertActorOperation {
 	GENERATE_CERTIFICATE("generateCert"),
 	GET_SIGN_URL("getSignUrl"),
-	VERIFY_CERT("verifyCert");
+	VERIFY_CERT("verifyCert"),
+	VALIDATE_TEMPLATE("validateTemplate");
 
 	private String operation;
 

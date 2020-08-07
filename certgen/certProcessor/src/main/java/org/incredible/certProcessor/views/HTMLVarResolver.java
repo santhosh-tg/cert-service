@@ -13,12 +13,13 @@ import java.util.Locale;
 
 public class HTMLVarResolver {
 
-
     private CertificateExtension certificateExtension;
 
     public HTMLVarResolver(CertificateExtension certificateExtension) {
         this.certificateExtension = certificateExtension;
     }
+
+
 
     public String getRecipientName() {
         return certificateExtension.getRecipient().getName();
@@ -60,26 +61,42 @@ public class HTMLVarResolver {
     }
 
     public String getSignatory0Image() {
-        return certificateExtension.getSignatory()[0].getImage();
+        if (certificateExtension.getSignatory().length >= 1) {
+            return certificateExtension.getSignatory()[0].getImage();
+        } else {
+            return "";
+        }
     }
 
     public String getSignatory0Designation() {
-        return certificateExtension.getSignatory()[0].getDesignation();
+        if (certificateExtension.getSignatory().length >= 1) {
+            return certificateExtension.getSignatory()[0].getDesignation();
+        } else {
+            return "";
+        }
     }
 
     public String getSignatory1Image() {
-        return certificateExtension.getSignatory()[1].getImage();
+        if (certificateExtension.getSignatory().length >= 2) {
+            return certificateExtension.getSignatory()[1].getImage();
+        } else {
+            return "";
+        }
     }
 
     public String getSignatory1Designation() {
-        return certificateExtension.getSignatory()[1].getDesignation();
+        if (certificateExtension.getSignatory().length >= 2) {
+            return certificateExtension.getSignatory()[1].getDesignation();
+        } else {
+            return "";
+        }
     }
 
     public String getCertificateName() {
         return certificateExtension.getBadge().getName();
     }
 
-    public String getcertificateDescription() {
+    public String getCertificateDescription() {
         return certificateExtension.getBadge().getDescription();
     }
 

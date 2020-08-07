@@ -17,7 +17,7 @@ public class UrlManager {
         return removeContainerName(uri,containerName);
     }
 
-    private static String removeQueryParams(String url) {
+    public static String removeQueryParams(String url) {
         return StringUtils.isNotBlank(url)?url.split("\\?")[0]:url;
     }
 
