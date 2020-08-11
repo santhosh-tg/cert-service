@@ -37,7 +37,11 @@ public class CertValidator {
     public void validateGenerateCertRequest(Request request) throws BaseException {
 
         Map<String, Object> certReq = (Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE);
-        checkMandatoryParamsPresent(certReq, JsonKey.CERTIFICATE, Arrays.asList(JsonKey.NAME, JsonKey.HTML_TEMPLATE));
+        if (((String) request.getContext().get(JsonKey.VERSION)).equalsIgnoreCase(JsonKey.VERSION_2)) {
+            checkMandatoryParamsPresent(certReq, JsonKey.CERTIFICATE, Arrays.asList(JsonKey.NAME));
+        } else {
+            checkMandatoryParamsPresent(certReq, JsonKey.CERTIFICATE, Arrays.asList(JsonKey.NAME, JsonKey.HTML_TEMPLATE));
+        }
         validateCertData((List<Map<String, Object>>) certReq.get(JsonKey.DATA));
         validateCertIssuer((Map<String, Object>) certReq.get(JsonKey.ISSUER));
         validateCertSignatoryList((List<Map<String, Object>>) certReq.get(JsonKey.SIGNATORY_LIST));

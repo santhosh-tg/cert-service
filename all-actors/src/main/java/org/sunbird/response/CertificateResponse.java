@@ -1,37 +1,27 @@
 package org.sunbird.response;
 
+import java.util.Map;
+
 public class CertificateResponse {
-    private String uuid;
+    private String id;
     private String accessCode;
-    private String jsonData;
+    private Map<String, Object> jsonData;
     private String recipientId;
-    private String pdfLink;
-    private String jsonLink;
-    public CertificateResponse() {
-    }
+    private String jsonUrl;
 
-    public CertificateResponse(String uuid, String accessCode, String jsonData, String recipientId) {
-        this.uuid = uuid;
+    public CertificateResponse(String id, String accessCode, String recipientId, Map<String, Object> jsonData) {
+        this.id = id;
         this.accessCode = accessCode;
-        this.jsonData = jsonData;
         this.recipientId = recipientId;
-        this.pdfLink = pdfLink;
-    }
-
-    public CertificateResponse(String uuid, String accessCode, String jsonData, String recipientId, String pdfLink) {
-        this.uuid = uuid;
-        this.accessCode = accessCode;
         this.jsonData = jsonData;
-        this.recipientId = recipientId;
-        this.pdfLink = pdfLink;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getId() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getAccessCode() {
@@ -42,11 +32,11 @@ public class CertificateResponse {
         this.accessCode = accessCode;
     }
 
-    public String getJsonData() {
+    public Map<String, Object> getJsonData() {
         return jsonData;
     }
 
-    public void setJsonData(String jsonData) {
+    public void setJsonData(Map<String, Object> jsonData) {
         this.jsonData = jsonData;
     }
 
@@ -58,20 +48,12 @@ public class CertificateResponse {
         this.recipientId = recipientId;
     }
 
-    public String getPdfLink() {
-        return pdfLink;
+    public String getJsonUrl() {
+        return jsonUrl;
     }
 
-    public void setPdfLink(String pdfLink) {
-        this.pdfLink = pdfLink;
-    }
-
-    public String getJsonLink() {
-        return jsonLink;
-    }
-
-    public void setJsonLink(String jsonLink) {
-        this.jsonLink = jsonLink;
+    public void setJsonUrl(String jsonUrl) {
+        this.jsonUrl = jsonUrl;
     }
 
 }

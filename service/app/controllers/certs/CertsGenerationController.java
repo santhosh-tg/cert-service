@@ -1,7 +1,10 @@
 package controllers.certs;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
+import org.incredible.certProcessor.JsonKey;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 
 import controllers.BaseController;
@@ -25,12 +28,30 @@ public class CertsGenerationController  extends BaseController{
 		CompletionStage<Result> response = handleRequest(request(),
 				request -> {
 					Request req = (Request) request;
+					Map<String, Object> context = new HashMap<>();
+					context.put(JsonKey.VERSION, JsonKey.VERSION_1);
+					req.setContext(context);
 					new CertValidator().validateGenerateCertRequest(req);
 					return null;
 					},
 				CertActorOperation.GENERATE_CERTIFICATE.getOperation());
 	    return response;
 	  }
+
+
+	public CompletionStage<Result> generateCertificateV2() {
+		CompletionStage<Result> response = handleRequest(request(),
+				request -> {
+					Request req = (Request) request;
+					Map<String, Object> context = new HashMap<>();
+					context.put(JsonKey.VERSION, JsonKey.VERSION_2);
+					req.setContext(context);
+					new CertValidator().validateGenerateCertRequest(req);
+					return null;
+				},
+				CertActorOperation.GENERATE_CERTIFICATE_V2.getOperation());
+		return response;
+	}
 
 	  public CompletionStage<Result> generateSignUrl() {
 			CompletionStage<Result> response = handleRequest(request(),

@@ -108,4 +108,11 @@ public interface JsonKey {
     String PUBLIC_CONTAINER_NAME = "PUBLIC_CONTAINER_NAME";
     String VALIDATE_TEMPLATE = "validateTemplate";
     String TEMPLATE_URL = "templateUrl";
+    String QR_CODE_URL  = "qrCodeUrl";
+    String VERSION_2 = "v2";
+    String VERSION_1 = "v1";
+    String VERSION = "version";
+    String GENERATE_CERT_V2 = "generateCertV2";
+
+
 }

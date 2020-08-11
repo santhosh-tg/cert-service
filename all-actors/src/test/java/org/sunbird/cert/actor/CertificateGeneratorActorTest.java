@@ -4,30 +4,17 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.zxing.NotFoundException;
-import com.google.zxing.WriterException;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.apache.commons.math3.analysis.function.Power;
-import org.incredible.CertificateGenerator;
-import org.incredible.UrlManager;
 import org.incredible.certProcessor.CertModel;
-import org.incredible.certProcessor.CertificateFactory;
+import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
 import org.incredible.certProcessor.qrcode.utils.QRCodeImageGenerator;
-import org.incredible.certProcessor.signature.exceptions.SignatureException;
 import org.incredible.certProcessor.store.*;
-import org.incredible.certProcessor.views.HTMLTemplateProvider;
 import org.incredible.certProcessor.views.HTMLTemplateZip;
 import org.incredible.certProcessor.views.HeadlessChromeHtmlToPdfConverter;
-import org.incredible.certProcessor.views.HtmlGenerator;
-import org.incredible.pojos.CertificateExtension;
-import org.incredible.pojos.CertificateResponse;
-import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -38,31 +25,25 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.sunbird.BaseException;
 import org.sunbird.CertMapper;
-import org.sunbird.CertsConstant;
-import org.sunbird.JsonKey;
-import org.sunbird.cert.actor.CertificateGeneratorActor;
 import org.sunbird.cloud.storage.BaseStorageService;
-import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
+import org.sunbird.response.CertificateResponse;
 import org.sunbird.response.Response;
 import scala.concurrent.duration.Duration;
 
-import java.awt.*;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.security.cert.CertStore;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
@@ -70,11 +51,9 @@ import static org.mockito.Mockito.when;
         CloudStorage.class,
         ICertStore.class,
         Localizer.class,
-        CertificateGenerator.class,
         AzureStore.class,
         FileUtils.class,
         File.class,
-        ObjectMapper.class,
         StorageServiceFactory.class})
 @PowerMockIgnore("javax.management.*")
 public class CertificateGeneratorActorTest {
@@ -105,8 +84,6 @@ public class CertificateGeneratorActorTest {
         PowerMockito.mockStatic(FileUtils.class);
         PowerMockito.mockStatic(Localizer.class);
         when(Localizer.getInstance()).thenReturn(null);
-        ObjectMapper mapper = PowerMockito.mock(ObjectMapper.class);
-        PowerMockito.whenNew(ObjectMapper.class).withNoArguments().thenReturn(mapper);
         CertStoreFactory certStoreFactory = PowerMockito.mock(CertStoreFactory.class);
         PowerMockito.whenNew(CertStoreFactory.class).withArguments(Mockito.anyMap()).thenReturn(certStoreFactory);
         StoreConfig storeParams = PowerMockito.mock(StoreConfig.class);
@@ -120,22 +97,6 @@ public class CertificateGeneratorActorTest {
         HTMLTemplateZip hTMLTemplateZip = PowerMockito.mock(HTMLTemplateZip.class);
         PowerMockito.whenNew(HTMLTemplateZip.class).withArguments(Mockito.any(ICertStore.class),Mockito.anyString()).thenReturn(hTMLTemplateZip);
         PowerMockito.when(certStoreFactory.getDirectoryName(Mockito.anyString())).thenReturn("directory");
-        CertificateGenerator certificateGenerator = PowerMockito.mock(CertificateGenerator.class);
-        PowerMockito.whenNew(CertificateGenerator.class).withArguments(Mockito.anyMap(),Mockito.anyString()).thenReturn(certificateGenerator);
-        CertificateResponse certificateResponse = PowerMockito.mock(CertificateResponse.class);
-        CertificateResponse certificateResponse2 = PowerMockito.mock(CertificateResponse.class);
-        PowerMockito.whenNew(CertificateResponse.class).withNoArguments().thenReturn(certificateResponse).thenReturn(certificateResponse2);
-        PowerMockito.whenNew(CertificateResponse.class).withArguments(Mockito.anyString(),Mockito.anyString(),Mockito.anyString(),Mockito.anyString()).thenReturn(certificateResponse2);
-        //CertificateResponse(uuid, accessCode, jsonData, certModel.getIdentifier());
-        CertModel certModel = PowerMockito.mock(CertModel.class);
-        List<CertModel> certModelList = new ArrayList<>();
-        certModelList.add(certModel);
-        PowerMockito.when(certMapper.toList(Mockito.anyMap())).thenReturn(certModelList);
-        CertificateExtension certificateExtension = PowerMockito.mock(CertificateExtension.class);
-        CertificateFactory certificateFactory = PowerMockito.mock(CertificateFactory.class);
-        PowerMockito.whenNew(CertificateFactory.class).withNoArguments().thenReturn(certificateFactory);
-        PowerMockito.when(certificateFactory.createCertificate(Mockito.any(CertModel.class),Mockito.anyMap())).thenReturn(certificateExtension);
-        PowerMockito.when(certificateExtension.getId()).thenReturn("AnyString").thenReturn("anotherString");
         AccessCodeGenerator accessCodeGenerator = PowerMockito.mock(AccessCodeGenerator.class);
         PowerMockito.whenNew(AccessCodeGenerator.class).withArguments(Mockito.anyDouble()).thenReturn(accessCodeGenerator);
         PowerMockito.when(accessCodeGenerator.generate()).thenReturn("anyString");
@@ -145,9 +106,6 @@ public class CertificateGeneratorActorTest {
         PowerMockito.whenNew(QRCodeImageGenerator.class).withNoArguments().thenReturn(qrCodeImageGenerator);
         File newFile = PowerMockito.mock(File.class);
         PowerMockito.when(qrCodeImageGenerator.createQRImages(qrCodeGenerationModel)).thenReturn(newFile);
-        HTMLTemplateProvider hTMLTemplateProvider = PowerMockito.mock(HTMLTemplateProvider.class);
-        PowerMockito.when(hTMLTemplateProvider.getTemplateContent(Mockito.anyString())).thenReturn("anyString");
-        PowerMockito.when(certificateGenerator.createCertificate(Mockito.any(CertModel.class),Mockito.any(HTMLTemplateZip.class))).thenReturn(certificateResponse2);
         PowerMockito.when(storeParams.getType()).thenReturn("Mockito.anyString()");
         File file6 = PowerMockito.mock(File.class);
         PowerMockito.when(FileUtils.getFile(Mockito.anyString())).thenReturn(file6);
@@ -163,11 +121,7 @@ public class CertificateGeneratorActorTest {
         PowerMockito.mockStatic(StorageServiceFactory.class);
         PowerMockito.when(StorageServiceFactory.getStorageService(Mockito.any(StorageConfig.class))).thenReturn(storageService);
         PowerMockito.when(certStore.save(Mockito.any(File.class), Mockito.anyString())).thenReturn("Mockito.anyString()");
-        PowerMockito.when(certificateResponse2.getUuid()).thenReturn("Mockito.anyString()");
-        PowerMockito.when(certificateResponse2.getRecipientId()).thenReturn("Mockito.anyString()");
-        PowerMockito.when(certificateResponse2.getAccessCode()).thenReturn("Mockito.anyString()");
-        PowerMockito.when(certificateResponse2.getJsonData()).thenReturn("{\"name\":\"john\",\"age\":22,\"class\":\"mca\"}");
-        Mockito.when(mapper.readValue(Mockito.anyString(), (TypeReference) Mockito.any(Map.class))).thenReturn(new HashMap());
+        PowerMockito.when(certStore.getPublicLink(Mockito.any(File.class), Mockito.anyString())).thenReturn("Mockito.anyString()");
         File file2 = PowerMockito.mock(File.class);
         File file3 = PowerMockito.mock(File.class);
         List<File> fileList = new ArrayList<>();
@@ -203,6 +157,9 @@ public class CertificateGeneratorActorTest {
         innerMap.put(JsonKey.ISSUER, issuer);
         innerMap.put(JsonKey.HTML_TEMPLATE, "https://drive.google.com/a/ilimi.in/uc?authuser=1&id=16WgZrm-1Dh44uFryMTo_0uVjZv65mp4u&export=download");
         reqObj.getRequest().put(JsonKey.CERTIFICATE, innerMap);
+        Map<String, Object> context = new HashMap<>();
+        context.put(JsonKey.VERSION, JsonKey.VERSION_2);
+        reqObj.setContext(context);
         return reqObj;
     }
 
