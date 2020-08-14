@@ -15,6 +15,7 @@ public class CertsConstant {
 
     private static final String BADGE_URL = "Badge.json";
     private static final String ISSUER_URL = "Issuer.json";
+    private static final String EVIDENCE_URL = "Evidence.json";
     private static final String CONTEXT = "v1/context.json";
     private static final String PUBLIC_KEY_URL = "_publicKey.json";
     private static final String VERIFICATION_TYPE = "SignedBadge";
@@ -54,6 +55,11 @@ public class CertsConstant {
     public String getISSUER_URL() {
         return BASE_PATH + "/" + ISSUER_URL;
     }
+
+    public String getEVIDENCE_URL() {
+        return BASE_PATH + "/" + EVIDENCE_URL;
+    }
+
 
     public String getCONTEXT() {
         return String.format("%s/%s", BASE_PATH, CONTEXT);

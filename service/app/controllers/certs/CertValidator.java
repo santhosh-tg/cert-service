@@ -38,7 +38,7 @@ public class CertValidator {
 
         Map<String, Object> certReq = (Map<String, Object>) request.getRequest().get(JsonKey.CERTIFICATE);
         if (((String) request.getContext().get(JsonKey.VERSION)).equalsIgnoreCase(JsonKey.VERSION_2)) {
-            checkMandatoryParamsPresent(certReq, JsonKey.CERTIFICATE, Arrays.asList(JsonKey.NAME));
+            checkMandatoryParamsPresent(certReq, JsonKey.CERTIFICATE, Arrays.asList(JsonKey.NAME, JsonKey.SVG_TEMPLATE));
         } else {
             checkMandatoryParamsPresent(certReq, JsonKey.CERTIFICATE, Arrays.asList(JsonKey.NAME, JsonKey.HTML_TEMPLATE));
         }

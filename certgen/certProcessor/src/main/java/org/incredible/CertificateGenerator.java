@@ -70,7 +70,7 @@ public class CertificateGenerator {
         return StringUtils.substringBefore(idStr, ".");
     }
 
-    public String generateCertificateJson() throws IOException {
+    public String generateCertificateJson(CertificateExtension certificateExtension) throws IOException {
         checkDirectoryExists();
         File file = new File(directory + getUUID(certificateExtension) + ".json");
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);

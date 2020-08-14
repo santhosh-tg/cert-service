@@ -6,6 +6,7 @@ import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.JsonKey;
@@ -26,6 +27,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.sunbird.CertMapper;
+import org.sunbird.SvgGenerator;
 import org.sunbird.cloud.storage.BaseStorageService;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
@@ -37,6 +39,9 @@ import org.sunbird.response.Response;
 import scala.concurrent.duration.Duration;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
@@ -54,7 +60,10 @@ import static org.mockito.Mockito.when;
         AzureStore.class,
         FileUtils.class,
         File.class,
-        StorageServiceFactory.class})
+        StorageServiceFactory.class,
+        LocalStore.class,
+        IOUtils.class,
+SvgGenerator.class})
 @PowerMockIgnore("javax.management.*")
 public class CertificateGeneratorActorTest {
     private static ActorSystem system = ActorSystem.create("system");
@@ -75,7 +84,7 @@ public class CertificateGeneratorActorTest {
         TestKit probe = new TestKit(system);
         ActorRef subject = system.actorOf(props);
         subject.tell(request, probe.getRef());
-        Response res = probe.expectMsgClass(Duration.create(10, TimeUnit.SECONDS),Response.class);
+        Response res = probe.expectMsgClass(Duration.create(40, TimeUnit.SECONDS),Response.class);
         Assert.assertTrue(null != res && res.getResponseCode() == ResponseCode.OK);
     }
 
@@ -106,6 +115,8 @@ public class CertificateGeneratorActorTest {
         PowerMockito.whenNew(QRCodeImageGenerator.class).withNoArguments().thenReturn(qrCodeImageGenerator);
         File newFile = PowerMockito.mock(File.class);
         PowerMockito.when(qrCodeImageGenerator.createQRImages(qrCodeGenerationModel)).thenReturn(newFile);
+        byte[] fileContent = new byte[4];
+        when(FileUtils.readFileToByteArray(Mockito.any(File.class))).thenReturn(fileContent);
         PowerMockito.when(storeParams.getType()).thenReturn("Mockito.anyString()");
         File file6 = PowerMockito.mock(File.class);
         PowerMockito.when(FileUtils.getFile(Mockito.anyString())).thenReturn(file6);
@@ -131,6 +142,12 @@ public class CertificateGeneratorActorTest {
         PowerMockito.when(file3.delete()).thenReturn(true);
         Iterator iterator = PowerMockito.mock(Iterator.class);
         PowerMockito.when(iterator.hasNext()).thenReturn(false);
+        LocalStore localStore = PowerMockito.mock(LocalStore.class);
+        PowerMockito.whenNew(LocalStore.class).withArguments(Mockito.anyString()).thenReturn(localStore);
+        doNothing().when(localStore).get(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        PowerMockito.mockStatic(IOUtils.class);
+        when(IOUtils.toString(Mockito.any(FileInputStream.class), Mockito.anyString())).thenReturn("This is to acknowledge that $recipientName has successfully completed the training $courseName");
+
     }
 
     private Request createCertRequest() {
@@ -156,6 +173,7 @@ public class CertificateGeneratorActorTest {
         innerMap.put(JsonKey.KEYS, null);
         innerMap.put(JsonKey.ISSUER, issuer);
         innerMap.put(JsonKey.HTML_TEMPLATE, "https://drive.google.com/a/ilimi.in/uc?authuser=1&id=16WgZrm-1Dh44uFryMTo_0uVjZv65mp4u&export=download");
+        innerMap.put(JsonKey.SVG_TEMPLATE, "https://sunbirddev.blob.core.windows.net/user/cert/File-01308512781758464046.svg");
         reqObj.getRequest().put(JsonKey.CERTIFICATE, innerMap);
         Map<String, Object> context = new HashMap<>();
         context.put(JsonKey.VERSION, JsonKey.VERSION_2);

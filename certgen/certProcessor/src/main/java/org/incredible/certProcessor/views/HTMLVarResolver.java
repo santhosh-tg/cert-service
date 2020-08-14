@@ -1,6 +1,7 @@
 package org.incredible.certProcessor.views;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.incredible.pojos.CertificateExtension;
 
 import java.net.URI;
@@ -30,10 +31,12 @@ public class HTMLVarResolver {
     }
 
     public String getCourseName() {
-        //todo need to resolve
-        return certificateExtension.getBadge().getName();
+        if(ObjectUtils.anyNotNull(certificateExtension.getEvidence()) && StringUtils.isNotBlank(certificateExtension.getEvidence().getName())) {
+            return certificateExtension.getEvidence().getName();
+        } else {
+            return "";
+        }
     }
-
 
     public String getQrCodeImage() {
         try {

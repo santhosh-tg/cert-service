@@ -11,6 +11,37 @@ public class TrainingEvidenceBuilder implements IBuilder<TrainingEvidence> {
         trainingEvidence = new TrainingEvidence(context);
     }
 
+    public TrainingEvidenceBuilder setId(String id) {
+        trainingEvidence.setId(id);
+        return this;
+    }
+
+    public TrainingEvidenceBuilder setNarrative(String narrative) {
+        trainingEvidence.setNarrative(narrative);
+        return this;
+    }
+
+    public TrainingEvidenceBuilder setName(String name) {
+        trainingEvidence.setName(name);
+        return this;
+    }
+
+    public TrainingEvidenceBuilder setDescription(String description) {
+        trainingEvidence.setDescription(description);
+        return this;
+    }
+
+    public TrainingEvidenceBuilder setAudience(String audience) {
+        trainingEvidence.setAudience(audience);
+        return this;
+    }
+
+    public TrainingEvidenceBuilder setGenre(String genre) {
+        trainingEvidence.setGenre(genre);
+        return this;
+    }
+
+
     public TrainingEvidenceBuilder setSubject(String subject) {
         trainingEvidence.setSubject(subject);
         return this;

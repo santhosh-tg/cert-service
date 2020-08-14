@@ -20,6 +20,7 @@ import org.sunbird.CertMapper;
 import org.sunbird.CertsConstant;
 import org.sunbird.PdfGenerator;
 import org.sunbird.QRStorageParams;
+import org.sunbird.SvgGenerator;
 import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 import org.sunbird.cloud.storage.BaseStorageService;
@@ -30,13 +31,13 @@ import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.CertificateResponse;
 import org.sunbird.response.CertificateResponseV1;
-import org.sunbird.response.CertificateResponseV2;
 import org.sunbird.response.Response;
 import scala.Some;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -134,19 +135,24 @@ public class CertificateGeneratorActor extends BaseActor {
                 CertificateExtension certificateExtension = certificateGenerator.getCertificateExtension(certModel);
                 uuid = certificateGenerator.getUUID(certificateExtension);
                 Map<String,Object> qrMap = certificateGenerator.generateQrCode();
-                String qrImageUrl = uploadQrCode((File)qrMap.get(JsonKey.QR_CODE_FILE),properties);
                 String accessCode = (String)qrMap.get(JsonKey.ACCESS_CODE);
-                String jsonData = certificateGenerator.generateCertificateJson();
-                Map<String, Object> uploadRes = uploadJson(directory + uuid, certStore, certStoreFactory.setCloudPath(storeParams));
                 String version = (String) request.getContext().get(JsonKey.VERSION);
                 CertificateResponse certificateResponse;
                 if (version.equalsIgnoreCase(JsonKey.VERSION_2)) {
-                    certificateResponse = new CertificateResponseV2(uuid, accessCode, certModel.getIdentifier(), mapper.readValue(jsonData, Map.class), qrImageUrl);
+                    String encodedQrCode = encodeQrCode((File)qrMap.get(JsonKey.QR_CODE_FILE));
+                    SvgGenerator svgGenerator = new SvgGenerator((String)((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.SVG_TEMPLATE), directory);
+                    String encodedSvg = svgGenerator.generate(certificateExtension, encodedQrCode);
+                    certificateExtension.setPrintUri(encodedSvg);
+                    String jsonData = certificateGenerator.generateCertificateJson(certificateExtension);
+                    certificateResponse = new CertificateResponse(uuid, accessCode, certModel.getIdentifier(), mapper.readValue(jsonData, Map.class));
                 } else {
+                    String jsonData = certificateGenerator.generateCertificateJson(certificateExtension);
+                    String qrImageUrl = uploadQrCode((File)qrMap.get(JsonKey.QR_CODE_FILE),properties);
                     String htmlTemplateUrl =  (String)((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.HTML_TEMPLATE);
                     String pdfLink = PdfGenerator.generate(htmlTemplateUrl, certificateExtension, qrImageUrl, getContainerName(storeParams), certStoreFactory.setCloudPath(storeParams));
                     certificateResponse = new CertificateResponseV1(uuid, accessCode,certModel.getIdentifier(), mapper.readValue(jsonData, Map.class), properties.get(JsonKey.BASE_PATH).concat(pdfLink));
                 }
+                Map<String, Object> uploadRes = uploadJson(directory + uuid, certStore, certStoreFactory.setCloudPath(storeParams));
                 certificateResponse.setJsonUrl(properties.get(JsonKey.BASE_PATH).concat((String) uploadRes.get(JsonKey.JSON_URL)));
                 certUrlList.add(mapper.convertValue(certificateResponse, new TypeReference<Map<String, Object>>(){}));
             } catch (Exception ex) {
@@ -184,6 +190,11 @@ public class CertificateGeneratorActor extends BaseActor {
         return qrImageUrl;
     }
 
+    private String encodeQrCode(File file) throws IOException {
+        byte[] fileContent = FileUtils.readFileToByteArray(file);
+        return Base64.getEncoder().encodeToString(fileContent);
+    }
+
     private String getContainerName (StoreConfig storeParams) {
         String type = storeParams.getType();
         if (JsonKey.AZURE.equalsIgnoreCase(type)) {
@@ -219,6 +230,7 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.CONTAINER_NAME, certVar.getCONTAINER_NAME());
         properties.put(JsonKey.BADGE_URL, certVar.getBADGE_URL(tag));
         properties.put(JsonKey.ISSUER_URL, certVar.getISSUER_URL());
+        properties.put(JsonKey.EVIDENCE_URL, certVar.getEVIDENCE_URL());
         properties.put(JsonKey.CONTEXT, certVar.getCONTEXT());
         properties.put(JsonKey.VERIFICATION_TYPE, certVar.getVERIFICATION_TYPE());
         properties.put(JsonKey.ACCESS_CODE_LENGTH, certVar.getACCESS_CODE_LENGTH());

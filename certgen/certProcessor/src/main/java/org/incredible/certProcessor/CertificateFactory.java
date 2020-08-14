@@ -43,6 +43,7 @@ public class CertificateFactory {
         IssuerBuilder issuerBuilder = new IssuerBuilder(properties.get(JsonKey.CONTEXT));
         SignedVerification signedVerification = new SignedVerification();
         SignatureBuilder signatureBuilder = new SignatureBuilder();
+        TrainingEvidenceBuilder trainingEvidenceBuilder = new TrainingEvidenceBuilder(properties.get(JsonKey.CONTEXT));
 
 
         /**
@@ -60,11 +61,18 @@ public class CertificateFactory {
          * badge class object
          * **/
 
-        badgeClassBuilder.setName(certModel.getCourseName()).setDescription(certModel.getCertificateDescription())
+        badgeClassBuilder.setName(certModel.getCertificateName()).setDescription(certModel.getCertificateDescription())
                 .setId(properties.get(JsonKey.BADGE_URL)).setCriteria(certModel.getCriteria())
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
 
+        /**
+         * Training evidence
+         */
+        if (StringUtils.isNotBlank(certModel.getCourseName())) {
+            trainingEvidenceBuilder.setId(properties.get(JsonKey.EVIDENCE_URL)).setName(certModel.getCourseName());
+            certificateExtensionBuilder.setEvidence(trainingEvidenceBuilder.build());
+        }
 
         /**
          *
