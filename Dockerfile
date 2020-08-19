@@ -12,5 +12,6 @@ ADD ./cert-service-1.2.0-dist.zip /home/sunbird/
 RUN unzip /home/sunbird/cert-service-1.2.0-dist.zip -d /home/sunbird/
 RUN chown -R sunbird:sunbird /home/sunbird
 USER sunbird
+EXPOSE 9000
 WORKDIR /home/sunbird/
-CMD java  -cp '/home/sunbird/cert-service-1.2.0/lib/*' play.core.server.ProdServerStart  /home/sunbird/cert-service-1.2.0
+CMD java -XX:+PrintFlagsFinal $JAVA_OPTIONS -cp '/home/sunbird/cert-service-1.2.0/lib/*' play.core.server.ProdServerStart  /home/sunbird/cert-service-1.2.0
