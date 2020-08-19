@@ -5,7 +5,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import controllers.RequestHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sunbird.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
@@ -27,7 +28,7 @@ import javax.inject.Inject;
  */
 public class HealthController extends BaseController {
   // Service name must be "service" for the DevOps monitoring.
-  Logger logger = Logger.getLogger(HealthController.class);
+  Logger logger = LoggerFactory.getLogger(HealthController.class);
   private static final String service = "service";
   private static final String HEALTH_ACTOR_OPERATION_NAME = "health";
 

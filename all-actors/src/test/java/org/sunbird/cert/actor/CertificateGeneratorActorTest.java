@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
         StorageServiceFactory.class,
         LocalStore.class,
         IOUtils.class,
-SvgGenerator.class})
+        SvgGenerator.class})
 @PowerMockIgnore("javax.management.*")
 public class CertificateGeneratorActorTest {
     private static ActorSystem system = ActorSystem.create("system");
@@ -145,8 +145,11 @@ public class CertificateGeneratorActorTest {
         LocalStore localStore = PowerMockito.mock(LocalStore.class);
         PowerMockito.whenNew(LocalStore.class).withArguments(Mockito.anyString()).thenReturn(localStore);
         doNothing().when(localStore).get(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        FileInputStream fileInputStreamMock = PowerMockito.mock(FileInputStream.class);
+        PowerMockito.whenNew(FileInputStream.class).withArguments(Mockito.anyString())
+                .thenReturn(fileInputStreamMock);
         PowerMockito.mockStatic(IOUtils.class);
-        when(IOUtils.toString(Mockito.any(FileInputStream.class), Mockito.anyString())).thenReturn("This is to acknowledge that $recipientName has successfully completed the training $courseName");
+        when(IOUtils.toString(fileInputStreamMock, StandardCharsets.UTF_8)).thenReturn("This is to acknowledge that $recipientName has successfully completed the training $courseName");
 
     }
 

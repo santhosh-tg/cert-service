@@ -1,8 +1,9 @@
 package org.sunbird;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.incredible.certProcessor.JsonKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +12,8 @@ import java.util.Map;
  * this constant file is used to get the Constants which is used by entire actors
  */
 public class CertsConstant {
-    private static Logger logger = Logger.getLogger(CertsConstant.class);
+
+    private static Logger logger = LoggerFactory.getLogger(CertsConstant.class);
 
     private static final String BADGE_URL = "Badge.json";
     private static final String ISSUER_URL = "Issuer.json";

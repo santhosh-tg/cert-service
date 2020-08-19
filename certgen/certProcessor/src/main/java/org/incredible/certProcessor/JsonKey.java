@@ -115,4 +115,7 @@ public interface JsonKey {
     String VERSION = "version";
     String GENERATE_CERT_V2 = "generateCertV2";
     String SVG_TEMPLATE = "svgTemplate";
+    String REQ_ID = "reqId";
+    String REQUEST_MESSAGE_ID = "msgId";
+    String X_REQUEST_ID = "X-Request-ID";
 }

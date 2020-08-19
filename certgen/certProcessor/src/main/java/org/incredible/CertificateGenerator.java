@@ -31,7 +31,7 @@ import java.util.Map;
 public class CertificateGenerator {
 
 
-    private static Logger logger = LoggerFactory.getLogger(CertificateFactory.class);
+    private static Logger logger = LoggerFactory.getLogger(CertificateGenerator.class);
 
     private Map<String, String> properties;
 

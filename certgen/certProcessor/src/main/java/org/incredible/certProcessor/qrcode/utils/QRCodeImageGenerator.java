@@ -66,7 +66,7 @@ public class QRCodeImageGenerator {
 
         File finalImageFile = new File(fileName + "." + imageFormat);
         ImageIO.write(qrImage, imageFormat, finalImageFile);
-        logger.info("qr code is created for the certificate");
+        logger.info("qr created");
         return finalImageFile;
 
     }

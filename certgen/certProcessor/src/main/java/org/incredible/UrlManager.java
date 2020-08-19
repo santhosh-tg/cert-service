@@ -1,14 +1,16 @@
 package org.incredible;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class UrlManager {
     private static URL urlPath;
-    private static Logger logger = Logger.getLogger(UrlManager.class);
+    private static Logger logger = LoggerFactory.getLogger(UrlManager.class);
 
     public static String getSharableUrl(String url,String containerName) {
         String uri;

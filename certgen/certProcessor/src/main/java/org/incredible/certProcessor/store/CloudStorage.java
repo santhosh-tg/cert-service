@@ -1,8 +1,10 @@
 package org.incredible.certProcessor.store;
 
 
-import org.apache.log4j.Logger;
 import org.incredible.UrlManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.sunbird.cloud.storage.BaseStorageService;
 import scala.Option;
 
@@ -10,7 +12,7 @@ import java.io.File;
 
 public class CloudStorage {
 
-    private Logger logger = Logger.getLogger(CloudStorage.class);
+    private Logger logger = LoggerFactory.getLogger(CloudStorage.class);
 
     private  BaseStorageService storageService;
 

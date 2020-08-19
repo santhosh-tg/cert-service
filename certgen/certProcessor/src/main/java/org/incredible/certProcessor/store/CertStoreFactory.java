@@ -5,8 +5,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.incredible.certProcessor.JsonKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -18,7 +19,7 @@ import java.util.Map;
 public class CertStoreFactory {
 
 
-    private static Logger logger = Logger.getLogger(CertStoreFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Map<String, String> properties;
 
@@ -98,7 +99,7 @@ public class CertStoreFactory {
                     File file = (File) iterator.next();
                     isDeleted = file.delete();
                 }
-                logger.info("CertificateGeneratorActor: cleanUp completed: " + isDeleted);
+                logger.info("files cleanUp completed: " + isDeleted);
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
