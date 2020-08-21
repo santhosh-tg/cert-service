@@ -4,11 +4,9 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.testkit.javadsl.TestKit;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
 import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
@@ -34,13 +32,11 @@ import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 import org.sunbird.message.Localizer;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
-import org.sunbird.response.CertificateResponse;
 import org.sunbird.response.Response;
 import scala.concurrent.duration.Duration;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -155,7 +151,7 @@ public class CertificateGeneratorActorTest {
 
     private Request createCertRequest() {
         Request reqObj = new Request();
-        reqObj.setOperation(JsonKey.GENERATE_CERT);
+        reqObj.setOperation(JsonKey.GENERATE_CERT_V2);
         Map<String, Object> innerMap = new HashMap<>();
         List<Map<String, Object>> listOfData = new ArrayList<>();
         Map<String, Object> data = new HashMap<>();
