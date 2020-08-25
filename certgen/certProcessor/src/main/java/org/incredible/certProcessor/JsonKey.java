@@ -118,4 +118,13 @@ public interface JsonKey {
     String REQ_ID = "reqId";
     String REQUEST_MESSAGE_ID = "msgId";
     String X_REQUEST_ID = "X-Request-ID";
+    String CERT_NAME = "certificateName";
+    String CERTIFICATE_DESCIPTION = "certificateDescription";
+    String SIGNATORY_0_IMAGE = "signatory0Image";
+    String SIGNATORY_0_DESIGNATION = "signatory0Designation";
+    String SIGNATORY_1_IMAGE = "signatory1Image";
+    String SIGNATORY_1_DESIGNATION = "signatory1Designation";
+    String QRCODE_IMAGE = "qrCodeImage";
+    String EXPIRY_DATE = "expiryDate";
+    String ISSUER_NAME = "issuerName";
 }
