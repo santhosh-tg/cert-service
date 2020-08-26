@@ -60,11 +60,18 @@ public class CertificateFactory {
         /**
          * badge class object
          * **/
-
-        badgeClassBuilder.setName(certModel.getCertificateName()).setDescription(certModel.getCertificateDescription())
+        badgeClassBuilder.setDescription(certModel.getCertificateDescription())
                 .setId(properties.get(JsonKey.BADGE_URL)).setCriteria(certModel.getCriteria())
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
+        //TODO for now badge name is set as course name, it should be certificate name
+        //after certificate QR validation the portal uses badge name to display the course name,but course name is in the training evidence(introduced in release-1.5.0)
+        //in evidence we are setting training name as courseName
+        if(StringUtils.isNotEmpty(certModel.getCourseName())){
+            badgeClassBuilder.setName(certModel.getCourseName());
+        } else {
+            badgeClassBuilder.setName(certModel.getCertificateName());
+        }
 
         /**
          * Training evidence
