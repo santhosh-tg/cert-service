@@ -41,11 +41,6 @@ import java.util.Map;
 /**
  * This actor is responsible for certificate verification.
  */
-@ActorConfig(
-  dispatcher = "cert-dispatcher",
-  tasks = {JsonKey.VERIFY_CERT},
-  asyncTasks = {}
-)
 public class CertificateVerifierActor extends BaseActor {
 
     private ObjectMapper mapper = new ObjectMapper();

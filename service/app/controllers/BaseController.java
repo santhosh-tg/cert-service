@@ -99,7 +99,7 @@ public class BaseController extends Controller {
 	 * @param operation
 	 * @return
 	 */
-	public CompletionStage<Result> handleRequest(play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
+	public CompletionStage<Result> handleRequest(ActorRef actorRef, play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
 			String operation) {
 		try {
 			Request request = new Request();
@@ -109,7 +109,7 @@ public class BaseController extends Controller {
 			if (validatorFunction != null) {
 				validatorFunction.apply(request);
 			}
-			return new RequestHandler().handleRequest(request, operation,req);
+			return new RequestHandler().handleRequest(request,actorRef,operation,req);
 		} catch (BaseException ex) {
 			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex, req));
 		} catch (Exception ex) {
@@ -125,9 +125,9 @@ public class BaseController extends Controller {
 	 * @param operation
 	 * @return
 	 */
-	public CompletionStage<Result> handleRequest(Request req, String operation, play.mvc.Http.Request httpReq) throws Exception {
+	public CompletionStage<Result> handleRequest(ActorRef actorRef, Request req, String operation, play.mvc.Http.Request httpReq) throws Exception {
 		try {
-			return new RequestHandler().handleRequest(req, operation, httpReq);
+			return new RequestHandler().handleRequest(req, actorRef, operation, httpReq);
 		} catch (BaseException ex) {
 			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,httpReq));
 		} catch (Exception ex) {

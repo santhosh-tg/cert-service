@@ -23,11 +23,6 @@ import java.util.Set;
  * @author Aishwarya
  * This actor is responsible for Template validation
  */
-@ActorConfig(
-  dispatcher = "cert-dispatcher",
-  tasks = {JsonKey.VALIDATE_TEMPLATE},
-  asyncTasks = {}
-)
 public class TemplateValidateActor extends BaseActor {
 
     private CertsConstant certsConstant = new CertsConstant();

@@ -11,10 +11,6 @@ import org.sunbird.response.Response;
  * @author manzarul
  *
  */
-@ActorConfig(
-        tasks = {"health"},
-        asyncTasks = {}
-)
 public class HealthActor extends BaseActor{
 
 	@Override
