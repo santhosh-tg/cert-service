@@ -43,6 +43,7 @@ public class CertificateFactory {
         IssuerBuilder issuerBuilder = new IssuerBuilder(properties.get(JsonKey.CONTEXT));
         SignedVerification signedVerification = new SignedVerification();
         SignatureBuilder signatureBuilder = new SignatureBuilder();
+        TrainingEvidenceBuilder trainingEvidenceBuilder = new TrainingEvidenceBuilder(properties.get(JsonKey.CONTEXT));
 
 
         /**
@@ -59,12 +60,26 @@ public class CertificateFactory {
         /**
          * badge class object
          * **/
-
-        badgeClassBuilder.setName(certModel.getCourseName()).setDescription(certModel.getCertificateDescription())
+        badgeClassBuilder.setDescription(certModel.getCertificateDescription())
                 .setId(properties.get(JsonKey.BADGE_URL)).setCriteria(certModel.getCriteria())
                 .setImage(certModel.getCertificateLogo()).
                 setIssuer(issuerBuilder.build());
+        //TODO for now badge name is set as course name, it should be certificate name
+        //after certificate QR validation the portal uses badge name to display the course name,but course name is in the training evidence(introduced in release-1.5.0)
+        //in evidence we are setting training name as courseName
+        if(StringUtils.isNotEmpty(certModel.getCourseName())){
+            badgeClassBuilder.setName(certModel.getCourseName());
+        } else {
+            badgeClassBuilder.setName(certModel.getCertificateName());
+        }
 
+        /**
+         * Training evidence
+         */
+        if (StringUtils.isNotBlank(certModel.getCourseName())) {
+            trainingEvidenceBuilder.setId(properties.get(JsonKey.EVIDENCE_URL)).setName(certModel.getCourseName());
+            certificateExtensionBuilder.setEvidence(trainingEvidenceBuilder.build());
+        }
 
         /**
          *

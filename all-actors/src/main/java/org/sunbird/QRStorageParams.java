@@ -1,14 +1,16 @@
 package org.sunbird;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.incredible.certProcessor.JsonKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class QRStorageParams {
 
-    private Logger logger = Logger.getLogger(QRStorageParams.class);
+    private Logger logger = LoggerFactory.getLogger(QRStorageParams.class);
     public Map<String, Object> storeParams;
 
     public QRStorageParams(String storageType) {

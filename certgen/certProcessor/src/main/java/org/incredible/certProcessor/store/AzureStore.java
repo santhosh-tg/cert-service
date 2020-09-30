@@ -2,9 +2,9 @@ package org.incredible.certProcessor.store;
 
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sunbird.cloud.storage.BaseStorageService;
-import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
@@ -12,11 +12,10 @@ import org.sunbird.cloud.storage.factory.StorageServiceFactory;
  * used to upload or download files to the azure
  */
 import java.io.File;
-import java.io.IOException;
 
 public class AzureStore extends CloudStore {
 
-    private Logger logger = Logger.getLogger(AzureStore.class);
+    private Logger logger = LoggerFactory.getLogger(AzureStore.class);
 
     private StoreConfig azureStoreConfig;
 
@@ -66,7 +65,6 @@ public class AzureStore extends CloudStore {
             StorageConfig storageConfig = new StorageConfig(azureStoreConfig.getType(), storageKey, storageSecret);
             logger.info("StorageParams:init:all storage params initialized for azure block");
             storageService = StorageServiceFactory.getStorageService(storageConfig);
-
             cloudStorage = new CloudStorage(storageService);
         } else {
             logger.error("StorageParams:init:provided cloud store type doesn't match supported storage devices:".concat(azureStoreConfig.getType()));

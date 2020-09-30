@@ -51,13 +51,13 @@ public class SignatureHelper {
         Map signReq = new HashMap<String, Object>();
         signReq.put(JsonKey.ENTITY, rootNode);
         CloseableHttpClient client = HttpClients.createDefault();
-        logger.info("SignatureHelper:generateSignature:keyID:".concat(keyId));
+        logger.info("generateSignature:keyID:".concat(keyId));
         String encServiceUrl = SIGN_API_ENDPOINT.concat(keyId);
-        logger.info("SignatureHelper:generateSignature:enc service url formed:".concat(encServiceUrl));
+        logger.info("generateSignature:enc service url formed:".concat(encServiceUrl));
         HttpPost httpPost = new HttpPost(encServiceUrl);
         try {
             StringEntity entity = new StringEntity(mapper.writeValueAsString(signReq));
-            logger.info("SignatureHelper:generateSignature:SignRequest for enc-service call:".concat(mapper.writeValueAsString(signReq)));
+            logger.info("generateSignature:SignRequest for enc-service call:".concat(mapper.writeValueAsString(signReq)));
             httpPost.setEntity(entity);
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
             CloseableHttpResponse response = client.execute(httpPost);

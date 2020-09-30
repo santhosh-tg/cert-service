@@ -1,7 +1,6 @@
 package org.sunbird.cert.actor;
 
 
-import org.apache.log4j.Logger;
 import org.incredible.certProcessor.JsonKey;
 import org.incredible.certProcessor.store.LocalStore;
 import org.incredible.certProcessor.views.HTMLTemplateValidator;
@@ -31,13 +30,12 @@ import java.util.Set;
 )
 public class TemplateValidateActor extends BaseActor {
 
-    private Logger logger = Logger.getLogger(TemplateValidateActor.class);
     private CertsConstant certsConstant = new CertsConstant();
 
     @Override
     public void onReceive(Request request) throws Throwable {
         String operation = request.getOperation();
-        logger.info("onReceive method call start for operation " + operation);
+        logger.info("onReceive method call start for operation {}", operation);
         if (JsonKey.VALIDATE_TEMPLATE.equalsIgnoreCase(operation)) {
             validateTemplate(request);
         }
@@ -63,10 +61,10 @@ public class TemplateValidateActor extends BaseActor {
                 throw new BaseException("INVALID_TEMPLATE_URL", MessageFormat.format(IResponseMessage.INVALID_TEMPLATE_URL, ": unable to download zip file , please provide valid url"), ResponseCode.BAD_REQUEST.getCode());
             }
         } catch (StorageServiceException e) {
-            logger.info("exception while downloading " + e.getMessage());
+            logger.info("exception while downloading {}", e.getMessage());
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
         } catch (IOException e) {
-            logger.info("exception while unzipping " + e.getMessage());
+            logger.info("exception while unzipping {}", e.getMessage());
             throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ": exception while unzipping " + e.getMessage()), ResponseCode.BAD_REQUEST.getCode());
         } finally {
             htmlTemplateZip.cleanUp();

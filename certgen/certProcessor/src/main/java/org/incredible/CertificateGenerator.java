@@ -31,7 +31,7 @@ import java.util.Map;
 public class CertificateGenerator {
 
 
-    private static Logger logger = LoggerFactory.getLogger(CertificateFactory.class);
+    private static Logger logger = LoggerFactory.getLogger(CertificateGenerator.class);
 
     private Map<String, String> properties;
 
@@ -70,7 +70,7 @@ public class CertificateGenerator {
         return StringUtils.substringBefore(idStr, ".");
     }
 
-    public String generateCertificateJson() throws IOException {
+    public String generateCertificateJson(CertificateExtension certificateExtension) throws IOException {
         checkDirectoryExists();
         File file = new File(directory + getUUID(certificateExtension) + ".json");
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);

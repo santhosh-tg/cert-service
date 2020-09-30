@@ -5,11 +5,14 @@ import org.incredible.pojos.ob.exeptions.InvalidDateFormatException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class IssuedDateValuator implements IEvaluator {
 
-    private static List<SimpleDateFormat> dateFormats = Arrays.asList(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    private List<SimpleDateFormat> dateFormats = Arrays.asList(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
             , new SimpleDateFormat("yyyy-MM-dd"));
 
     @Override

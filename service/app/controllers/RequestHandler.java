@@ -14,11 +14,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.sunbird.response.ResponseParams;
 import play.libs.Json;
-import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.Result;
 import play.mvc.Results;
 import scala.compat.java8.FutureConverters;
-import scala.concurrent.Await;
 import scala.concurrent.Future;
 
 import java.util.concurrent.CompletableFuture;
@@ -77,7 +75,7 @@ public class RequestHandler extends BaseController {
             ex.getResponseCode(),
             Json.toJson(createResponseOnException(ex)));
         } else {
-          return Results.internalServerError();
+          return Results.internalServerError(Json.toJson(response));
         }
       } else {
         response.setResponseCode(ResponseCode.SERVER_ERROR);

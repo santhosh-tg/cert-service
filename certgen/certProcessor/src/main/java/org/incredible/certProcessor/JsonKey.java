@@ -12,6 +12,7 @@ public interface JsonKey {
     String DOMAIN_URL = "sunbird_cert_domain_url";
     String BADGE_URL = "BADGE_URL";
     String ISSUER_URL = "ISSUER_URL";
+    String EVIDENCE_URL = "EVIDENCE_URL";
     String CONTEXT = "CONTEXT";
     String VERIFICATION_TYPE = "VERIFICATION_TYPE";
     String PUBLIC_KEY_URL = "PUBLIC_KEY_URL";
@@ -108,4 +109,22 @@ public interface JsonKey {
     String PUBLIC_CONTAINER_NAME = "PUBLIC_CONTAINER_NAME";
     String VALIDATE_TEMPLATE = "validateTemplate";
     String TEMPLATE_URL = "templateUrl";
+    String QR_CODE_URL  = "qrCodeUrl";
+    String VERSION_2 = "v2";
+    String VERSION_1 = "v1";
+    String VERSION = "version";
+    String GENERATE_CERT_V2 = "generateCertV2";
+    String SVG_TEMPLATE = "svgTemplate";
+    String REQ_ID = "reqId";
+    String REQUEST_MESSAGE_ID = "msgId";
+    String X_REQUEST_ID = "X-Request-ID";
+    String CERT_NAME = "certificateName";
+    String CERTIFICATE_DESCIPTION = "certificateDescription";
+    String SIGNATORY_0_IMAGE = "signatory0Image";
+    String SIGNATORY_0_DESIGNATION = "signatory0Designation";
+    String SIGNATORY_1_IMAGE = "signatory1Image";
+    String SIGNATORY_1_DESIGNATION = "signatory1Designation";
+    String QRCODE_IMAGE = "qrCodeImage";
+    String EXPIRY_DATE = "expiryDate";
+    String ISSUER_NAME = "issuerName";
 }

@@ -11,6 +11,7 @@ import org.sunbird.message.ResponseCode;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /** @author Manzarul */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,6 +29,7 @@ public class Request implements Serializable {
   private RequestParams params;
 
   private Map<String, Object> request = new HashMap<>();
+  private Map<String, Object> headers = new WeakHashMap<>();
 
   private String managerName;
   private String operation;
@@ -145,6 +147,14 @@ public class Request implements Serializable {
   public void setParams(RequestParams params) {
     this.params = params;
     if (this.params.getMsgid() == null && requestId != null) this.params.setMsgid(requestId);
+  }
+
+  public Map<String, Object> getHeaders() {
+    return headers;
+  }
+
+  public void setHeaders(Map<String, Object> headers) {
+    this.headers = headers;
   }
 
   /** @return the env */

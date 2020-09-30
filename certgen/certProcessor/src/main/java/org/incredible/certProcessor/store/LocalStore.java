@@ -1,8 +1,9 @@
 package org.incredible.certProcessor.store;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 import org.incredible.certProcessor.JsonKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.HttpMethod;
 import java.io.File;
@@ -15,7 +16,7 @@ import java.net.URL;
 
 public class LocalStore implements ICertStore {
 
-    private Logger logger = Logger.getLogger(LocalStore.class);
+    private Logger logger = LoggerFactory.getLogger(LocalStore.class);
 
     private String domainUrl;
 

@@ -1,14 +1,13 @@
 package org.incredible.certProcessor.store;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sunbird.cloud.storage.BaseStorageService;
-import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * used to upload or downloads files to aws
@@ -17,7 +16,7 @@ public class AwsStore extends CloudStore {
 
     private StoreConfig awsStoreConfig;
 
-    private Logger logger = Logger.getLogger(AwsStore.class);
+    private Logger logger = LoggerFactory.getLogger(AwsStore.class);
 
     private BaseStorageService storageService = null;
 
