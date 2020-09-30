@@ -166,21 +166,35 @@ public class CertificateGeneratorActor extends BaseActor {
         CertMapper certMapper = new CertMapper(properties);
         List<CertModel> certModelList = certMapper.toList(request.getRequest());
         CertificateGenerator certificateGenerator = new CertificateGenerator(properties, directory);
+        CertStoreFactory certStoreFactory = new CertStoreFactory(properties);
+        StoreConfig storeParams = new StoreConfig(getStorageParamsFromRequestOrEnv((Map<String, Object>) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.STORE)));
+        ICertStore certStore = certStoreFactory.getCertStore(storeParams, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
         List<Map<String, Object>> certUrlList = new ArrayList<>();
+        String uuid = null;
         for (CertModel certModel : certModelList) {
             try {
                 CertificateExtension certificateExtension = certificateGenerator.getCertificateExtension(certModel);
+                uuid = certificateGenerator.getUUID(certificateExtension);
                 Map<String, Object> qrMap = certificateGenerator.generateQrCode();
                 String encodedQrCode = encodeQrCode((File) qrMap.get(JsonKey.QR_CODE_FILE));
                 SvgGenerator svgGenerator = new SvgGenerator((String) ((Map) request.get(JsonKey.CERTIFICATE)).get(JsonKey.SVG_TEMPLATE), directory);
                 String encodedSvg = svgGenerator.generate(certificateExtension, encodedQrCode);
                 certificateExtension.setPrintUri(encodedSvg);
+                String jsonUrl = uploadJson(certificateExtension, uuid , certStore, certStoreFactory.setCloudPath(storeParams));
                 CertificateResponse certificateResponse = new CertificateResponse(certificateGenerator.getUUID(certificateExtension), (String) qrMap.get(JsonKey.ACCESS_CODE), certModel.getIdentifier(), mapper.convertValue(certificateExtension, Map.class));
+                certificateResponse.setJsonUrl(properties.get(JsonKey.BASE_PATH).concat(jsonUrl));
                 certUrlList.add(mapper.convertValue(certificateResponse, new TypeReference<Map<String, Object>>() {
                 }));
             } catch (Exception ex) {
                 logger.error("generateCertificateV2:Exception Occurred while generating certificate. : {}", ex.getMessage());
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
+            } finally {
+                certStore.close();
+                try{
+                    certStoreFactory.cleanUp(uuid, directory);
+                } catch (Exception ex) {
+                    logger.error("Exception occurred during resource clean");
+                }
             }
         }
         Response response = new Response();
@@ -230,6 +244,13 @@ public class CertificateGeneratorActor extends BaseActor {
         File file = FileUtils.getFile(fileName.concat(".json"));
         resMap.put(JsonKey.JSON_URL, certStore.save(file, cloudPath));
         return resMap;
+    }
+
+    private String uploadJson(CertificateExtension certificateExtension, String uuid, ICertStore certStore, String cloudPath) throws IOException {
+        logger.info("uploadJson: uploading json file started {}", uuid);
+        File file = new File(directory + uuid + ".json");
+        mapper.writeValue(file, certificateExtension);
+        return certStore.save(file, cloudPath);
     }
 
     private HashMap<String, String> populatePropertiesMap(Request request) {
