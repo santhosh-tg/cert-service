@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sunbird.Application;
 import org.sunbird.BaseException;
 import org.sunbird.RequestValidatorFunction;
 import org.sunbird.message.Localizer;
@@ -83,9 +82,6 @@ public class BaseController extends Controller {
 		logger.info("Method call ended.");
 	}
 
-	protected ActorRef getActorRef(String operation) throws BaseException {
-		return Application.getInstance().getActorRef(operation);
-	}
 
 	/**
 	 * this method will take play.mv.http request and a validation function and

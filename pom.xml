@@ -33,7 +33,6 @@
 
     <modules>
         <module>certgen</module>
-        <module>sb-actor</module>
         <module>all-actors</module>
         <module>es-utils</module>
         <module>service</module>
