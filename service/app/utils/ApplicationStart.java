@@ -5,8 +5,6 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.sunbird.Application;
-
 import org.sunbird.common.Platform;
 import org.sunbird.es.ElasticSearchUtil;
 import play.api.Environment;
