@@ -52,17 +52,9 @@ import java.util.Map;
 public class CertificateGeneratorActor extends BaseActor {
     private static CertsConstant certVar = new CertsConstant();
     private static ObjectMapper mapper = new ObjectMapper();
-    private static StoreConfig storeConfig = new StoreConfig(getStorageParamsFromRequestOrEnv(null));
-    private static ICertStore certStore = null;
-    private static String storageType = certVar.getCloudStorageType();
     String directory = "conf/";
     static {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        if(storageType.equalsIgnoreCase(JsonKey.AZURE)){
-            certStore = new AzureStore(storeConfig);
-        } else if(storageType.equalsIgnoreCase(JsonKey.AWS)) {
-            certStore = new AwsStore(storeConfig);
-        }
     }
 
     @Override
@@ -297,7 +289,7 @@ public class CertificateGeneratorActor extends BaseActor {
         return properties;
     }
 
-    private static Map<String, Object> getStorageParamsFromRequestOrEnv(Map<String, Object> storeParams) {
+    private Map<String, Object> getStorageParamsFromRequestOrEnv(Map<String, Object> storeParams) {
         if (MapUtils.isNotEmpty(storeParams)) {
             return storeParams;
         } else {

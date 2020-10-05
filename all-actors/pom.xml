@@ -15,7 +15,7 @@
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-actor_2.12</artifactId>
+            <artifactId>akka-actor_${scala.major.version}</artifactId>
             <version>${akka.x.version}</version>
         </dependency>
         <dependency>
@@ -25,8 +25,8 @@
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-testkit_2.12</artifactId>
-            <version>2.6.0-M5</version>
+            <artifactId>akka-testkit_${scala.major.version}</artifactId>
+            <version>2.5.16</version>
             <scope>test</scope>
         </dependency>
         <dependency>
