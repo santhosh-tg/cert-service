@@ -10,6 +10,8 @@ import org.incredible.CertificateGenerator;
 import org.incredible.UrlManager;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.JsonKey;
+import org.incredible.certProcessor.store.AwsStore;
+import org.incredible.certProcessor.store.AzureStore;
 import org.incredible.certProcessor.store.CertStoreFactory;
 import org.incredible.certProcessor.store.ICertStore;
 import org.incredible.certProcessor.store.StoreConfig;
@@ -50,9 +52,17 @@ import java.util.Map;
 public class CertificateGeneratorActor extends BaseActor {
     private static CertsConstant certVar = new CertsConstant();
     private static ObjectMapper mapper = new ObjectMapper();
+    private static StoreConfig storeConfig = new StoreConfig(getStorageParamsFromRequestOrEnv(null));
+    private static ICertStore certStore = null;
+    private static String storageType = certVar.getCloudStorageType();
     String directory = "conf/";
     static {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        if(storageType.equalsIgnoreCase(JsonKey.AZURE)){
+            certStore = new AzureStore(storeConfig);
+        } else if(storageType.equalsIgnoreCase(JsonKey.AWS)) {
+            certStore = new AwsStore(storeConfig);
+        }
     }
 
     @Override
@@ -287,7 +297,7 @@ public class CertificateGeneratorActor extends BaseActor {
         return properties;
     }
 
-    private Map<String, Object> getStorageParamsFromRequestOrEnv(Map<String, Object> storeParams) {
+    private static Map<String, Object> getStorageParamsFromRequestOrEnv(Map<String, Object> storeParams) {
         if (MapUtils.isNotEmpty(storeParams)) {
             return storeParams;
         } else {
