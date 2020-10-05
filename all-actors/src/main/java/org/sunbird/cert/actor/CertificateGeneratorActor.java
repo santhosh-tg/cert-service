@@ -10,8 +10,6 @@ import org.incredible.CertificateGenerator;
 import org.incredible.UrlManager;
 import org.incredible.certProcessor.CertModel;
 import org.incredible.certProcessor.JsonKey;
-import org.incredible.certProcessor.store.AwsStore;
-import org.incredible.certProcessor.store.AzureStore;
 import org.incredible.certProcessor.store.CertStoreFactory;
 import org.incredible.certProcessor.store.ICertStore;
 import org.incredible.certProcessor.store.StoreConfig;
