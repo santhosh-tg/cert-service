@@ -21,7 +21,6 @@ import org.sunbird.CertsConstant;
 import org.sunbird.PdfGenerator;
 import org.sunbird.QRStorageParams;
 import org.sunbird.SvgGenerator;
-import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 import org.sunbird.cloud.storage.BaseStorageService;
 import org.sunbird.cloud.storage.factory.StorageConfig;
@@ -48,11 +47,6 @@ import java.util.Map;
  *
  * @author manzarul
  */
-@ActorConfig(
-  dispatcher = "cert-dispatcher",
-  tasks = {JsonKey.GENERATE_CERT, JsonKey.GET_SIGN_URL, JsonKey.GENERATE_CERT_V2},
-  asyncTasks = {}
-)
 public class CertificateGeneratorActor extends BaseActor {
     private static CertsConstant certVar = new CertsConstant();
     private static ObjectMapper mapper = new ObjectMapper();

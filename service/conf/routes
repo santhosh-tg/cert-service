@@ -4,20 +4,20 @@
 
 #Health check
 GET  /health                                  @controllers.health.HealthController.getHealth()
-GET  /:service/health                      @controllers.health.HealthController.getServiceHealth(service:String)
-POST /v1/certs/generate                    @controllers.certs.CertsGenerationController.generateCerificate()
-POST /private/cert/v1/certs/generate        @controllers.certs.CertsGenerationController.generateCerificate()
-POST /v1/user/certs/download               @controllers.certs.CertsGenerationController.generateSignUrl()
-POST /v1/certs/verify                      @controllers.certs.CertsGenerationController.verifyCerificate()
+GET  /:service/health                      @controllers.health.HealthController.getServiceHealth(service:String, request: play.mvc.Http.Request)
+POST /v1/certs/generate                    @controllers.certs.CertsGenerationController.generateCerificate(request: play.mvc.Http.Request)
+POST /private/cert/v1/certs/generate        @controllers.certs.CertsGenerationController.generateCerificate(request: play.mvc.Http.Request)
+POST /v1/user/certs/download               @controllers.certs.CertsGenerationController.generateSignUrl(request: play.mvc.Http.Request)
+POST /v1/certs/verify                      @controllers.certs.CertsGenerationController.verifyCerificate(request: play.mvc.Http.Request)
 GET  /assets/*file        controllers.Assets.at(path="/public", file)
-POST /cert/v1/template/validate  @controllers.certs.CertsGenerationController.validateTemplate()
-POST /v2/certs/generate                    @controllers.certs.CertsGenerationController.generateCertificateV2()
+POST /cert/v1/template/validate  @controllers.certs.CertsGenerationController.validateTemplate(request: play.mvc.Http.Request)
+POST /v2/certs/generate                    @controllers.certs.CertsGenerationController.generateCertificateV2(request: play.mvc.Http.Request)
 
 # Logs Management APIs
 # POST    /v1.3/system/log/update            @controllers.logsmanager.LogController.setLogLevel()
 
 # Certificate Template APIs
 
-POST /cert/v1/template/create @controllers.certs.CertTemplateController.create()
-PATCH /cert/v1/template/update/:identifier @controllers.certs.CertTemplateController.update(identifier: String)
-GET /cert/v1/template/read/:identifier @controllers.certs.CertTemplateController.read(identifier: String)
+POST /cert/v1/template/create @controllers.certs.CertTemplateController.create(request: play.mvc.Http.Request)
+PATCH /cert/v1/template/update/:identifier @controllers.certs.CertTemplateController.update(identifier: String, request: play.mvc.Http.Request)
+GET /cert/v1/template/read/:identifier @controllers.certs.CertTemplateController.read(identifier: String, request: play.mvc.Http.Request)

@@ -8,7 +8,6 @@ import org.incredible.certProcessor.views.HTMLTemplateZip;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
 import org.sunbird.CertsConstant;
-import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
@@ -23,11 +22,6 @@ import java.util.Set;
  * @author Aishwarya
  * This actor is responsible for Template validation
  */
-@ActorConfig(
-  dispatcher = "cert-dispatcher",
-  tasks = {JsonKey.VALIDATE_TEMPLATE},
-  asyncTasks = {}
-)
 public class TemplateValidateActor extends BaseActor {
 
     private CertsConstant certsConstant = new CertsConstant();

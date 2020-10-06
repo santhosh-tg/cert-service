@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sunbird.Application;
 import org.sunbird.BaseException;
 import org.sunbird.RequestValidatorFunction;
 import org.sunbird.message.Localizer;
@@ -83,9 +82,6 @@ public class BaseController extends Controller {
 		logger.info("Method call ended.");
 	}
 
-	protected ActorRef getActorRef(String operation) throws BaseException {
-		return Application.getInstance().getActorRef(operation);
-	}
 
 	/**
 	 * this method will take play.mv.http request and a validation function and
@@ -99,7 +95,7 @@ public class BaseController extends Controller {
 	 * @param operation
 	 * @return
 	 */
-	public CompletionStage<Result> handleRequest(play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
+	public CompletionStage<Result> handleRequest(ActorRef actorRef, play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
 			String operation) {
 		try {
 			Request request = new Request();
@@ -109,7 +105,7 @@ public class BaseController extends Controller {
 			if (validatorFunction != null) {
 				validatorFunction.apply(request);
 			}
-			return new RequestHandler().handleRequest(request, operation,req);
+			return new RequestHandler().handleRequest(request,actorRef,operation,req);
 		} catch (BaseException ex) {
 			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex, req));
 		} catch (Exception ex) {
@@ -125,9 +121,9 @@ public class BaseController extends Controller {
 	 * @param operation
 	 * @return
 	 */
-	public CompletionStage<Result> handleRequest(Request req, String operation, play.mvc.Http.Request httpReq) throws Exception {
+	public CompletionStage<Result> handleRequest(ActorRef actorRef, Request req, String operation, play.mvc.Http.Request httpReq) throws Exception {
 		try {
-			return new RequestHandler().handleRequest(req, operation, httpReq);
+			return new RequestHandler().handleRequest(req, actorRef, operation, httpReq);
 		} catch (BaseException ex) {
 			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,httpReq));
 		} catch (Exception ex) {

@@ -15,7 +15,6 @@ import org.incredible.certProcessor.store.StoreConfig;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
 import org.sunbird.CertsConstant;
-import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
@@ -41,11 +40,6 @@ import java.util.Map;
 /**
  * This actor is responsible for certificate verification.
  */
-@ActorConfig(
-  dispatcher = "cert-dispatcher",
-  tasks = {JsonKey.VERIFY_CERT},
-  asyncTasks = {}
-)
 public class CertificateVerifierActor extends BaseActor {
 
     private ObjectMapper mapper = new ObjectMapper();

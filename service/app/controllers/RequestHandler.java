@@ -1,5 +1,7 @@
 package controllers;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import org.apache.commons.lang3.StringUtils;
@@ -38,13 +40,18 @@ public class RequestHandler extends BaseController {
      * @return CompletionStage<Result>
      * @throws Exception
      */
-    public CompletionStage<Result> handleRequest(Request request, String operation, play.mvc.Http.Request req) throws Exception {
+    public CompletionStage<Result> handleRequest(Request request,Object actorRef, String operation, play.mvc.Http.Request req) throws Exception {
         Object obj;
         request.setOperation(operation);
         Function<Object, Result> fn =
         object -> handleResponse(object, req);
+        Future<Object> future;
         Timeout t = new Timeout(Long.valueOf(request.getTimeout()), TimeUnit.SECONDS);
-        Future<Object> future = Patterns.ask(getActorRef(operation), request, t);
+        if (actorRef instanceof ActorRef) {
+            future = Patterns.ask((ActorRef) actorRef, request, t);
+        } else {
+            future = Patterns.ask((ActorSelection) actorRef, request, t);
+        }
         return FutureConverters.toJava(future).thenApplyAsync(fn);
     }
 

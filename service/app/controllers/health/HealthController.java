@@ -1,5 +1,6 @@
 package controllers.health;
 
+import akka.actor.ActorRef;
 import controllers.BaseController;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -15,11 +16,13 @@ import org.sunbird.response.Response;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import play.libs.Json;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
 import utils.module.SignalHandler;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This controller class will responsible to check health of the services.
@@ -33,6 +36,10 @@ public class HealthController extends BaseController {
   private static final String HEALTH_ACTOR_OPERATION_NAME = "health";
 
   @Inject
+  @Named("health-actor")
+  private ActorRef healthActorRef;
+
+  @Inject
   SignalHandler signalHandler;
 
   /**
@@ -44,7 +51,7 @@ public class HealthController extends BaseController {
     try {
       handleSigTerm();
       logger.info("complete health method called.");
-      CompletionStage<Result> response = handleRequest(request(), null, HEALTH_ACTOR_OPERATION_NAME);
+      CompletionStage<Result> response = handleRequest(healthActorRef, request(), null, HEALTH_ACTOR_OPERATION_NAME);
       return response;
     }  catch (Exception e) {
       return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(e,request()));
@@ -56,7 +63,7 @@ public class HealthController extends BaseController {
    *
    * @return a CompletableFuture of success response
    */
-  public CompletionStage<Result> getServiceHealth(String health) throws BaseException {
+  public CompletionStage<Result> getServiceHealth(String health, Http.Request httpRequest) throws BaseException {
     CompletableFuture<JsonNode> cf = new CompletableFuture<>();
     try {
       handleSigTerm();
