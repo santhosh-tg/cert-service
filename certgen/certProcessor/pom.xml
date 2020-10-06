@@ -12,7 +12,6 @@
         <artifactId>cert-play-service</artifactId>
         <version>1.2.0</version>
     </parent>
-
     <dependencies>
         <dependency>
             <groupId>commons-io</groupId>
