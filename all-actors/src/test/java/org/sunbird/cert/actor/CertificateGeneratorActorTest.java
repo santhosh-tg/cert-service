@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
         LocalStore.class,
         IOUtils.class,
         SvgGenerator.class})
-@PowerMockIgnore("javax.management.*")
+@PowerMockIgnore({"jdk.internal.reflect.*", "javax.management.*", "sun.security.ssl.*", "javax.net.ssl.*", "javax.crypto.*"})
 public class CertificateGeneratorActorTest {
     private static ActorSystem system = ActorSystem.create("system");
     private static final Props props = Props.create(CertificateGeneratorActor.class);
