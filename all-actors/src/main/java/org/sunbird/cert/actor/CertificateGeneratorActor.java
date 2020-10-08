@@ -20,7 +20,7 @@ import org.sunbird.CertMapper;
 import org.sunbird.CertsConstant;
 import org.sunbird.PdfGenerator;
 import org.sunbird.QRStorageParams;
-import org.sunbird.SvgGenerator;
+import org.incredible.certProcessor.views.SvgGenerator;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 import org.sunbird.cloud.storage.BaseStorageService;
 import org.sunbird.cloud.storage.factory.StorageConfig;

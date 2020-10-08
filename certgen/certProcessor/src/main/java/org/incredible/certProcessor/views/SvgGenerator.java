@@ -1,14 +1,11 @@
-package org.sunbird;
+package org.incredible.certProcessor.views;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.incredible.certProcessor.store.LocalStore;
-import org.incredible.certProcessor.views.HTMLVarResolver;
 import org.incredible.pojos.CertificateExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sunbird.message.IResponseMessage;
-import org.sunbird.message.ResponseCode;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +40,7 @@ public class SvgGenerator {
         this.directory = directory;
     }
 
-    public String generate(CertificateExtension certificateExtension, String encodedQrCode) throws BaseException {
+    public String generate(CertificateExtension certificateExtension, String encodedQrCode) throws IOException {
         String svgFileName = getSvgFileName();
         String svgContent;
         File file = new File(directory + svgFileName);
@@ -83,27 +80,18 @@ public class SvgGenerator {
         return stringBuffer.toString();
     }
 
-    private String readSvgContent(String path) throws BaseException {
+    private String readSvgContent(String path) throws IOException {
         FileInputStream fis;
         String svgContent = null;
-        try {
-            fis = new FileInputStream(path);
-            svgContent = IOUtils.toString(fis, StandardCharsets.UTF_8);
-            fis.close();
-        } catch (IOException e) {
-            logger.info("Exception occurred while reading svg content {}", path);
-            throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
-        }
+        fis = new FileInputStream(path);
+        svgContent = IOUtils.toString(fis, StandardCharsets.UTF_8);
+        fis.close();
         return svgContent;
     }
 
-    private void download(String fileName) {
+    private void download(String fileName) throws IOException {
         LocalStore localStore = new LocalStore("");
-        try {
-            localStore.get(svgTemplate, fileName, directory);
-        } catch (IOException e) {
-            logger.info("Exception while downloading svg template {}", e.getMessage());
-        }
+        localStore.get(svgTemplate, fileName, directory);
     }
 
     private String getSvgFileName() {
