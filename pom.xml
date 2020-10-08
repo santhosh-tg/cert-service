@@ -29,6 +29,7 @@
         <scala.version>2.11.12</scala.version>
         <powermock.version>1.7.4</powermock.version>
         <httpClient.version>4.5.1</httpClient.version>
+        <jacoco.maven.plugin.version>0.8.5</jacoco.maven.plugin.version>
     </properties>
 
     <modules>
