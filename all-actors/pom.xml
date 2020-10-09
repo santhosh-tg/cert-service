@@ -19,7 +19,7 @@
             <version>${akka.x.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.incredible</groupId>
+            <groupId>org.sunbird.incredible</groupId>
             <artifactId>certProcessor</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
