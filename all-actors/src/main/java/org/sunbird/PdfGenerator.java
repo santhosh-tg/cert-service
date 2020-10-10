@@ -12,10 +12,10 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeaderElementIterator;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.incredible.certProcessor.JsonKey;
-import org.incredible.certProcessor.views.HTMLVarResolver;
-import org.incredible.certProcessor.views.HTMLVars;
-import org.incredible.pojos.CertificateExtension;
+import org.sunbird.incredible.processor.JsonKey;
+import org.sunbird.incredible.processor.views.HTMLVarResolver;
+import org.sunbird.incredible.processor.views.HTMLVars;
+import org.sunbird.incredible.pojos.CertificateExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

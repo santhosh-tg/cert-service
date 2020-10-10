@@ -1,10 +1,10 @@
 package org.sunbird.cert.actor;
 
 
-import org.incredible.certProcessor.JsonKey;
-import org.incredible.certProcessor.store.LocalStore;
-import org.incredible.certProcessor.views.HTMLTemplateValidator;
-import org.incredible.certProcessor.views.HTMLTemplateZip;
+import org.sunbird.incredible.processor.JsonKey;
+import org.sunbird.incredible.processor.store.LocalStore;
+import org.sunbird.incredible.processor.views.HTMLTemplateValidator;
+import org.sunbird.incredible.processor.views.HTMLTemplateZip;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
 import org.sunbird.CertsConstant;

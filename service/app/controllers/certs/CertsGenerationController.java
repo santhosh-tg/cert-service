@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
 import akka.actor.ActorRef;
-import org.incredible.certProcessor.JsonKey;
+import org.sunbird.incredible.processor.JsonKey;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 
 import controllers.BaseController;
