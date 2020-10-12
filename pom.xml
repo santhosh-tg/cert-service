@@ -33,7 +33,7 @@
     </properties>
 
     <modules>
-        <module>certgen</module>
+        <module>cert-processor</module>
         <module>all-actors</module>
         <module>es-utils</module>
         <module>service</module>
