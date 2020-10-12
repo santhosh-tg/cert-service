@@ -3,20 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.incredible</groupId>
-        <artifactId>certgen</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
     <groupId>org.sunbird.incredible</groupId>
-    <artifactId>certProcessor</artifactId>
+    <artifactId>cert-processor</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <properties>
+        <powermock.version>1.7.4</powermock.version>
+    </properties>
     <dependencies>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.6</version>
-        </dependency>
         <dependency>
             <!-- velocity framework-->
             <groupId>org.apache.velocity</groupId>
@@ -29,19 +22,6 @@
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.6</version>
-        </dependency>
-        <!--        cloud storage sdk-->
-<!--        <dependency>-->
-<!--            <groupId>org.sunbird</groupId>-->
-<!--            <artifactId>cloud-store-sdk_2.12</artifactId>-->
-<!--            <version>1.2.5</version>-->
-
-<!--        </dependency>-->
-
-        <dependency>
             <groupId>org.sunbird</groupId>
             <artifactId>cloud-store-sdk</artifactId>
             <version>1.2.8</version>
@@ -51,35 +31,6 @@
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.12.8</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.53</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.9.9</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.powermock/powermock-api-easymock -->
         <dependency>
@@ -96,12 +47,6 @@
             <!--<scope>test</scope>-->
         </dependency>
 
-        <!--<dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.12.0</version>
-            <scope>test</scope>
-        </dependency>-->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
@@ -163,8 +108,8 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.5</version>
                 <configuration>
-                    <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
-                    <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+                    <destFile>target/coverage-reports/jacoco-unit.exec</destFile>
+                    <dataFile>target/coverage-reports/jacoco-unit.exec</dataFile>
                 </configuration>
                 <executions>
                     <execution>
