@@ -1,6 +1,7 @@
 package org.sunbird.incredible.processor.views;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.sunbird.incredible.processor.store.LocalStore;
 import org.sunbird.incredible.pojos.CertificateExtension;
@@ -47,6 +48,9 @@ public class SvgGenerator {
         if (!file.exists()) {
             logger.info("{} file does not exits , downloading", svgFileName);
             download(svgFileName);
+        }
+        if (!cachedSvgTemplates.containsKey(this.svgTemplate)) {
+            logger.info("svg data is not cached , read svf file");
             svgContent = readSvgContent(file.getAbsolutePath());
             String encodedSvg = "data:image/svg+xml," + encodeData(svgContent);
             encodedSvg = encodedSvg.replaceAll("\n", "").replaceAll("\t", "");
@@ -54,7 +58,7 @@ public class SvgGenerator {
         }
         logger.info("svg template is cached {}", cachedSvgTemplates.containsKey(this.svgTemplate));
         String svgData = replaceTemplateVars(cachedSvgTemplates.get(this.svgTemplate), certificateExtension, encodedQrCode);
-        logger.info("svg template string creation completed");
+        logger.info("svg template string creation completed {}", StringUtils.isNotBlank(svgData));
         return svgData;
     }
 
