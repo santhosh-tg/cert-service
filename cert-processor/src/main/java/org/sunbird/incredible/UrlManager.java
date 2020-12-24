@@ -9,7 +9,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class UrlManager {
-    private static URL urlPath;
     private static Logger logger = LoggerFactory.getLogger(UrlManager.class);
 
     public static String getSharableUrl(String url,String containerName) {
@@ -25,7 +24,7 @@ public class UrlManager {
 
     private static String fetchFileFromUrl(String url) {
         try {
-            urlPath = new URL(url);
+            URL urlPath = new URL(url);
             return urlPath.getFile();
         } catch (Exception e) {
             logger.error("UrlManager:getUriFromUrl:some error occurred in fetch fileName from Url:".concat(url));
