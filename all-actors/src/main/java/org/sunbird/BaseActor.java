@@ -16,7 +16,8 @@ import java.util.*;
  * @author Amit Kumar
  */
 public abstract class BaseActor extends UntypedAbstractActor {
-    public final DiagnosticLoggingAdapter logger = Logging.getLogger(this);
+//    public final DiagnosticLoggingAdapter logger = Logging.getLogger(this);
+    public LoggerUtil logger = new LoggerUtil(this.getClass());
     public abstract void onReceive(Request request) throws Throwable;
     protected Localizer localizer = getLocalizer();
    
@@ -29,24 +30,24 @@ public abstract class BaseActor extends UntypedAbstractActor {
                 ArrayList<String> requestIds =
                         (ArrayList<String>) request.getHeaders().get(JsonKey.REQUEST_MESSAGE_ID);
                 trace.put(JsonKey.REQUEST_MESSAGE_ID, requestIds.get(0));
-                logger.setMDC(trace);
-                // set mdc for non actors
-                new BaseLogger().setReqId(logger.getMDC());
+//                logger.setMDC(trace);
+//                // set mdc for non actors
+//                new BaseLogger().setReqId(logger.getMDC());
             }
             String operation = request.getOperation();
-            logger.info("BaseActor:onReceive called for operation: {}", operation);
+            logger.info(null, "BaseActor:onReceive called for operation: {}", operation);
             try {
-                logger.info("method started : operation {}", operation);
+                logger.info(null, "method started : operation {}", operation);
                 onReceive(request);
-                logger.info("method ended : operation {}", operation);
+                logger.info(null, "method ended : operation {}", operation);
             } catch (Exception e) {
-                logger.error("Exception : operation {} : message : {} {}", operation, e.getMessage(), e);
+                logger.error(null, "Exception : operation {} : message : {} {} " + operation + " " + e.getMessage(), e);
                 onReceiveException(operation, e);
             } finally {
-                logger.clearMDC();
+//                logger.clearMDC();
             }
         } else {
-            logger.info(" onReceive called with invalid type of request.");
+            logger.info(null, " onReceive called with invalid type of request.");
         }
     }
 
@@ -57,7 +58,7 @@ public abstract class BaseActor extends UntypedAbstractActor {
      * @throws Exception
      */
     protected void onReceiveException(String callerName, Exception exception) throws Exception {
-        logger.error("Exception in message processing for: " + callerName + " :: message: " + exception.getMessage(), exception);
+        logger.error(null, "Exception in message processing for: " + callerName + " :: message: " + exception.getMessage(), exception);
         sender().tell(exception, self());
     }
 
@@ -67,7 +68,7 @@ public abstract class BaseActor extends UntypedAbstractActor {
      * @param callerName
      */
     protected void onReceiveUnsupportedMessage(String callerName) {
-        logger.info(callerName + ": unsupported operation");
+        logger.info(null, callerName + ": unsupported operation");
         /**
          * TODO Need to replace null reference from getLocalized method and replace with requested local.
          */
@@ -106,7 +107,7 @@ public abstract class BaseActor extends UntypedAbstractActor {
      * @param tag
      */
     public void startTrace(String tag) {
-        logger.info(String.format("%s:%s:started at %s", this.getClass().getSimpleName(), tag, getTimeStamp()));
+        logger.info(null, String.format("%s:%s:started at %s", this.getClass().getSimpleName(), tag, getTimeStamp()));
     }
 
     /**
@@ -115,7 +116,7 @@ public abstract class BaseActor extends UntypedAbstractActor {
      * @param tag
      */
     public void endTrace(String tag) {
-        logger.info(String.format("%s:%s:ended at %s", this.getClass().getSimpleName(), tag, getTimeStamp()));
+        logger.info(null, String.format("%s:%s:ended at %s", this.getClass().getSimpleName(), tag, getTimeStamp()));
     }
 
     public Localizer getLocalizer(){
