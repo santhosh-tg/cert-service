@@ -56,8 +56,8 @@
         </encoder>
     </appender>
 
-    <logger name="org.sunbird" level="INFO">
-        <appender-ref ref="defaultLoggerAppender" />
+    <logger name="defaultLoggerAppender" level="INFO">
+        <appender-ref ref="defaultLoggerAppender"/>
     </logger>
 
     <root level="INFO">
