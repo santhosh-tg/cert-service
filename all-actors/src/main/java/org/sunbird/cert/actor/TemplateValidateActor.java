@@ -29,7 +29,7 @@ public class TemplateValidateActor extends BaseActor {
     @Override
     public void     onReceive(Request request) throws Throwable {
         String operation = request.getOperation();
-        logger.info(null, "onReceive method call start for operation {}", operation);
+        logger.info(request.getRequestContext(), "onReceive method call start for operation {}", operation);
         if (JsonKey.VALIDATE_TEMPLATE.equalsIgnoreCase(operation)) {
             validateTemplate(request);
         }
@@ -55,10 +55,10 @@ public class TemplateValidateActor extends BaseActor {
                 throw new BaseException("INVALID_TEMPLATE_URL", MessageFormat.format(IResponseMessage.INVALID_TEMPLATE_URL, ": unable to download zip file , please provide valid url"), ResponseCode.BAD_REQUEST.getCode());
             }
         } catch (StorageServiceException e) {
-            logger.info(null, "exception while downloading {}", e.getMessage());
+            logger.info(request.getRequestContext(), "exception while downloading {}", e.getMessage());
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, e.getMessage(), ResponseCode.SERVER_ERROR.getCode());
         } catch (IOException e) {
-            logger.info(null, "exception while unzipping {}", e.getMessage());
+            logger.info(request.getRequestContext(), "exception while unzipping {}", e.getMessage());
             throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ": exception while unzipping " + e.getMessage()), ResponseCode.BAD_REQUEST.getCode());
         } finally {
             htmlTemplateZip.cleanUp();
@@ -67,7 +67,7 @@ public class TemplateValidateActor extends BaseActor {
         Response response = new Response();
         response.getResult().put("response", validatorResponse);
         sender().tell(response, getSelf());
-        logger.info(null, "onReceive method call End");
+        logger.info(request.getRequestContext(), "onReceive method call End");
     }
 
     private HTMLValidatorResponse validateHtml(HTMLTemplateZip htmlTemplateZip) {

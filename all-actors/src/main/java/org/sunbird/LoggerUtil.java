@@ -16,17 +16,13 @@ public class LoggerUtil {
 
     public void info(RequestContext requestContext, String message, Object data) {
         if(null != requestContext) {
-            System.out.println("RequestContext : not null");
             logger.info(Markers.appendEntries(requestContext.getContextMap()), message, data);
         } else {
-            System.out.println("RequestContext : null");
             logger.info(message, data);
         }
-
     }
 
     public void info(RequestContext requestContext, String message) {
-        System.out.println("health-2");
         info(requestContext, message, null);
     }
 
@@ -44,7 +40,6 @@ public class LoggerUtil {
         } else {
             logger.warn(message, e);
         }
-
     }
 
     public void debug(RequestContext requestContext, String message, Object data) {

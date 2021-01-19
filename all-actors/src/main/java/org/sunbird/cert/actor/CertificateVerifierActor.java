@@ -49,7 +49,7 @@ public class CertificateVerifierActor extends BaseActor {
     @Override
     public void onReceive(Request request) throws Throwable {
         String operation = request.getOperation();
-        logger.info(null, "onReceive method call start for operation {}" ,operation);
+        logger.info(request.getRequestContext(), "onReceive method call start for operation {}" ,operation);
         if (JsonKey.VERIFY_CERT.equalsIgnoreCase(operation)) {
             verifyCertificate(request);
         }
@@ -64,7 +64,7 @@ public class CertificateVerifierActor extends BaseActor {
             } else if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.ID)) {
                 certificate = downloadCert((String) ((Map<String, Object>) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ID));
             }
-            logger.debug(null, "Certificate extension {}" ,certificate);
+            logger.debug(request.getRequestContext(), "Certificate extension {}" ,certificate);
             List<String> certificateType = (List<String>) ((Map) certificate.get(JsonKey.VERIFICATION)).get(JsonKey.TYPE);
             if (JsonKey.HOSTED.equals(certificateType.get(0))) {
                 verificationResponse = verifyHostedCertificate(certificate);
@@ -72,13 +72,13 @@ public class CertificateVerifierActor extends BaseActor {
                 verificationResponse = verifySignedCertificate(certificate);
             }
         } catch (IOException | SignatureException.UnreachableException | SignatureException.VerificationException ex) {
-            logger.error(null, "verifySignedCertificate:Exception Occurred while verifying certificate. {} " + ex.getMessage(), ex);
+            logger.error(request.getRequestContext(), "verifySignedCertificate:Exception Occurred while verifying certificate. {} " + ex.getMessage(), ex);
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
         }
         Response response = new Response();
         response.getResult().put("response", verificationResponse);
         sender().tell(response, getSelf());
-        logger.info(null, "onReceive method call End");
+        logger.info(request.getRequestContext(), "onReceive method call End");
     }
 
     /**
