@@ -35,7 +35,7 @@ public abstract class BaseActor extends UntypedAbstractActor {
 //                new BaseLogger().setReqId(logger.getMDC());
             }
             String operation = request.getOperation();
-            logger.info(null, "BaseActor:onReceive called for operation: {}", operation);
+            logger.info(request.getRequestContext(), "BaseActor:onReceive called for operation: {}", operation);
             try {
                 logger.info(null, "method started : operation {}", operation);
                 onReceive(request);
