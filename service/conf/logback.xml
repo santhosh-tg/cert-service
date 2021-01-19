@@ -65,11 +65,11 @@
         </layout>
     </appender>
 
-    <logger name="org.sunbird" level="info" additivity="false">
+    <logger name="org.sunbird" level="INFO">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <logger name="org.sunbird" level="info">
+    <logger name="org.sunbird" level="INFO">
         <appender-ref ref="defaultLoggerAppender" />
     </logger>
 
