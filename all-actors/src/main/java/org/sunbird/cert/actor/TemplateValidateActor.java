@@ -12,6 +12,7 @@ import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
+import org.sunbird.request.RequestContext;
 import org.sunbird.response.Response;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class TemplateValidateActor extends BaseActor {
     private CertsConstant certsConstant = new CertsConstant();
 
     @Override
-    public void     onReceive(Request request) throws Throwable {
+    public void onReceive(Request request) throws Throwable {
         String operation = request.getOperation();
         logger.info(request.getRequestContext(), "onReceive method call start for operation {}", operation);
         if (JsonKey.VALIDATE_TEMPLATE.equalsIgnoreCase(operation)) {
@@ -47,7 +48,7 @@ public class TemplateValidateActor extends BaseActor {
             if (Boolean.TRUE.equals(htmlTemplateZip.isZipFileExists())) {
                 htmlTemplateZip.unzip();
                 if (Boolean.TRUE.equals(htmlTemplateZip.isIndexHTMlFileExits())) {
-                    validatorResponse = validateHtml(htmlTemplateZip);
+                    validatorResponse = validateHtml(request.getRequestContext(), htmlTemplateZip);
                 } else {
                     throw new BaseException("INVALID_ZIP_FILE", MessageFormat.format(IResponseMessage.INVALID_ZIP_FILE, ":zip file format is invalid, unable to find file index.html"), ResponseCode.BAD_REQUEST.getCode());
                 }
@@ -70,7 +71,7 @@ public class TemplateValidateActor extends BaseActor {
         logger.info(request.getRequestContext(), "onReceive method call End");
     }
 
-    private HTMLValidatorResponse validateHtml(HTMLTemplateZip htmlTemplateZip) {
+    private HTMLValidatorResponse validateHtml(RequestContext requestContext, HTMLTemplateZip htmlTemplateZip) {
         HTMLValidatorResponse validatorResponse = new HTMLValidatorResponse();
         String htmlContent;
         try {
@@ -78,15 +79,15 @@ public class TemplateValidateActor extends BaseActor {
             HTMLTemplateValidator htmlTemplateValidator = new HTMLTemplateValidator(htmlContent);
             Set<String> invalidVars = htmlTemplateValidator.validate();
             if (invalidVars.isEmpty()) {
-                logger.info(null, String.format("given template %s is valid", htmlTemplateZip.getTemplateUrl()));
+                logger.info(requestContext, String.format("given template %s is valid", htmlTemplateZip.getTemplateUrl()));
                 validatorResponse.setValid(true);
             } else {
                 validatorResponse.setValid(false);
                 validatorResponse.setMessage(invalidVars);
-                logger.info(null, String.format("given template %s is invalid , it contains invalid variables : %s ", htmlTemplateZip.getTemplateUrl(), invalidVars));
+                logger.info(requestContext, String.format("given template %s is invalid , it contains invalid variables : %s ", htmlTemplateZip.getTemplateUrl(), invalidVars));
             }
         } catch (IOException e) {
-            logger.info(null, e.getMessage());
+            logger.info(requestContext, e.getMessage());
         }
         return validatorResponse;
     }

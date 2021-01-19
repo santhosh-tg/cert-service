@@ -220,7 +220,7 @@ public class CertificateGeneratorActor extends BaseActor {
         ICertStore certStore = certStoreFactory.getCertStore(storeConfig, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
         String qrImageUrl = certStore.getPublicLink(qrCodeFile, certStoreFactory.setCloudPath(storeConfig));
         certStore.close();
-        logger.info(null, "QR code is created for the certificate : {} URL : {}" + qrCodeFile.getName(), qrImageUrl);
+        logger.info(null, "QR code is created for the certificate : {} URL : {}", qrCodeFile.getName() + " " + qrImageUrl);
         return qrImageUrl;
     }
 
@@ -247,7 +247,7 @@ public class CertificateGeneratorActor extends BaseActor {
     }
 
     private String uploadJson(CertificateExtension certificateExtension, String uuid, ICertStore certStore, String cloudPath) throws IOException {
-        logger.info(null, null, "uploadJson: uploading json file started {}" + uuid);
+        logger.info(null, "uploadJson: uploading json file started {}", uuid);
         File file = new File(directory + uuid + ".json");
         mapper.writeValue(file, certificateExtension);
         return certStore.save(file, cloudPath);
@@ -283,7 +283,7 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.PREVIEW, certVar.getPreview(preview));
         properties.put(JsonKey.BASE_PATH, certVar.getBasePath());
 
-        logger.info(request.getRequestContext(), null, "getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
+        logger.info(request.getRequestContext(), "getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;
     }
 
@@ -302,7 +302,7 @@ public class CertificateGeneratorActor extends BaseActor {
         for (File file : files) {
           if (file.getName().startsWith(fileName)) file.delete();
         }
-        logger.info(null, null, "CertificateGeneratorActor: cleanUp completed");
+        logger.info(null, "CertificateGeneratorActor: cleanUp completed");
       } catch (Exception ex) {
         logger.error(null, ex.getMessage(), ex);
       }

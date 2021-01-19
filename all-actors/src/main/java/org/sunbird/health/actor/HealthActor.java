@@ -16,8 +16,7 @@ public class HealthActor extends BaseActor{
 
 	@Override
 	public void onReceive(Request request) throws Throwable {
-		System.out.println("health-1");
-		logger.info(null, "HealthActor: HealthActor called for operation: status check");
+		logger.info(request.getRequestContext(), "HealthActor: HealthActor called for operation: status check");
 		Response response = new Response();
 		response.getResult().put("response", "Success");
 		sender().tell(response, getSelf());
