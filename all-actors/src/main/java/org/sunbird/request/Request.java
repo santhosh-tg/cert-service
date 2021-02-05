@@ -38,6 +38,8 @@ public class Request implements Serializable {
 
   private Integer timeout; // in seconds
 
+  private RequestContext requestContext;
+
   public Request() {
     this.params = new RequestParams();
     this.params.setMsgid(requestId);
@@ -50,6 +52,12 @@ public class Request implements Serializable {
     if (StringUtils.isBlank(this.params.getMsgid()) && !StringUtils.isBlank(requestId))
       this.params.setMsgid(requestId);
     this.context.putAll(request.getContext());
+  }
+
+  public Request(RequestContext requestContext) {
+    this.context = new WeakHashMap<>();
+    this.params = new RequestParams();
+    this.requestContext = requestContext;
   }
 
   public String getRequestId() {
@@ -179,5 +187,13 @@ public class Request implements Serializable {
               ResponseCode.CLIENT_ERROR.getCode());
     }
     this.timeout = timeout;
+  }
+
+  public RequestContext getRequestContext() {
+    return requestContext;
+  }
+
+  public void setRequestContext(RequestContext requestContext) {
+    this.requestContext = requestContext;
   }
 }
