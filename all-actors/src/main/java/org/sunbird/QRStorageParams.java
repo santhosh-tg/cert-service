@@ -1,7 +1,7 @@
 package org.sunbird;
 
 import org.apache.commons.lang3.StringUtils;
-import org.incredible.certProcessor.JsonKey;
+import org.sunbird.incredible.processor.JsonKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

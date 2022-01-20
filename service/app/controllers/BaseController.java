@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import javax.inject.Inject;
@@ -10,16 +11,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sunbird.Application;
 import org.sunbird.BaseException;
 import org.sunbird.RequestValidatorFunction;
 import org.sunbird.message.Localizer;
 import org.sunbird.request.Request;
+import org.sunbird.request.RequestContext;
 import org.sunbird.response.Response;
 
 import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
+import play.libs.typedmap.TypedKey;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
 import utils.RequestMapper;
@@ -36,6 +39,8 @@ import utils.RequestMapper;
  */
 public class BaseController extends Controller {
 	Logger logger = LoggerFactory.getLogger(BaseController.class);
+	private static final String debugEnabled = "false";
+
 	/**
 	 * We injected HttpExecutionContext to decrease the response time of APIs.
 	 */
@@ -83,9 +88,6 @@ public class BaseController extends Controller {
 		logger.info("Method call ended.");
 	}
 
-	protected ActorRef getActorRef(String operation) throws BaseException {
-		return Application.getInstance().getActorRef(operation);
-	}
 
 	/**
 	 * this method will take play.mv.http request and a validation function and
@@ -99,17 +101,18 @@ public class BaseController extends Controller {
 	 * @param operation
 	 * @return
 	 */
-	public CompletionStage<Result> handleRequest(play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
+	public CompletionStage<Result> handleRequest(ActorRef actorRef, play.mvc.Http.Request req, RequestValidatorFunction validatorFunction,
 			String operation) {
 		try {
 			Request request = new Request();
 			if (req.body() != null && req.body().asJson() != null) {
 				request = (Request) RequestMapper.mapRequest(req, Request.class);
+				request.setRequestContext(getRequestContext(req, operation));
 			}
 			if (validatorFunction != null) {
 				validatorFunction.apply(request);
 			}
-			return new RequestHandler().handleRequest(request, operation,req);
+			return new RequestHandler().handleRequest(request,actorRef,operation,req);
 		} catch (BaseException ex) {
 			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex, req));
 		} catch (Exception ex) {
@@ -118,6 +121,17 @@ public class BaseController extends Controller {
 
 	}
 
+	private RequestContext getRequestContext(Http.Request httpRequest, String actorOperation) {
+		RequestContext requestContext = new RequestContext(httpRequest.attrs().getOptional(TypedKey.<String>create("user_id")).orElse(null),
+				httpRequest.header("x-device-id").orElse(null), httpRequest.header("x-session-id").orElse(null),
+				httpRequest.header("x-app-id").orElse(null), httpRequest.header("x-app-ver").orElse(null),
+				httpRequest.header("x-trace-id").orElse(UUID.randomUUID().toString()),
+				(httpRequest.header("x-trace-enabled").isPresent() ? httpRequest.header("x-trace-enabled").orElse(debugEnabled): debugEnabled),
+				actorOperation);
+		return requestContext;
+	}
+
+
 	/**
 	 * this method is used to handle the only GET requests.
 	 *
@@ -125,9 +139,9 @@ public class BaseController extends Controller {
 	 * @param operation
 	 * @return
 	 */
-	public CompletionStage<Result> handleRequest(Request req, String operation, play.mvc.Http.Request httpReq) throws Exception {
+	public CompletionStage<Result> handleRequest(ActorRef actorRef, Request req, String operation, play.mvc.Http.Request httpReq) throws Exception {
 		try {
-			return new RequestHandler().handleRequest(req, operation, httpReq);
+			return new RequestHandler().handleRequest(req, actorRef, operation, httpReq);
 		} catch (BaseException ex) {
 			return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,httpReq));
 		} catch (Exception ex) {

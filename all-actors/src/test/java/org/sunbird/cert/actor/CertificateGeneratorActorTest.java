@@ -7,13 +7,13 @@ import akka.testkit.javadsl.TestKit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.incredible.certProcessor.JsonKey;
-import org.incredible.certProcessor.qrcode.AccessCodeGenerator;
-import org.incredible.certProcessor.qrcode.QRCodeGenerationModel;
-import org.incredible.certProcessor.qrcode.utils.QRCodeImageGenerator;
-import org.incredible.certProcessor.store.*;
-import org.incredible.certProcessor.views.HTMLTemplateZip;
-import org.incredible.certProcessor.views.HeadlessChromeHtmlToPdfConverter;
+import org.sunbird.incredible.processor.JsonKey;
+import org.sunbird.incredible.processor.qrcode.AccessCodeGenerator;
+import org.sunbird.incredible.processor.qrcode.QRCodeGenerationModel;
+import org.sunbird.incredible.processor.qrcode.utils.QRCodeImageGenerator;
+import org.sunbird.incredible.processor.store.*;
+import org.sunbird.incredible.processor.views.HTMLTemplateZip;
+import org.sunbird.incredible.processor.views.HeadlessChromeHtmlToPdfConverter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -25,7 +25,7 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.sunbird.CertMapper;
-import org.sunbird.SvgGenerator;
+import org.sunbird.incredible.processor.views.SvgGenerator;
 import org.sunbird.cloud.storage.BaseStorageService;
 import org.sunbird.cloud.storage.factory.StorageConfig;
 import org.sunbird.cloud.storage.factory.StorageServiceFactory;
@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
         LocalStore.class,
         IOUtils.class,
         SvgGenerator.class})
-@PowerMockIgnore("javax.management.*")
+@PowerMockIgnore({"jdk.internal.reflect.*", "javax.management.*", "sun.security.ssl.*", "javax.net.ssl.*", "javax.crypto.*"})
 public class CertificateGeneratorActorTest {
     private static ActorSystem system = ActorSystem.create("system");
     private static final Props props = Props.create(CertificateGeneratorActor.class);

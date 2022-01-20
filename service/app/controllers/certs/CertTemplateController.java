@@ -5,7 +5,7 @@ import controllers.BaseController;
 import controllers.RequestHandler;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import org.incredible.certProcessor.JsonKey;
+import org.sunbird.incredible.processor.JsonKey;
 import org.sunbird.BaseException;
 import org.sunbird.es.ElasticSearchUtil;
 import org.sunbird.message.IResponseMessage;
@@ -13,6 +13,7 @@ import org.sunbird.message.ResponseCode;
 import org.sunbird.request.Request;
 import org.sunbird.response.Response;
 import play.libs.Json;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
 import utils.RequestMapper;
@@ -27,9 +28,9 @@ public class CertTemplateController extends BaseController {
     private static String indexName = "cert-templates";
     private static String docType = "_doc";
 
-    public CompletionStage<Result> create() {
+    public CompletionStage<Result> create(Http.Request httpRequest) {
         try {
-            Map<String, Object> template = getTemplate(getRequest(request()));
+            Map<String, Object> template = getTemplate(getRequest(httpRequest));
             validateTemplate(template, true);
             String identifier = (String) template.get("identifier");
             if (StringUtils.isBlank(identifier))
@@ -61,13 +62,13 @@ public class CertTemplateController extends BaseController {
             });
 
         } catch (Exception ex) {
-            return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,request()));
+            return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,httpRequest));
         }
     }
 
-    public CompletionStage<Result> update(String identifier) {
+    public CompletionStage<Result> update(String identifier, Http.Request httpRequest) {
         try {
-            Map<String, Object> template = getTemplate(getRequest(request()));
+            Map<String, Object> template = getTemplate(getRequest(httpRequest));
             template.put("identifier", identifier);
             validateTemplate(template, false);
             CompletableFuture<Map<String, Object>> future = ElasticSearchUtil.addDocument(indexName, docType, template, identifier);
@@ -97,11 +98,11 @@ public class CertTemplateController extends BaseController {
             });
 
         } catch (Exception ex) {
-            return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,request()));
+            return CompletableFuture.completedFuture(RequestHandler.handleFailureResponse(ex,httpRequest));
         }
     }
 
-    public CompletionStage<Result> read(String identifier) {
+    public CompletionStage<Result> read(String identifier, Http.Request httpRequest) {
         return ElasticSearchUtil.getDocument(indexName, docType, identifier)
                 .handleAsync((template, exception) -> {
                     Response response = new Response();

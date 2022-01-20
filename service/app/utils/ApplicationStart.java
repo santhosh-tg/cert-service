@@ -5,8 +5,6 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.sunbird.Application;
-
 import org.sunbird.common.Platform;
 import org.sunbird.es.ElasticSearchUtil;
 import play.api.Environment;
@@ -27,8 +25,6 @@ public class ApplicationStart {
 	   */
 	  @Inject
 	  public ApplicationStart(ApplicationLifecycle lifecycle, Environment environment) {
-	  	//instantiate actor system and initialize all the actors
-		  Application.getInstance().init();
 		  String esConnection = (Platform.config.hasPath("es_conn_info"))? Platform.config.getString("es_conn_info") : "localhost:9200";
 		  ElasticSearchUtil.initialiseESClient("cert-templates", esConnection);
 	    // Shut-down hook
