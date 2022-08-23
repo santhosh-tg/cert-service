@@ -28,11 +28,11 @@ public class StoreConfig {
         if (storeParams.containsKey(JsonKey.AZURE)) {
             AzureStoreConfig azureStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AZURE), AzureStoreConfig.class);
             setAzureStoreConfig(azureStoreConfig);
-        } else if (storeParams.containsKey(JsonKey.TYPE)) {
+        } else if (storeParams.containsKey(JsonKey.AWS)) {
             AwsStoreConfig awsStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AWS), AwsStoreConfig.class);
             setAwsStoreConfig(awsStoreConfig);
-        } else if (storeParams.containsKey(JsonKey.TYPE)) {
-            GcpStoreConfig awsStoreConfig = mapper.convertValue(storeParams.get(JsonKey.GCP), GcpStoreConfig.class);
+        } else if (storeParams.containsKey(JsonKey.GCP)) {
+            GcpStoreConfig gcpStoreConfig = mapper.convertValue(storeParams.get(JsonKey.GCP), GcpStoreConfig.class);
             setGcpStoreConfig(gcpStoreConfig);
         }
     }
@@ -47,6 +47,8 @@ public class StoreConfig {
             containerName = azureStoreConfig.getContainerName();
         } else if (JsonKey.AWS.equals(getType())) {
             containerName = awsStoreConfig.getContainerName();
+        } else if (JsonKey.GCP.equals(getType())) {
+            containerName = gcpStoreConfig.getContainerName();
         }
         return containerName;
     }
