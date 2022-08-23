@@ -38,7 +38,7 @@ public class StoreConfig {
     }
 
     public boolean isCloudStore() {
-        return (azureStoreConfig != null || awsStoreConfig != null);
+        return (azureStoreConfig != null || awsStoreConfig != null || gcpStoreConfig != null);
     }
 
     public String getContainerName() {
