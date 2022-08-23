@@ -234,8 +234,10 @@ public class CertificateGeneratorActor extends BaseActor {
         String type = storeParams.getType();
         if (JsonKey.AZURE.equalsIgnoreCase(type)) {
             return storeParams.getAzureStoreConfig().getContainerName();
-        } else {
+        } else if (JsonKey.AWS.equalsIgnoreCase(type)) {
             return storeParams.getAwsStoreConfig().getContainerName();
+        } else {
+            return storeParams.getGcpStoreConfig().getContainerName();
         }
     }
 
