@@ -28,6 +28,8 @@ public interface JsonKey {
     String AZURE_STORAGE_KEY = "AZURE_STORAGE_KEY";
     String AZURE="azure";
     String AWS="aws";
+
+    String GCP="gcp";
     String AWS_STORAGE_KEY="AWS_STORAGE_KEY";
     String AWS_STORAGE_SECRET="AWS_STORAGE_SECRET";
     String SLUG ="sunbird_cert_slug";

@@ -18,6 +18,8 @@ public class StoreConfig {
 
     private AwsStoreConfig awsStoreConfig;
 
+    private GcpStoreConfig gcpStoreConfig;
+
     private StoreConfig() {
     }
 
@@ -29,6 +31,9 @@ public class StoreConfig {
         } else if (storeParams.containsKey(JsonKey.TYPE)) {
             AwsStoreConfig awsStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AWS), AwsStoreConfig.class);
             setAwsStoreConfig(awsStoreConfig);
+        } else if (storeParams.containsKey(JsonKey.TYPE)) {
+            GcpStoreConfig awsStoreConfig = mapper.convertValue(storeParams.get(JsonKey.GCP), GcpStoreConfig.class);
+            setGcpStoreConfig(gcpStoreConfig);
         }
     }
 
@@ -76,6 +81,14 @@ public class StoreConfig {
 
     public void setAwsStoreConfig(AwsStoreConfig awsStoreConfig) {
         this.awsStoreConfig = awsStoreConfig;
+    }
+
+    public GcpStoreConfig getGcpStoreConfig() {
+        return gcpStoreConfig;
+    }
+
+    public void setGcpStoreConfig(GcpStoreConfig gcpStoreConfig) {
+        this.gcpStoreConfig = gcpStoreConfig;
     }
 
     @Override

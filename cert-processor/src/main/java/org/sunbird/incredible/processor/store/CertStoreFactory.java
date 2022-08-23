@@ -132,6 +132,8 @@ public class CertStoreFactory {
             cloudStore = new AzureStore(storeConfig);
         } else if (JsonKey.AWS.equals(storeConfig.getType())) {
             cloudStore = new AwsStore(storeConfig);
+        } else if (JsonKey.GCP.equals(storeConfig.getType())) {
+            cloudStore = new GcpStore(storeConfig);
         }
         return cloudStore;
     }
@@ -151,7 +153,6 @@ public class CertStoreFactory {
             }
         } else {
             stringBuilder.append("public/").toString();
-
         }
         return stringBuilder.toString();
     }
