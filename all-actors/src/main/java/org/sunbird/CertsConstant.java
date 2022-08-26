@@ -172,6 +172,14 @@ public class CertsConstant {
         return getPropertyFromEnv(JsonKey.AWS_STORAGE_KEY);
     }
 
+    public String getGcpStorageSecret() {
+        return getPropertyFromEnv(JsonKey.GCP_STORAGE_SECRET);
+    }
+
+    public String getGcpStorageKey() {
+        return getPropertyFromEnv(JsonKey.GCP_STORAGE_KEY);
+    }
+
     public String getSignatoryExtensionUrl() {
         return String.format("%s/%s/%s", BASE_PATH, SIGNATORY_EXTENSION, "context.json");
     }
@@ -204,8 +212,19 @@ public class CertsConstant {
             if (type.equals(JsonKey.AWS)) {
                 storeParams.put(JsonKey.AWS, getAwsParams());
             }
+            if (type.equals(JsonKey.GCP)) {
+                storeParams.put(JsonKey.GCP, getGcpParams());
+            }
         }
         return storeParams;
+    }
+
+    private Map<String, String> getGcpParams() {
+        Map<String, String> azureParams = new HashMap<>();
+        azureParams.put(JsonKey.containerName, getCONTAINER_NAME());
+        azureParams.put(JsonKey.ACCOUNT, getGcpStorageKey());
+        azureParams.put(JsonKey.KEY, getGcpStorageSecret());
+        return azureParams;
     }
 
     private Map<String, String> getAzureParams() {

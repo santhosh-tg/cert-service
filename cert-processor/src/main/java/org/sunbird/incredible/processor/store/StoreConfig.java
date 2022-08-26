@@ -18,6 +18,8 @@ public class StoreConfig {
 
     private AwsStoreConfig awsStoreConfig;
 
+    private GcpStoreConfig gcpStoreConfig;
+
     private StoreConfig() {
     }
 
@@ -26,14 +28,17 @@ public class StoreConfig {
         if (storeParams.containsKey(JsonKey.AZURE)) {
             AzureStoreConfig azureStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AZURE), AzureStoreConfig.class);
             setAzureStoreConfig(azureStoreConfig);
-        } else if (storeParams.containsKey(JsonKey.TYPE)) {
+        } else if (storeParams.containsKey(JsonKey.AWS)) {
             AwsStoreConfig awsStoreConfig = mapper.convertValue(storeParams.get(JsonKey.AWS), AwsStoreConfig.class);
             setAwsStoreConfig(awsStoreConfig);
+        } else if (storeParams.containsKey(JsonKey.GCP)) {
+            GcpStoreConfig gcpStoreConfig = mapper.convertValue(storeParams.get(JsonKey.GCP), GcpStoreConfig.class);
+            setGcpStoreConfig(gcpStoreConfig);
         }
     }
 
     public boolean isCloudStore() {
-        return (azureStoreConfig != null || awsStoreConfig != null);
+        return (azureStoreConfig != null || awsStoreConfig != null || gcpStoreConfig != null);
     }
 
     public String getContainerName() {
@@ -42,6 +47,8 @@ public class StoreConfig {
             containerName = azureStoreConfig.getContainerName();
         } else if (JsonKey.AWS.equals(getType())) {
             containerName = awsStoreConfig.getContainerName();
+        } else if (JsonKey.GCP.equals(getType())) {
+            containerName = gcpStoreConfig.getContainerName();
         }
         return containerName;
     }
@@ -76,6 +83,14 @@ public class StoreConfig {
 
     public void setAwsStoreConfig(AwsStoreConfig awsStoreConfig) {
         this.awsStoreConfig = awsStoreConfig;
+    }
+
+    public GcpStoreConfig getGcpStoreConfig() {
+        return gcpStoreConfig;
+    }
+
+    public void setGcpStoreConfig(GcpStoreConfig gcpStoreConfig) {
+        this.gcpStoreConfig = gcpStoreConfig;
     }
 
     @Override

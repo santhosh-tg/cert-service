@@ -45,8 +45,8 @@ public class AwsStore extends CloudStore {
     private String getPath(String path) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(path);
-        if (StringUtils.isNotBlank(awsStoreConfig.getAzureStoreConfig().getPath())) {
-            stringBuilder.append(awsStoreConfig.getAzureStoreConfig().getPath() + "/");
+        if (StringUtils.isNotBlank(awsStoreConfig.getAwsStoreConfig().getPath())) {
+            stringBuilder.append(awsStoreConfig.getAwsStoreConfig().getPath() + "/");
         }
         return stringBuilder.toString();
     }
