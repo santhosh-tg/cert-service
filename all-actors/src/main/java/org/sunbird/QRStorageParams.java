@@ -21,30 +21,20 @@ public class QRStorageParams {
         logger.info("QRStorageParams getting storage params from env ");
         Map<String, Object> storeParams = new HashMap<>();
         storeParams.put(JsonKey.TYPE, type);
-        if (StringUtils.isNotBlank(type)) {
-            if (type.equals(JsonKey.AZURE)) {
-                storeParams.put(JsonKey.AZURE, getAzureParams());
-            }
-            if (type.equals(JsonKey.AWS)) {
-                storeParams.put(JsonKey.AWS, getAwsParams());
-            }
+        if (StringUtils.isNotBlank(type) ||
+                (type.equals(JsonKey.AZURE) ||
+                 type.equals(JsonKey.AWS) ||
+                 type.equals(JsonKey.GCP))) {
+            storeParams.put(type, getCloudStoreParams());
         }
         return storeParams;
     }
 
-    private Map<String, String> getAzureParams() {
-        Map<String, String> azureParams = new HashMap<>();
-        azureParams.put(JsonKey.containerName, System.getenv(JsonKey.PUBLIC_CONTAINER_NAME));
-        azureParams.put(JsonKey.ACCOUNT, System.getenv(JsonKey.PUBLIC_AZURE_STORAGE_KEY));
-        azureParams.put(JsonKey.KEY, System.getenv(JsonKey.PUBLIC_AZURE_STORAGE_SECRET));
-        return azureParams;
-    }
-
-    private Map<String, String> getAwsParams() {
-        Map<String, String> awsParams = new HashMap<>();
-        awsParams.put(JsonKey.containerName, System.getenv(JsonKey.PUBLIC_CONTAINER_NAME));
-        awsParams.put(JsonKey.ACCOUNT, System.getenv(JsonKey.PUBLIC_AWS_STORAGE_KEY));
-        awsParams.put(JsonKey.KEY, System.getenv(JsonKey.PUBLIC_AWS_STORAGE_SECRET));
-        return awsParams;
+    private Map<String, String> getCloudStoreParams() {
+        Map<String, String> storeParams = new HashMap<>();
+        storeParams.put(JsonKey.containerName, System.getenv(JsonKey.PUBLIC_CONTAINER_NAME));
+        storeParams.put(JsonKey.ACCOUNT, System.getenv(JsonKey.PUBLIC_CLOUD_STORAGE_KEY));
+        storeParams.put(JsonKey.KEY, System.getenv(JsonKey.PUBLIC_CLOUD_STORAGE_SECRET));
+        return storeParams;
     }
 }

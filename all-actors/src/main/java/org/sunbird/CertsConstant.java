@@ -157,27 +157,27 @@ public class CertsConstant {
     }
 
     public String getAzureStorageSecret() {
-        return getPropertyFromEnv(JsonKey.AZURE_STORAGE_SECRET);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_SECRET);
     }
 
     public String getAzureStorageKey() {
-        return getPropertyFromEnv(JsonKey.AZURE_STORAGE_KEY);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_KEY);
     }
 
     public String getAwsStorageSecret() {
-        return getPropertyFromEnv(JsonKey.AWS_STORAGE_SECRET);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_SECRET);
     }
 
     public String getAwsStorageKey() {
-        return getPropertyFromEnv(JsonKey.AWS_STORAGE_KEY);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_KEY);
     }
 
     public String getGcpStorageSecret() {
-        return getPropertyFromEnv(JsonKey.GCP_STORAGE_SECRET);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_SECRET);
     }
 
     public String getGcpStorageKey() {
-        return getPropertyFromEnv(JsonKey.GCP_STORAGE_KEY);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_KEY);
     }
 
     public String getSignatoryExtensionUrl() {
