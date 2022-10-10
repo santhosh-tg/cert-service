@@ -76,8 +76,15 @@ public class CertificateGeneratorActor extends BaseActor {
             storageService = getStorageService();
             String uri = UrlManager.getContainerRelativePath((String) request.getRequest().get(JsonKey.PDF_URL));
             logger.info(request.getRequestContext(), "generateSignUrl:generate sign url method called for uri: {}", uri);
-            String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
-                    Some.apply("r"));
+            String cloudType = System.getenv(JsonKey.CLOUD_STORAGE_TYPE);
+            String signUrl = "";
+            if (JsonKey.GCP.equalsIgnoreCase(cloudType)) {
+                signUrl = storageService.getPutSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
+                        Some.apply("r"),Some.apply("application/pdf"));
+            } else {
+                signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
+                        Some.apply("r"));
+            }
             logger.info(request.getRequestContext(), "generateSignUrl:signedUrl got: {}",signUrl);
             Response response = new Response();
             response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
