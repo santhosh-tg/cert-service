@@ -6,22 +6,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.incredible.CertificateGenerator;
-import org.incredible.UrlManager;
-import org.incredible.certProcessor.CertModel;
-import org.incredible.certProcessor.JsonKey;
-import org.incredible.certProcessor.store.CertStoreFactory;
-import org.incredible.certProcessor.store.ICertStore;
-import org.incredible.certProcessor.store.StoreConfig;
-import org.incredible.pojos.CertificateExtension;
+import org.sunbird.incredible.CertificateGenerator;
+import org.sunbird.incredible.UrlManager;
+import org.sunbird.incredible.processor.CertModel;
+import org.sunbird.incredible.processor.JsonKey;
+import org.sunbird.incredible.processor.store.CertStoreFactory;
+import org.sunbird.incredible.processor.store.ICertStore;
+import org.sunbird.incredible.processor.store.StoreConfig;
+import org.sunbird.incredible.pojos.CertificateExtension;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
 import org.sunbird.CertMapper;
 import org.sunbird.CertsConstant;
 import org.sunbird.PdfGenerator;
 import org.sunbird.QRStorageParams;
-import org.sunbird.SvgGenerator;
-import org.sunbird.actor.core.ActorConfig;
+import org.sunbird.incredible.processor.views.SvgGenerator;
 import org.sunbird.cert.actor.operation.CertActorOperation;
 import org.sunbird.cloud.storage.BaseStorageService;
 import org.sunbird.cloud.storage.factory.StorageConfig;
@@ -48,11 +47,6 @@ import java.util.Map;
  *
  * @author manzarul
  */
-@ActorConfig(
-  dispatcher = "cert-dispatcher",
-  tasks = {JsonKey.GENERATE_CERT, JsonKey.GET_SIGN_URL, JsonKey.GENERATE_CERT_V2},
-  asyncTasks = {}
-)
 public class CertificateGeneratorActor extends BaseActor {
     private static CertsConstant certVar = new CertsConstant();
     private static ObjectMapper mapper = new ObjectMapper();
@@ -64,7 +58,7 @@ public class CertificateGeneratorActor extends BaseActor {
     @Override
     public void onReceive(Request request) throws Throwable {
         String operation = request.getOperation();
-        logger.info("onReceive method call start for operation {}",operation);
+        logger.info(request.getRequestContext(), "onReceive method call start for operation {}",operation);
         if (JsonKey.GENERATE_CERT.equalsIgnoreCase(operation)) {
             generateCertificate(request);
         } else if (CertActorOperation.GET_SIGN_URL.getOperation().equalsIgnoreCase(operation)) {
@@ -72,25 +66,32 @@ public class CertificateGeneratorActor extends BaseActor {
         } else if (CertActorOperation.GENERATE_CERTIFICATE_V2.getOperation().equalsIgnoreCase(operation)) {
             generateCertificateV2(request);
         }
-        logger.info("onReceive method call End");
+        logger.info(request.getRequestContext(), "onReceive method call End");
     }
 
     private void generateSignUrl(Request request) {
       BaseStorageService storageService = null;
         try {
-            logger.info("generateSignUrl:generate request got : {}", request.getRequest());
+            logger.info(request.getRequestContext(), "generateSignUrl:generate request got : {}", request.getRequest());
             storageService = getStorageService();
             String uri = UrlManager.getContainerRelativePath((String) request.getRequest().get(JsonKey.PDF_URL));
-            logger.info("generateSignUrl:generate sign url method called for uri: {}", uri);
-            String signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
-                    Some.apply("r"));
-            logger.info("generateSignUrl:signedUrl got: {}",signUrl);
+            logger.info(request.getRequestContext(), "generateSignUrl:generate sign url method called for uri: {}", uri);
+            String cloudType = System.getenv(JsonKey.CLOUD_STORAGE_TYPE);
+            String signUrl = "";
+            if (JsonKey.GCP.equalsIgnoreCase(cloudType)) {
+                signUrl = storageService.getPutSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
+                        Some.apply("r"),Some.apply("application/pdf"));
+            } else {
+                signUrl = storageService.getSignedURL(certVar.getCONTAINER_NAME(), uri, Some.apply(getTimeoutInSeconds()),
+                        Some.apply("r"));
+            }
+            logger.info(request.getRequestContext(), "generateSignUrl:signedUrl got: {}",signUrl);
             Response response = new Response();
             response.put(JsonKey.RESPONSE, JsonKey.SUCCESS);
             response.put(JsonKey.SIGNED_URL, signUrl);
             sender().tell(response, self());
         } catch (Exception e) {
-            logger.error("generateSignUrl: error in generating sign url {}", e);
+            logger.error(null, "generateSignUrl: error in generating sign url {}", e);
             Response response = new Response();
             response.put(JsonKey.RESPONSE, "failure");
             response.put(JsonKey.SIGNED_URL, "");
@@ -101,7 +102,7 @@ public class CertificateGeneratorActor extends BaseActor {
               storageService.closeContext();
             }
           } catch (Exception ex) {
-            logger.info("CertificateGeneratorActor:generateSignUrl : Exception occurred while closing connection");
+            logger.info(request.getRequestContext(), "CertificateGeneratorActor:generateSignUrl : Exception occurred while closing connection");
           }
         }
 
@@ -110,18 +111,18 @@ public class CertificateGeneratorActor extends BaseActor {
 
     private BaseStorageService getStorageService() {
         StorageConfig storageConfig = new StorageConfig(certVar.getCloudStorageType(), certVar.getAzureStorageKey(), certVar.getAzureStorageSecret());
-        logger.info("CertificateGeneratorActor:getStorageService:storage object formed: {}" ,storageConfig.toString());
+        logger.info(null, "CertificateGeneratorActor:getStorageService:storage object formed: {}" ,storageConfig.toString());
         return StorageServiceFactory.getStorageService(storageConfig);
     }
 
     private int getTimeoutInSeconds() {
         String timeoutInSecondsStr = CertsConstant.getExpiryLink(CertsConstant.DOWNLOAD_LINK_EXPIRY_TIMEOUT);
-        logger.info("CertificateGeneratorActor:getTimeoutInSeconds:timeout got: ".concat(timeoutInSecondsStr));
+        logger.info(null, "CertificateGeneratorActor:getTimeoutInSeconds:timeout got: ".concat(timeoutInSecondsStr));
         return Integer.parseInt(timeoutInSecondsStr);
     }
 
     private void generateCertificate(Request request) throws BaseException {
-        logger.info("Request received== {}", request.getRequest());
+        logger.info(request.getRequestContext(), "Request received== {}", request.getRequest());
         Map<String, String> properties = populatePropertiesMap(request);
 
         CertStoreFactory certStoreFactory = new CertStoreFactory(properties);
@@ -149,13 +150,13 @@ public class CertificateGeneratorActor extends BaseActor {
                 certUrlList.add(mapper.convertValue(certificateResponse, new TypeReference<Map<String, Object>>() {
                 }));
             } catch (Exception ex) {
-                logger.error("generateCertificate:Exception Occurred while generating certificate. : {}", ex.getMessage());
+                logger.error(request.getRequestContext(),"generateCertificate:Exception Occurred while generating certificate. : {}" + ex.getMessage(), ex);
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
             } finally {
               try{
                 certStoreFactory.cleanUp(uuid, directory);
                 } catch (Exception ex) {
-                  logger.error("Exception occurred during resource clean");
+                  logger.error(request.getRequestContext(),"Exception occurred during resource clean", ex);
                 }
             }
         }
@@ -163,11 +164,11 @@ public class CertificateGeneratorActor extends BaseActor {
         Response response = new Response();
         response.getResult().put("response", certUrlList);
         sender().tell(response, getSelf());
-        logger.info("onReceive method call End");
+        logger.info(request.getRequestContext(), "onReceive method call End");
     }
 
     private void generateCertificateV2(Request request) throws BaseException {
-        logger.info("generateCertificateV2 request received== {}", request.getRequest());
+        logger.info(request.getRequestContext(), "generateCertificateV2 request received== {}" + request.getRequest());
         Map<String, String> properties = populatePropertiesMap(request);
         CertMapper certMapper = new CertMapper(properties);
         List<CertModel> certModelList = certMapper.toList(request.getRequest());
@@ -192,21 +193,21 @@ public class CertificateGeneratorActor extends BaseActor {
                 certUrlList.add(mapper.convertValue(certificateResponse, new TypeReference<Map<String, Object>>() {
                 }));
             } catch (Exception ex) {
-                logger.error("generateCertificateV2:Exception Occurred while generating certificate. : {}", ex.getMessage());
+                logger.error(request.getRequestContext(), "generateCertificateV2:Exception Occurred while generating certificate. : {}" + ex.getMessage(), ex);
                 throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
             } finally {
                 certStore.close();
                 try{
                     certStoreFactory.cleanUp(uuid, directory);
                 } catch (Exception ex) {
-                    logger.error("Exception occurred during resource clean");
+                    logger.error(request.getRequestContext(), "Exception occurred during resource clean", ex);
                 }
             }
         }
         Response response = new Response();
         response.getResult().put("response", certUrlList);
         sender().tell(response, getSelf());
-        logger.info("onReceive method call End");
+        logger.info(request.getRequestContext(), "onReceive method call End", null);
     }
 
     private Map<String, Object> convertStringToMap(String jsonData) {
@@ -214,7 +215,7 @@ public class CertificateGeneratorActor extends BaseActor {
         try {
             data = mapper.readValue(jsonData, new TypeReference<Map<String, Object>>() {});
         } catch (IOException e) {
-            logger.error("Exception occurred convert json String To Map {}", e.getMessage());
+            logger.error(null, "Exception occurred convert json String To Map {}" + e.getMessage(), e);
         }
         return data;
     }
@@ -226,7 +227,7 @@ public class CertificateGeneratorActor extends BaseActor {
         ICertStore certStore = certStoreFactory.getCertStore(storeConfig, BooleanUtils.toBoolean(properties.get(JsonKey.PREVIEW)));
         String qrImageUrl = certStore.getPublicLink(qrCodeFile, certStoreFactory.setCloudPath(storeConfig));
         certStore.close();
-        logger.info("QR code is created for the certificate : {} URL : {}", qrCodeFile.getName(), qrImageUrl);
+        logger.info(null, "QR code is created for the certificate : {} URL : {}", qrCodeFile.getName() + " " + qrImageUrl);
         return qrImageUrl;
     }
 
@@ -240,8 +241,10 @@ public class CertificateGeneratorActor extends BaseActor {
         String type = storeParams.getType();
         if (JsonKey.AZURE.equalsIgnoreCase(type)) {
             return storeParams.getAzureStoreConfig().getContainerName();
-        } else {
+        } else if (JsonKey.AWS.equalsIgnoreCase(type)) {
             return storeParams.getAwsStoreConfig().getContainerName();
+        } else {
+            return storeParams.getGcpStoreConfig().getContainerName();
         }
     }
 
@@ -253,7 +256,7 @@ public class CertificateGeneratorActor extends BaseActor {
     }
 
     private String uploadJson(CertificateExtension certificateExtension, String uuid, ICertStore certStore, String cloudPath) throws IOException {
-        logger.info("uploadJson: uploading json file started {}", uuid);
+        logger.info(null, "uploadJson: uploading json file started {}", uuid);
         File file = new File(directory + uuid + ".json");
         mapper.writeValue(file, certificateExtension);
         return certStore.save(file, cloudPath);
@@ -271,7 +274,7 @@ public class CertificateGeneratorActor extends BaseActor {
             properties.put(JsonKey.KEY_ID, keyId);
             properties.put(JsonKey.SIGN_CREATOR, certVar.getSignCreator(keyId));
             properties.put(JsonKey.PUBLIC_KEY_URL, certVar.getPUBLIC_KEY_URL(keyId));
-            logger.info("populatePropertiesMap: keys after {}", keyId);
+            logger.info(request.getRequestContext(), "populatePropertiesMap: keys after {}", keyId);
         }
         properties.put(JsonKey.TAG, tag);
         properties.put(JsonKey.CONTAINER_NAME, certVar.getCONTAINER_NAME());
@@ -289,7 +292,7 @@ public class CertificateGeneratorActor extends BaseActor {
         properties.put(JsonKey.PREVIEW, certVar.getPreview(preview));
         properties.put(JsonKey.BASE_PATH, certVar.getBasePath());
 
-        logger.info("getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
+        logger.info(request.getRequestContext(), "getProperties:properties got from Constant File ".concat(Collections.singleton(properties.toString()) + ""));
         return properties;
     }
 
@@ -308,9 +311,9 @@ public class CertificateGeneratorActor extends BaseActor {
         for (File file : files) {
           if (file.getName().startsWith(fileName)) file.delete();
         }
-        logger.info("CertificateGeneratorActor: cleanUp completed");
+        logger.info(null, "CertificateGeneratorActor: cleanUp completed");
       } catch (Exception ex) {
-        logger.error(ex.getMessage(), ex);
+        logger.error(null, ex.getMessage(), ex);
       }
     }
 

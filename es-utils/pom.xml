@@ -44,12 +44,12 @@
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch</artifactId>
-			<version>6.2.4</version>
+			<version>6.8.22</version>
 		</dependency>
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
 			<artifactId>elasticsearch-rest-high-level-client</artifactId>
-			<version>6.2.4</version>
+			<version>6.8.22</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -63,7 +63,7 @@
 				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.7.5.201505241946</version>
+					<version>${jacoco.maven.plugin.version}</version>
 					<configuration>
 						<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
 						<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>

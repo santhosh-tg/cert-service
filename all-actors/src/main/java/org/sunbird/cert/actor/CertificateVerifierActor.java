@@ -5,17 +5,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.incredible.UrlManager;
-import org.incredible.certProcessor.CertificateFactory;
-import org.incredible.certProcessor.JsonKey;
-import org.incredible.certProcessor.signature.exceptions.SignatureException;
-import org.incredible.certProcessor.store.CertStoreFactory;
-import org.incredible.certProcessor.store.ICertStore;
-import org.incredible.certProcessor.store.StoreConfig;
+import org.sunbird.incredible.UrlManager;
+import org.sunbird.incredible.processor.CertificateFactory;
+import org.sunbird.incredible.processor.JsonKey;
+import org.sunbird.incredible.processor.signature.exceptions.SignatureException;
+import org.sunbird.incredible.processor.store.CertStoreFactory;
+import org.sunbird.incredible.processor.store.ICertStore;
+import org.sunbird.incredible.processor.store.StoreConfig;
 import org.sunbird.BaseActor;
 import org.sunbird.BaseException;
 import org.sunbird.CertsConstant;
-import org.sunbird.actor.core.ActorConfig;
 import org.sunbird.cloud.storage.exception.StorageServiceException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;
@@ -41,11 +40,6 @@ import java.util.Map;
 /**
  * This actor is responsible for certificate verification.
  */
-@ActorConfig(
-  dispatcher = "cert-dispatcher",
-  tasks = {JsonKey.VERIFY_CERT},
-  asyncTasks = {}
-)
 public class CertificateVerifierActor extends BaseActor {
 
     private ObjectMapper mapper = new ObjectMapper();
@@ -55,7 +49,7 @@ public class CertificateVerifierActor extends BaseActor {
     @Override
     public void onReceive(Request request) throws Throwable {
         String operation = request.getOperation();
-        logger.info("onReceive method call start for operation {}" ,operation);
+        logger.info(request.getRequestContext(), "onReceive method call start for operation {}" ,operation);
         if (JsonKey.VERIFY_CERT.equalsIgnoreCase(operation)) {
             verifyCertificate(request);
         }
@@ -70,7 +64,7 @@ public class CertificateVerifierActor extends BaseActor {
             } else if (((Map) request.get(JsonKey.CERTIFICATE)).containsKey(JsonKey.ID)) {
                 certificate = downloadCert((String) ((Map<String, Object>) request.get(JsonKey.CERTIFICATE)).get(JsonKey.ID));
             }
-            logger.debug("Certificate extension {}" ,certificate);
+            logger.debug(request.getRequestContext(), "Certificate extension {}" ,certificate);
             List<String> certificateType = (List<String>) ((Map) certificate.get(JsonKey.VERIFICATION)).get(JsonKey.TYPE);
             if (JsonKey.HOSTED.equals(certificateType.get(0))) {
                 verificationResponse = verifyHostedCertificate(certificate);
@@ -78,13 +72,13 @@ public class CertificateVerifierActor extends BaseActor {
                 verificationResponse = verifySignedCertificate(certificate);
             }
         } catch (IOException | SignatureException.UnreachableException | SignatureException.VerificationException ex) {
-            logger.error("verifySignedCertificate:Exception Occurred while verifying certificate. {} ", ex.getMessage());
+            logger.error(request.getRequestContext(), "verifySignedCertificate:Exception Occurred while verifying certificate. {} " + ex.getMessage(), ex);
             throw new BaseException(IResponseMessage.INTERNAL_ERROR, ex.getMessage(), ResponseCode.SERVER_ERROR.getCode());
         }
         Response response = new Response();
         response.getResult().put("response", verificationResponse);
         sender().tell(response, getSelf());
-        logger.info("onReceive method call End");
+        logger.info(request.getRequestContext(), "onReceive method call End");
     }
 
     /**
@@ -153,7 +147,7 @@ public class CertificateVerifierActor extends BaseActor {
             file.delete();
             return certificate;
         } catch (StorageServiceException ex) {
-            logger.error("downloadCertJson:Exception Occurred while downloading json certificate from the cloud. {} ", ex.getMessage());
+            logger.error(null,"downloadCertJson:Exception Occurred while downloading json certificate from the cloud. {} "+ex.getMessage(), ex);
             throw new BaseException("INVALID_PARAM_VALUE", MessageFormat.format(IResponseMessage.INVALID_PARAM_VALUE,
                     url, JsonKey.ID), ResponseCode.CLIENT_ERROR.getCode());
         }
@@ -166,7 +160,7 @@ public class CertificateVerifierActor extends BaseActor {
             String path = uri.getPath();
             idStr = path.substring(path.lastIndexOf('/') + 1);
         } catch (URISyntaxException e) {
-            logger.debug("getFileName : exception occurred while getting file form the uri {}", e.getMessage());
+            logger.debug(null, "getFileName : exception occurred while getting file form the uri {}"+ e.getMessage(), e);
         }
         return idStr;
     }
@@ -203,7 +197,7 @@ public class CertificateVerifierActor extends BaseActor {
                     message = "ERROR: Assertion.expires - certificate has been expired";
                 }
             } catch (ParseException e) {
-                logger.info("verifyExpiryDate : exception occurred parsing date {}" , e.getMessage());
+                logger.info(null, "verifyExpiryDate : exception occurred parsing date {}" , e.getMessage());
             }
         }
         return message;

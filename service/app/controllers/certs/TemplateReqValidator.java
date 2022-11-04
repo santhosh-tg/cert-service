@@ -1,7 +1,7 @@
 package controllers.certs;
 
 import org.apache.commons.lang.StringUtils;
-import org.incredible.certProcessor.JsonKey;
+import org.sunbird.incredible.processor.JsonKey;
 import org.sunbird.BaseException;
 import org.sunbird.message.IResponseMessage;
 import org.sunbird.message.ResponseCode;

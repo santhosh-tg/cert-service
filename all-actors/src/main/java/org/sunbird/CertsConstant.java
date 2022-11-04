@@ -1,7 +1,7 @@
 package org.sunbird;
 
 import org.apache.commons.lang3.StringUtils;
-import org.incredible.certProcessor.JsonKey;
+import org.sunbird.incredible.processor.JsonKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,19 +157,27 @@ public class CertsConstant {
     }
 
     public String getAzureStorageSecret() {
-        return getPropertyFromEnv(JsonKey.AZURE_STORAGE_SECRET);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_SECRET);
     }
 
     public String getAzureStorageKey() {
-        return getPropertyFromEnv(JsonKey.AZURE_STORAGE_KEY);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_KEY);
     }
 
     public String getAwsStorageSecret() {
-        return getPropertyFromEnv(JsonKey.AWS_STORAGE_SECRET);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_SECRET);
     }
 
     public String getAwsStorageKey() {
-        return getPropertyFromEnv(JsonKey.AWS_STORAGE_KEY);
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_KEY);
+    }
+
+    public String getGcpStorageSecret() {
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_SECRET);
+    }
+
+    public String getGcpStorageKey() {
+        return getPropertyFromEnv(JsonKey.PRIVATE_CLOUD_STORAGE_KEY);
     }
 
     public String getSignatoryExtensionUrl() {
@@ -204,8 +212,19 @@ public class CertsConstant {
             if (type.equals(JsonKey.AWS)) {
                 storeParams.put(JsonKey.AWS, getAwsParams());
             }
+            if (type.equals(JsonKey.GCP)) {
+                storeParams.put(JsonKey.GCP, getGcpParams());
+            }
         }
         return storeParams;
+    }
+
+    private Map<String, String> getGcpParams() {
+        Map<String, String> azureParams = new HashMap<>();
+        azureParams.put(JsonKey.containerName, getCONTAINER_NAME());
+        azureParams.put(JsonKey.ACCOUNT, getGcpStorageKey());
+        azureParams.put(JsonKey.KEY, getGcpStorageSecret());
+        return azureParams;
     }
 
     private Map<String, String> getAzureParams() {
